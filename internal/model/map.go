@@ -10,11 +10,13 @@ type Map struct {
 }
 
 type Layer struct {
-	M [][]Case // M[y][x]
+	M [][]*Case // M[y][x]
 }
 
 type Case struct {
 	Tile Tile
+	X    int
+	Y    int
 }
 
 type Tile int
@@ -25,7 +27,11 @@ func (m *Map) Print() {
 		for y := range l.M {
 			var line strings.Builder
 			for _, c := range l.M[y] {
-				line.WriteString(fmt.Sprintf("%d ", c.Tile))
+				var tile Tile = 0
+				if c != nil {
+					tile = c.Tile
+				}
+				line.WriteString(fmt.Sprintf("%d ", tile))
 			}
 			fmt.Println(line.String())
 		}
