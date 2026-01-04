@@ -43,11 +43,20 @@ tags:
 
 ## TODO
 
+- Handle all relevant tags
+- Add arugments and options to handle bounded exports
+- Refacto & tests
+
+- POC drawer 2d (ebiten, draw2d ?)
+
 - How to handle multiple tags ?
-- OSM file is a polygon, tmx file is a square. How to handle the translation ? Should we auto-detect, taking the max lat and min lon and extrapolate to have the corresponding top_left corner of the square ?
-- What default tile to give for positions without corresponding lat,long in the osm file ? Should we begin the tmx file, at pos 0, with conventionnaly the default tile (ex: water ?) ?
-- What precision to give for the translation lat,lon->pos ? We'd need to calculate the tile size in meters to allow a realistic translation
 - How to handle z-index and level lines ?
+- Handle the mapping.yaml file
+- Optimisation
+- More examples with other tilesets
+- Generate a tileset like OSM stylesheets to have a pretty map in tmx :)
+
+- Explore a direct integration in 2d video games, without tilesets, using directional svg ?
 
 ## Resources
 
