@@ -27,9 +27,11 @@ type Tileset struct {
 }
 
 type Layer struct {
-	ID   int    `xml:"id,attr"`
-	Name string `xml:"name,attr"`
-	Data Data   `xml:"data"`
+	ID     int    `xml:"id,attr"`
+	Name   string `xml:"name,attr"`
+	Width  int    `xml:"width,attr"`
+	Height int    `xml:"height,attr"`
+	Data   Data   `xml:"data"`
 }
 
 type Data struct {

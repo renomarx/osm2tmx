@@ -70,6 +70,10 @@ Usage: %s --mapping=<my_mapping_file.yaml> <my.osm.pbf> [--out=<my.osm.tmx>]
 	mapSizeX := int(math.Ceil(maxEasting - minEasting))
 	log.Printf("Map size: (%d,%d) meters\n", mapSizeX, mapSizeY)
 
+	// // Temporary overload map size
+	// mapSizeX = 100
+	// mapSizeY = 100
+
 	// init map
 	m := model.Map{
 		Layers: []model.Layer{
@@ -105,7 +109,7 @@ Usage: %s --mapping=<my_mapping_file.yaml> <my.osm.pbf> [--out=<my.osm.tmx>]
 				numberOfPointsOutOfBounds++
 				continue
 			}
-			var tile model.Tile = 0
+			var tile model.Tile = 2
 			for _, tag := range node.Tags {
 				// TODO: use atlas-index instead of hard-coded switch
 				switch tag.Key {
@@ -134,7 +138,7 @@ Usage: %s --mapping=<my_mapping_file.yaml> <my.osm.pbf> [--out=<my.osm.tmx>]
 
 	for _, way := range osmWays {
 		// TODO: find a way to make a relation between these nodes
-		var tile model.Tile = 0
+		var tile model.Tile = 2
 		for _, tag := range way.Tags {
 			// TODO: use atlas-index instead of hard-coded switch
 			switch tag.Key {
@@ -188,8 +192,10 @@ Usage: %s --mapping=<my_mapping_file.yaml> <my.osm.pbf> [--out=<my.osm.tmx>]
 		},
 		Layers: []tmx.Layer{
 			{
-				ID:   1,
-				Name: "Calque 1",
+				ID:     1,
+				Name:   "Calque 1",
+				Width:  mapSizeX,
+				Height: mapSizeY,
 				Data: tmx.Data{
 					Encoding: "csv",
 					CSV:      data,
