@@ -7,6 +7,7 @@ import (
 	"math"
 	"os"
 
+	"github.com/renomarx/osm2tmx/internal/bresenham"
 	"github.com/renomarx/osm2tmx/internal/mercator"
 	"github.com/renomarx/osm2tmx/internal/model"
 	"github.com/renomarx/osm2tmx/internal/tmx"
@@ -116,7 +117,7 @@ Usage: %s --mapping=<my_mapping_file.yaml> <my.osm.pbf> [--out=<my.osm.tmx>]
 				case "buidling":
 					tile = 240
 				case "highway":
-					tile = 7
+					tile = 8
 				}
 			}
 			m.Layers[0].M[y][x] = &model.Case{Tile: tile, X: x, Y: y}
@@ -148,12 +149,28 @@ Usage: %s --mapping=<my_mapping_file.yaml> <my.osm.pbf> [--out=<my.osm.tmx>]
 				tile = 7
 			}
 		}
+		var lastCase *model.Case
 		for _, nd := range way.Nodes {
 			pointerToCase, exists := casesByNodeID[int64(nd.ID)]
 			if !exists {
+				lastCase = nil
 				continue
 			}
+			// Filling all points between the last way point and the current one by the right tile
 			pointerToCase.Tile = tile
+			if lastCase != nil {
+				points := bresenham.Bresenham(lastCase.X, lastCase.Y, pointerToCase.X, pointerToCase.Y)
+				for _, point := range points {
+					if m.Layers[0].M[point.Y][point.X] == nil {
+						m.Layers[0].M[point.Y][point.X] = &model.Case{
+							X: point.X,
+							Y: point.Y,
+						}
+					}
+					m.Layers[0].M[point.Y][point.X].Tile = tile
+				}
+			}
+			lastCase = pointerToCase
 		}
 	}
 
