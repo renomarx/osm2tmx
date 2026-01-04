@@ -3,7 +3,6 @@ module github.com/renomarx/osm2tmx
 go 1.23
 
 require (
-	github.com/icholy/utm v1.0.1
 	github.com/paulmach/osm v0.9.0
 	google.golang.org/protobuf v1.36.11 // indirect
 )

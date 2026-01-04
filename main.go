@@ -7,8 +7,9 @@ import (
 	"math"
 	"os"
 
-	"github.com/icholy/utm"
+	"github.com/renomarx/osm2tmx/internal/mercator"
 	"github.com/renomarx/osm2tmx/internal/model"
+	"github.com/renomarx/osm2tmx/internal/tmx"
 
 	"github.com/paulmach/osm"
 	"github.com/paulmach/osm/osmpbf"
@@ -21,11 +22,24 @@ func init() {
 func main() {
 
 	if len(os.Args) < 2 {
-		fmt.Printf("Usage: %s <my_file.osm.pbf> <my_atlas_index.yaml>\n", os.Args[0])
+		fmt.Printf(`
+Usage: %s --mapping=<my_mapping_file.yaml> <my.osm.pbf> [--out=<my.osm.tmx>]
+
+- mapping: mapping file of osm tags <-> tileset pos, see below
+- out: default to my.osm.tmx
+`, os.Args[0])
 		os.Exit(1)
 	}
 
 	osmFile := os.Args[1]
+
+	osmFileExt := osmFile[len(osmFile)-8:]
+	if osmFileExt != ".osm.pbf" {
+		fmt.Printf("OSM filename in argument should match *.osm.pbf, got extension %s\n", osmFileExt)
+		os.Exit(1)
+	}
+	tmxFilename := osmFile[:len(osmFile)-4] + ".tmx"
+	log.Printf("will write output to %s", tmxFilename)
 
 	f, err := os.Open(osmFile)
 	if err != nil {
@@ -42,10 +56,12 @@ func main() {
 	}
 	log.Printf("%#v\n", header.Bounds)
 
-	maxEasting, maxNorthing, _ := utm.ToUTM(header.Bounds.MaxLat, header.Bounds.MaxLon)
+	maxNorthing := mercator.Lat2y(header.Bounds.MaxLat)
+	maxEasting := mercator.Lon2x(header.Bounds.MaxLon)
 	log.Printf("Max: UTM: [east:%f,north:%f]\n", maxEasting, maxNorthing)
 
-	minEasting, minNorthing, _ := utm.ToUTM(header.Bounds.MinLat, header.Bounds.MinLon)
+	minNorthing := mercator.Lat2y(header.Bounds.MinLat)
+	minEasting := mercator.Lon2x(header.Bounds.MinLon)
 	log.Printf("Min: UTM: [east:%f,north:%f]\n", minEasting, minNorthing)
 
 	maxY := int(math.Ceil(maxNorthing))
@@ -79,7 +95,8 @@ func main() {
 		switch scanner.Object().(type) {
 		case *osm.Node:
 			node := *scanner.Object().(*osm.Node)
-			east, north, _ := utm.ToUTM(node.Lat, node.Lon)
+			north := mercator.Lat2y(node.Lat)
+			east := mercator.Lon2x(node.Lon)
 			// we want to have point 0,0 at minEasting,maxNorthing
 			x := int(math.Floor(east)) - minX
 			y := maxY - int(math.Floor(north))
@@ -136,11 +153,49 @@ func main() {
 		}
 	}
 
-	log.Printf("Nodes: %d\n", len(osmNodes))
-	log.Printf("Ways: %d\n", len(osmWays))
-	log.Printf("Relations: %d\n", len(osmRelations))
+	// TODO: handle relations ?
 
-	log.Printf("Number of points out of bounds: %d\n", numberOfPointsOutOfBounds)
+	log.Printf("Nodes: %d", len(osmNodes))
+	log.Printf("Ways: %d", len(osmWays))
+	log.Printf("Relations: %d", len(osmRelations))
 
-	m.Print()
+	log.Printf("Generated map: height: %d, width: %d", mapSizeY, mapSizeX)
+
+	log.Printf("Number of points out of bounds: %d", numberOfPointsOutOfBounds)
+
+	// 	<?xml version="1.0" encoding="UTF-8"?>
+	// <map version="1.4" tiledversion="1.4.3" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="1">
+	//  <tileset firstgid="1" source="tileset/basechip_pipo.tsx"/>
+	//  <layer id="1" name="Calque de Tuiles 1" width="100" height="100">
+	//   <data encoding="csv">
+	// TODO: optimize
+	// TODO: handle layers
+	data := m.Layers[0].PrintCSV2()
+	tmxMap := tmx.Map{
+		Version:     "1.4",
+		TiledVer:    "1.4.3",
+		Orientation: "orthogonal",
+		RenderOrder: "right-down",
+		Width:       mapSizeX,
+		Height:      mapSizeY,
+		TileWidth:   16,
+		TileHeight:  16,
+		Tilesets: []tmx.Tileset{
+			{
+				FirstGID: 1,
+				Source:   "tileset/basechip_pipo.tsx",
+			},
+		},
+		Layers: []tmx.Layer{
+			{
+				ID:   1,
+				Name: "Calque 1",
+				Data: tmx.Data{
+					Encoding: "csv",
+					CSV:      data,
+				},
+			},
+		},
+	}
+	tmx.SaveTMX(tmxFilename, &tmxMap)
 }

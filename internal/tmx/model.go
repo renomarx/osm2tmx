@@ -35,5 +35,5 @@ type Layer struct {
 type Data struct {
 	Encoding    string `xml:"encoding,attr,omitempty"`
 	Compression string `xml:"compression,attr,omitempty"`
-	CSV         string `xml:",chardata"`
+	CSV         string `xml:",innerxml"`
 }

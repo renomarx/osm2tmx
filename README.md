@@ -6,25 +6,39 @@ Util to convert osm.pbf files to tmx files, using a tileset and a tileset mappin
 
 ```bash
 # Ile de la reunion
-./osm2tmx --tileset=<my_tileset.tsx> --tags=<my_mapping_file.csv> --tl_lat=-21.129278 --tl_long=55.4150827 [--out=<my.osm.tmx>] <my.osm.pbf>
+./osm2tmx --mapping=<my_mapping_file.yaml> <my.osm.pbf> [--out=<my.osm.tmx>]
 
-- tr_lat, tr_long: top-left latitude, longitude of the map. The corresponding position will be 0,0
-- tags: mapping file of osm tags <-> tmx pos, see below
+- mapping: mapping file of osm tags <-> tileset pos, see below
 - out: default to my.osm.tmx
 ```
 
-### Tags mapping file format: CSV
-
-```csv
-key,value,<pos_in_tmx_file>
-key,value,<pos2_in_tmx_file>
-```
+### Tags mapping file format: YAML
 
 Example:
 
-```csv
-building,pagoda,99
-building,roof,1442
+```yaml
+tileset: "tileset/basechip_pipo.png"
+
+layers: 3
+
+tags:
+  default:
+    layer: 0
+    x: 0
+    y: 0
+  building:
+    layer: 1
+    x: 0
+    y: 493
+    # values:
+    #   roof:
+    #     layer: 2
+    #     x: 0
+    #     y: 232
+  highway:
+    layer: 1
+    x: 120
+    y: 0
 ```
 
 ## TODO

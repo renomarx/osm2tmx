@@ -1,2 +1,5 @@
 osm2tmx
 data
+*.osm
+*.osm.pbf
+*.tmx
