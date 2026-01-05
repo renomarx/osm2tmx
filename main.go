@@ -112,13 +112,7 @@ Usage: %s --mapping=<my_mapping_file.yaml> <my.osm.pbf> [--out=<my.osm.tmx>]
 			}
 			var tile model.Tile = 2
 			for _, tag := range node.Tags {
-				// TODO: use atlas-index instead of hard-coded switch
-				switch tag.Key {
-				case "buidling":
-					tile = 240
-				case "highway":
-					tile = 8
-				}
+				tile = mapTagToTile(tag)
 			}
 			m.Layers[0].M[y][x] = &model.Case{Tile: tile, X: x, Y: y}
 			osmNodes = append(osmNodes, node)
@@ -141,13 +135,7 @@ Usage: %s --mapping=<my_mapping_file.yaml> <my.osm.pbf> [--out=<my.osm.tmx>]
 		// TODO: find a way to make a relation between these nodes
 		var tile model.Tile = 2
 		for _, tag := range way.Tags {
-			// TODO: use atlas-index instead of hard-coded switch
-			switch tag.Key {
-			case "buidling":
-				tile = 240
-			case "highway":
-				tile = 7
-			}
+			tile = mapTagToTile(tag)
 		}
 		var lastCase *model.Case
 		for _, nd := range way.Nodes {
@@ -221,4 +209,16 @@ Usage: %s --mapping=<my_mapping_file.yaml> <my.osm.pbf> [--out=<my.osm.tmx>]
 		},
 	}
 	tmx.SaveTMX(tmxFilename, &tmxMap)
+}
+
+func mapTagToTile(tag osm.Tag) model.Tile {
+	// TODO: use atlas-index instead of hard-coded switch
+	// Get the tile ID from tiled editor, +1
+	switch tag.Key {
+	case "building":
+		return 417
+	case "highway":
+		return 7
+	}
+	return 2
 }

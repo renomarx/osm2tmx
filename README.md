@@ -64,6 +64,7 @@ Les valeurs de latitude sont mesurées par rapport à l'équateur et à une plag
 
 - OpenStreetMap specifications:
     - https://planet.openstreetmap.org/
+    - https://download.geofabrik.de/
     - https://wiki.openstreetmap.org/wiki/Map_features
     - https://wiki.openstreetmap.org/wiki/Osmosis#Usage
     - https://github.com/maguro/pbf/blob/master/model/elements.go
