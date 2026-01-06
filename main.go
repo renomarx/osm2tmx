@@ -110,10 +110,7 @@ Usage: %s --mapping=<my_mapping_file.yaml> <my.osm.pbf> [--out=<my.osm.tmx>]
 				numberOfPointsOutOfBounds++
 				continue
 			}
-			var tile model.Tile = 2
-			for _, tag := range node.Tags {
-				tile = mapTagToTile(tag)
-			}
+			tile := mapTagsToTile(node.Tags)
 			m.Layers[0].M[y][x] = &model.Case{Tile: tile, X: x, Y: y}
 			osmNodes = append(osmNodes, node)
 			casesByNodeID[int64(node.ID)] = m.Layers[0].M[y][x]
@@ -133,10 +130,7 @@ Usage: %s --mapping=<my_mapping_file.yaml> <my.osm.pbf> [--out=<my.osm.tmx>]
 
 	for _, way := range osmWays {
 		// TODO: find a way to make a relation between these nodes
-		var tile model.Tile = 2
-		for _, tag := range way.Tags {
-			tile = mapTagToTile(tag)
-		}
+		tile := mapTagsToTile(way.Tags)
 		var lastCase *model.Case
 		for _, nd := range way.Nodes {
 			pointerToCase, exists := casesByNodeID[int64(nd.ID)]
@@ -211,14 +205,17 @@ Usage: %s --mapping=<my_mapping_file.yaml> <my.osm.pbf> [--out=<my.osm.tmx>]
 	tmx.SaveTMX(tmxFilename, &tmxMap)
 }
 
-func mapTagToTile(tag osm.Tag) model.Tile {
-	// TODO: use atlas-index instead of hard-coded switch
-	// Get the tile ID from tiled editor, +1
-	switch tag.Key {
-	case "building":
-		return 417
-	case "highway":
-		return 7
+func mapTagsToTile(tags osm.Tags) model.Tile {
+	var tile model.Tile = 2
+	for _, tag := range tags {
+		// TODO: use atlas-index instead of hard-coded switch
+		// Get the tile ID from tiled editor, +1
+		switch tag.Key {
+		case "building":
+			tile = 417
+		case "highway":
+			tile = 8
+		}
 	}
-	return 2
+	return tile
 }
