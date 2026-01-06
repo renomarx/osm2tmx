@@ -4,9 +4,6 @@ import (
 	"encoding/xml"
 )
 
-// ----------------------------------------------------------------
-// Structures qui mappent la structure TMX
-
 type Map struct {
 	XMLName     xml.Name  `xml:"map"`
 	Version     string    `xml:"version,attr"`
