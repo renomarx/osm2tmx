@@ -43,9 +43,9 @@ tags:
 
 ## TODO
 
-- Handle all relevant tags
-- Add arugments and options to handle bounded exports
 - Refacto & tests
+- Handle all relevant tags
+- Add arguments and options to handle bounded exports
 
 - POC drawer 2d (ebiten, draw2d ?)
 
