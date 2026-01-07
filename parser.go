@@ -56,11 +56,11 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 		panic(err)
 	}
 
-	maxNorthing := mercator.Lat2y(header.Bounds.MaxLat)
-	maxEasting := mercator.Lon2x(header.Bounds.MaxLon)
+	maxNorthing := math.Ceil(mercator.Lat2y(header.Bounds.MaxLat)*100) / 100
+	maxEasting := math.Ceil(mercator.Lon2x(header.Bounds.MaxLon)*100) / 100
 
-	minNorthing := mercator.Lat2y(header.Bounds.MinLat)
-	minEasting := mercator.Lon2x(header.Bounds.MinLon)
+	minNorthing := math.Floor(mercator.Lat2y(header.Bounds.MinLat)*100) / 100
+	minEasting := math.Floor(mercator.Lon2x(header.Bounds.MinLon)*100) / 100
 
 	maxY := int(math.Ceil(maxNorthing))
 	minX := int(math.Floor(minEasting))
