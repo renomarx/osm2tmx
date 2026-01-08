@@ -136,7 +136,7 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 			// Filling all points between the last way point and the current one by the right tile
 			pointerToCase.Tile = tile
 			if lastCase != nil {
-				points := bresenham.Bresenham(lastCase.X, lastCase.Y, pointerToCase.X, pointerToCase.Y)
+				points := bresenham.Bresenham(lastCase.X, lastCase.Y, pointerToCase.X, pointerToCase.Y, true)
 				for _, point := range points {
 					if m.Layers[0].M[point.Y][point.X] == nil {
 						m.Layers[0].M[point.Y][point.X] = &model.Case{

@@ -5,7 +5,7 @@ type Point struct {
 	Y int
 }
 
-func Bresenham(xa, ya, xb, yb int) []Point {
+func Bresenham(xa, ya, xb, yb int, withCorners bool) []Point {
 	var points []Point
 
 	dx := abs(xb - xa)
@@ -25,7 +25,11 @@ func Bresenham(xa, ya, xb, yb int) []Point {
 			break
 		}
 
-		e2 := 2 * err
+		multiplicator := 2
+		if withCorners {
+			multiplicator = 16
+		}
+		e2 := multiplicator * err
 
 		if e2 > -dy {
 			err -= dy
