@@ -151,7 +151,9 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 		}
 	}
 
-	// TODO: handle relations ?
+	// TODO: handle relations: relations are made of members of type node or way,
+	// representing bounaries of the way
+	// used to represent rivers, for example
 
 	return ParsingResult{
 		Map: &m,
