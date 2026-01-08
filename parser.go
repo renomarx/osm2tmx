@@ -20,7 +20,7 @@ type ParsingResult struct {
 	Map              *model.Map
 	Meta             ParsingResultMeta
 	Nodes            []osm.Node
-	Ways             []osm.Way
+	Ways             map[int64]*osm.Way
 	Relations        []osm.Relation
 	NodesOutOfBounds []osm.Node
 }
@@ -88,7 +88,7 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 	// fill map first layer with Tile values
 	osmNodes := []osm.Node{}
 	casesByNodeID := make(map[int64]*model.Case)
-	osmWays := []osm.Way{}
+	osmWays := make(map[int64]*osm.Way)
 	osmRelations := []osm.Relation{}
 	osmNodesOutOfBounds := []osm.Node{}
 	for scanner.Scan() {
@@ -110,7 +110,8 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 			osmNodes = append(osmNodes, node)
 			casesByNodeID[int64(node.ID)] = m.Layers[0].M[y][x]
 		case *osm.Way:
-			osmWays = append(osmWays, *scanner.Object().(*osm.Way))
+			way := scanner.Object().(*osm.Way)
+			osmWays[int64(way.ID)] = way
 			// TODO
 		case *osm.Relation:
 			osmRelations = append(osmRelations, *scanner.Object().(*osm.Relation))
@@ -126,34 +127,31 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 	for _, way := range osmWays {
 		// TODO: find a way to make a relation between these nodes
 		tile := p.mapper.MapTagsToTile(way.Tags)
-		var lastCase *model.Case
-		for _, nd := range way.Nodes {
-			pointerToCase, exists := casesByNodeID[int64(nd.ID)]
-			if !exists {
-				lastCase = nil
-				continue
-			}
-			// Filling all points between the last way point and the current one by the right tile
-			pointerToCase.Tile = tile
-			if lastCase != nil {
-				points := bresenham.Bresenham(lastCase.X, lastCase.Y, pointerToCase.X, pointerToCase.Y, true)
-				for _, point := range points {
-					if m.Layers[0].M[point.Y][point.X] == nil {
-						m.Layers[0].M[point.Y][point.X] = &model.Case{
-							X: point.X,
-							Y: point.Y,
-						}
-					}
-					m.Layers[0].M[point.Y][point.X].Tile = tile
-				}
-			}
-			lastCase = pointerToCase
-		}
+		p.parseWayWithTile(&m, way, tile, casesByNodeID)
 	}
 
 	// TODO: handle relations: relations are made of members of type node or way,
 	// representing bounaries of the way
 	// used to represent rivers, for example
+	for _, relation := range osmRelations {
+		tile := p.mapper.MapTagsToTile(relation.Tags)
+		for _, member := range relation.Members {
+			switch member.Type {
+			case osm.TypeWay:
+				// TODO : replace with fillflodd algorithm to fill the surface instead of the boundary line
+				way, exists := osmWays[int64(member.Ref)]
+				if exists {
+					p.parseWayWithTile(&m, way, tile, casesByNodeID)
+				}
+
+			case osm.TypeNode:
+				pointerToCase, exists := casesByNodeID[int64(member.Ref)]
+				if exists {
+					pointerToCase.Tile = tile
+				}
+			}
+		}
+	}
 
 	return ParsingResult{
 		Map: &m,
@@ -171,4 +169,30 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 		Relations:        osmRelations,
 		NodesOutOfBounds: osmNodesOutOfBounds,
 	}, nil
+}
+
+func (p *Parser) parseWayWithTile(m *model.Map, way *osm.Way, tile model.Tile, casesByNodeID map[int64]*model.Case) {
+	var lastCase *model.Case
+	for _, nd := range way.Nodes {
+		pointerToCase, exists := casesByNodeID[int64(nd.ID)]
+		if !exists {
+			lastCase = nil
+			continue
+		}
+		// Filling all points between the last way point and the current one by the right tile
+		pointerToCase.Tile = tile
+		if lastCase != nil {
+			points := bresenham.Bresenham(lastCase.X, lastCase.Y, pointerToCase.X, pointerToCase.Y, true)
+			for _, point := range points {
+				if m.Layers[0].M[point.Y][point.X] == nil {
+					m.Layers[0].M[point.Y][point.X] = &model.Case{
+						X: point.X,
+						Y: point.Y,
+					}
+				}
+				m.Layers[0].M[point.Y][point.X].Tile = tile
+			}
+		}
+		lastCase = pointerToCase
+	}
 }
