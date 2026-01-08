@@ -49,7 +49,7 @@ func TestBresenhamWithCorners(t *testing.T) {
 		{8, 4},
 		{9, 4},
 		{10, 4},
-		{11, 4},
+		{10, 5},
 		{11, 5},
 	}
 

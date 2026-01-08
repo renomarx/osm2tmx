@@ -25,11 +25,7 @@ func Bresenham(xa, ya, xb, yb int, withCorners bool) []Point {
 			break
 		}
 
-		multiplicator := 2
-		if withCorners {
-			multiplicator = 16
-		}
-		e2 := multiplicator * err
+		e2 := 2 * err
 
 		if e2 > -dy {
 			err -= dy
@@ -39,6 +35,14 @@ func Bresenham(xa, ya, xb, yb int, withCorners bool) []Point {
 		if e2 < dx {
 			err += dx
 			y += sy
+		}
+
+		if withCorners {
+			if e2 > -dy && e2 < dx {
+				// we advance x & y at the same time, we want to add a point between
+				// with only x advanced, to make a corner
+				points = append(points, Point{X: x, Y: y - sy})
+			}
 		}
 	}
 
