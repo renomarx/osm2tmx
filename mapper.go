@@ -23,6 +23,13 @@ func (m *Mapper) MapTagsToTile(tags osm.Tags) model.Tile {
 			tile = 417
 		case "highway":
 			tile = 8
+		case "waterway", "water":
+			tile = 318
+		case "natural":
+			switch tag.Value {
+			case "water":
+				tile = 318
+			}
 		}
 	}
 	return tile
