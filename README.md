@@ -44,6 +44,7 @@ tags:
 ## TODO
 
 - Refacto & tests
+- Handle relations, fillign areas of relation
 - Handle all relevant tags
 - Add arguments and options to handle bounded exports
 
