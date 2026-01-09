@@ -33,6 +33,7 @@ func PrintCSV(l *model.Layer) string {
 
 // PrintCSVWithLastComma writes non-standard csv,
 // adding a comma at the end of each line except the last line
+// because it seems that it's the expected format for Tiled software
 func PrintCSVWithLastComma(l *model.Layer) string {
 	var csvStr strings.Builder
 
