@@ -1,9 +1,7 @@
 package model
 
 import (
-	"encoding/csv"
 	"fmt"
-	"strconv"
 	"strings"
 )
 
@@ -38,45 +36,4 @@ func (m *Map) Print() {
 			fmt.Println(line.String())
 		}
 	}
-}
-
-func (l *Layer) PrintCSV() string {
-	var csvStr strings.Builder
-	writer := csv.NewWriter(&csvStr)
-
-	for y := range l.M {
-		var records []string = make([]string, len(l.M[y]))
-		for x, c := range l.M[y] {
-			var tile Tile = 0
-			if c != nil {
-				tile = c.Tile
-			}
-			records[x] = strconv.Itoa(int(tile))
-		}
-		err := writer.Write(records)
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	return csvStr.String()
-}
-
-func (l *Layer) PrintCSV2() string {
-	var csvStr strings.Builder
-
-	for y := range l.M {
-		for _, c := range l.M[y] {
-			var tile Tile = 0
-			if c != nil {
-				tile = c.Tile
-			}
-			csvStr.WriteString(fmt.Sprintf("%d,", tile))
-		}
-		csvStr.WriteString("\n")
-	}
-	result := csvStr.String()
-
-	// removing last comma
-	return result[:len(result)-2] + "\n"
 }

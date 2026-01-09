@@ -17,7 +17,7 @@ func (w *TMXWriter) Write(parsingResult ParsingResult, tmxFilename string) error
 	//   <data encoding="csv">
 	// TODO: optimize
 	// TODO: handle layers
-	data := parsingResult.Map.Layers[0].PrintCSV2()
+	data := tmx.PrintCSVWithLastComma(&parsingResult.Map.Layers[0])
 	tmxMap := tmx.Map{
 		Version:     "1.4",
 		TiledVer:    "1.4.3",
