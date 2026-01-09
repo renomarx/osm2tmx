@@ -30,6 +30,11 @@ func (m *Mapper) MapTagsToTile(tags osm.Tags) model.Tile {
 			case "water":
 				tile = 318
 			}
+		case "surface":
+			switch tag.Value {
+			case "sand":
+				tile = 5
+			}
 		}
 	}
 	return tile

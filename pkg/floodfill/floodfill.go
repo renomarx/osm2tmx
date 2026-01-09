@@ -1,13 +1,10 @@
 package floodfill
 
-import "github.com/renomarx/osm2tmx/pkg/model"
+import (
+	"github.com/renomarx/osm2tmx/pkg/model"
+)
 
 // FloodFill performs a flood fill operation on a 2D grid.
-//
-// grid: The 2D grid to fill.
-// y: The starting y index.
-// x: The starting xumn index.
-// tile: The tile to fill with.
 func FloodFill(layer *model.Layer, y int, x int, tile model.Tile) {
 	// Check if the starting cell is within the grid bounds.
 	grid := layer.M
@@ -23,7 +20,7 @@ func FloodFill(layer *model.Layer, y int, x int, tile model.Tile) {
 		return
 	}
 
-	layer.M[y][x].Tile = tile
+	layer.SetTile(x, y, tile)
 
 	// Recursively fill the neighbors
 	FloodFill(layer, y+1, x, tile) // Down
@@ -32,7 +29,43 @@ func FloodFill(layer *model.Layer, y int, x int, tile model.Tile) {
 	FloodFill(layer, y, x-1, tile) // Left
 }
 
-func isInsidePolygon(x int, y int, poly []Point) bool {
+// FloodFillDerecursive performs a flood fill operation on a 2D grid, unrecursively to avoid stack overflows with big grids
+func FloodFillDerecursive(layer *model.Layer, y int, x int, tile model.Tile) {
+
+	queue := make(chan *model.Cell, 256) // 4^4
+
+	queue <- layer.M[y][x]
+
+	for len(queue) > 0 {
+
+		cellPointer := <-queue
+
+		layer.SetTile(cellPointer.X, cellPointer.Y, tile)
+
+		if isCellToBeFilled(layer, cellPointer.Y+1, cellPointer.X, tile) {
+			queue <- layer.M[cellPointer.Y+1][cellPointer.X]
+		}
+		if isCellToBeFilled(layer, cellPointer.Y-1, cellPointer.X, tile) {
+			queue <- layer.M[cellPointer.Y-1][cellPointer.X]
+		}
+		if isCellToBeFilled(layer, cellPointer.Y, cellPointer.X+1, tile) {
+			queue <- layer.M[cellPointer.Y][cellPointer.X+1]
+		}
+		if isCellToBeFilled(layer, cellPointer.Y, cellPointer.X-1, tile) {
+			queue <- layer.M[cellPointer.Y][cellPointer.X-1]
+		}
+	}
+	close(queue)
+}
+
+func isCellToBeFilled(layer *model.Layer, y int, x int, tile model.Tile) bool {
+	if y < 0 || y >= len(layer.M) || x < 0 || x >= len(layer.M[0]) {
+		return false
+	}
+	return layer.M[y][x].Tile != tile
+}
+
+func IsInsidePolygon(x int, y int, poly []Point) bool {
 	c := false
 	for i := range len(poly) {
 		a := poly[i]

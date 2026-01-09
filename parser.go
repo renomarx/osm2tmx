@@ -82,6 +82,9 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 	for _, l := range m.Layers {
 		for y := range l.M {
 			l.M[y] = make([]*model.Cell, mapSizeX)
+			for x := range l.M[y] {
+				l.M[y][x] = &model.Cell{Tile: 0, X: x, Y: y}
+			}
 		}
 	}
 
@@ -106,7 +109,7 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 				continue
 			}
 			tile := p.mapper.MapTagsToTile(node.Tags)
-			m.Layers[0].M[y][x] = &model.Cell{Tile: tile, X: x, Y: y}
+			m.Layers[0].M[y][x].Tile = tile
 			osmNodes = append(osmNodes, node)
 			cellsByNodeID[int64(node.ID)] = m.Layers[0].M[y][x]
 		case *osm.Way:
@@ -130,7 +133,7 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 		p.fillWayWithTile(&m, way, tile, cellsByNodeID)
 	}
 
-	// TODO: handle relations: relations are made of members of type node or way,
+	// relations are made of members of type node or way,
 	// representing boundaries of the way
 	// used to represent rivers, for example
 	for _, relation := range osmRelations {
@@ -138,11 +141,18 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 		for _, member := range relation.Members {
 			switch member.Type {
 			case osm.TypeWay:
-				// TODO : replace with floodfill algorithm to fill the surface instead of the boundary line
 				way, exists := osmWays[int64(member.Ref)]
 				if exists {
 					p.fillWayWithTile(&m, way, tile, cellsByNodeID)
-					// TODO: floodfill from any node within
+					// // TODO
+					// lastCellOfWay := p.fillWayWithTile(&m, way, tile, cellsByNodeID)
+					// // Get a node probably within boundaries of the polygon to apply floodfill algorithm
+					// // TODO: be sure that the node is within the boundaries
+					// if lastCellOfWay != nil {
+					// 	x, y := lastCellOfWay.X-2, lastCellOfWay.Y-2
+					// 	// floodfill from any node within
+					// 	floodfill.FloodFillDerecursive(&m.Layers[0], y, x, tile)
+					// }
 				}
 
 			case osm.TypeNode:
@@ -172,28 +182,26 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 	}, nil
 }
 
-func (p *Parser) fillWayWithTile(m *model.Map, way *osm.Way, tile model.Tile, casesByNodeID map[int64]*model.Cell) {
-	var lastCase *model.Cell
+func (p *Parser) fillWayWithTile(m *model.Map, way *osm.Way, tile model.Tile, casesByNodeID map[int64]*model.Cell) *model.Cell {
+	var lastCell *model.Cell
+	var lastKnownCell *model.Cell
 	for _, nd := range way.Nodes {
-		pointerToCase, exists := casesByNodeID[int64(nd.ID)]
+		cellPointer, exists := casesByNodeID[int64(nd.ID)]
 		if !exists {
-			lastCase = nil
+			lastCell = nil
 			continue
 		}
 		// Filling all points between the last way point and the current one by the right tile
-		pointerToCase.Tile = tile
-		if lastCase != nil {
-			points := bresenham.Bresenham(lastCase.X, lastCase.Y, pointerToCase.X, pointerToCase.Y, true)
+		cellPointer.Tile = tile
+		if lastCell != nil {
+			points := bresenham.Bresenham(lastCell.X, lastCell.Y, cellPointer.X, cellPointer.Y, true)
 			for _, point := range points {
-				if m.Layers[0].M[point.Y][point.X] == nil {
-					m.Layers[0].M[point.Y][point.X] = &model.Cell{
-						X: point.X,
-						Y: point.Y,
-					}
-				}
-				m.Layers[0].M[point.Y][point.X].Tile = tile
+				m.Layers[0].SetTile(point.X, point.Y, tile)
 			}
 		}
-		lastCase = pointerToCase
+		lastCell = cellPointer
+		lastKnownCell = lastCell
 	}
+
+	return lastKnownCell
 }
