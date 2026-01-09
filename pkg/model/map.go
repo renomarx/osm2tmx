@@ -10,10 +10,10 @@ type Map struct {
 }
 
 type Layer struct {
-	M [][]*Case // M[y][x]
+	M [][]*Cell // M[y][x]
 }
 
-type Case struct {
+type Cell struct {
 	Tile Tile
 	X    int
 	Y    int

@@ -75,19 +75,19 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 	m := model.Map{
 		Layers: []model.Layer{
 			{
-				M: make([][]*model.Case, mapSizeY),
+				M: make([][]*model.Cell, mapSizeY),
 			},
 		},
 	}
 	for _, l := range m.Layers {
 		for y := range l.M {
-			l.M[y] = make([]*model.Case, mapSizeX)
+			l.M[y] = make([]*model.Cell, mapSizeX)
 		}
 	}
 
 	// fill map first layer with Tile values
 	osmNodes := []osm.Node{}
-	casesByNodeID := make(map[int64]*model.Case)
+	cellsByNodeID := make(map[int64]*model.Cell)
 	osmWays := make(map[int64]*osm.Way)
 	osmRelations := []osm.Relation{}
 	osmNodesOutOfBounds := []osm.Node{}
@@ -106,9 +106,9 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 				continue
 			}
 			tile := p.mapper.MapTagsToTile(node.Tags)
-			m.Layers[0].M[y][x] = &model.Case{Tile: tile, X: x, Y: y}
+			m.Layers[0].M[y][x] = &model.Cell{Tile: tile, X: x, Y: y}
 			osmNodes = append(osmNodes, node)
-			casesByNodeID[int64(node.ID)] = m.Layers[0].M[y][x]
+			cellsByNodeID[int64(node.ID)] = m.Layers[0].M[y][x]
 		case *osm.Way:
 			way := scanner.Object().(*osm.Way)
 			osmWays[int64(way.ID)] = way
@@ -127,25 +127,26 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 	for _, way := range osmWays {
 		// TODO: find a way to make a relation between these nodes
 		tile := p.mapper.MapTagsToTile(way.Tags)
-		p.parseWayWithTile(&m, way, tile, casesByNodeID)
+		p.fillWayWithTile(&m, way, tile, cellsByNodeID)
 	}
 
 	// TODO: handle relations: relations are made of members of type node or way,
-	// representing bounaries of the way
+	// representing boundaries of the way
 	// used to represent rivers, for example
 	for _, relation := range osmRelations {
 		tile := p.mapper.MapTagsToTile(relation.Tags)
 		for _, member := range relation.Members {
 			switch member.Type {
 			case osm.TypeWay:
-				// TODO : replace with fillflodd algorithm to fill the surface instead of the boundary line
+				// TODO : replace with floodfill algorithm to fill the surface instead of the boundary line
 				way, exists := osmWays[int64(member.Ref)]
 				if exists {
-					p.parseWayWithTile(&m, way, tile, casesByNodeID)
+					p.fillWayWithTile(&m, way, tile, cellsByNodeID)
+					// TODO: floodfill from any node within
 				}
 
 			case osm.TypeNode:
-				pointerToCase, exists := casesByNodeID[int64(member.Ref)]
+				pointerToCase, exists := cellsByNodeID[int64(member.Ref)]
 				if exists {
 					pointerToCase.Tile = tile
 				}
@@ -171,8 +172,8 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 	}, nil
 }
 
-func (p *Parser) parseWayWithTile(m *model.Map, way *osm.Way, tile model.Tile, casesByNodeID map[int64]*model.Case) {
-	var lastCase *model.Case
+func (p *Parser) fillWayWithTile(m *model.Map, way *osm.Way, tile model.Tile, casesByNodeID map[int64]*model.Cell) {
+	var lastCase *model.Cell
 	for _, nd := range way.Nodes {
 		pointerToCase, exists := casesByNodeID[int64(nd.ID)]
 		if !exists {
@@ -185,7 +186,7 @@ func (p *Parser) parseWayWithTile(m *model.Map, way *osm.Way, tile model.Tile, c
 			points := bresenham.Bresenham(lastCase.X, lastCase.Y, pointerToCase.X, pointerToCase.Y, true)
 			for _, point := range points {
 				if m.Layers[0].M[point.Y][point.X] == nil {
-					m.Layers[0].M[point.Y][point.X] = &model.Case{
+					m.Layers[0].M[point.Y][point.X] = &model.Cell{
 						X: point.X,
 						Y: point.Y,
 					}
