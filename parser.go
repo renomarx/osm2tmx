@@ -226,7 +226,7 @@ func (p *Parser) drawWayArea(m *model.Map, way *osm.Way, tile model.Tile, cellsB
 		// Filling all points between the last way point and the current one by the right tile
 		cellPointer.Tile = tile
 		if lastCell != nil {
-			points := bresenham.Bresenham(lastCell.X, lastCell.Y, cellPointer.X, cellPointer.Y, true)
+			points := bresenham.Bresenham(lastCell.X, lastCell.Y, cellPointer.X, cellPointer.Y, false)
 			for _, point := range points {
 				m.Layers[0].SetTile(point.X, point.Y, tile)
 				cell := m.Layers[0].GetCell(point.X, point.Y)
