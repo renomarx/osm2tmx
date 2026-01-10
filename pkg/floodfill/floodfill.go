@@ -1,22 +1,14 @@
 package floodfill
 
 import (
+	"log"
+
 	"github.com/renomarx/osm2tmx/pkg/model"
 )
 
 // FloodFill performs a flood fill operation on a 2D grid.
 func FloodFill(layer *model.Layer, y int, x int, tile model.Tile) {
-	// Check if the starting cell is within the grid bounds.
-	grid := layer.M
-	if y < 0 || y >= len(grid) || x < 0 || x >= len(grid[0]) {
-		return
-	}
-
-	// Get the original cell.
-	originalCell := grid[y][x]
-
-	// If the original tile is already the new tile, there's nothing to do.
-	if originalCell != nil && originalCell.Tile == tile {
+	if !isCellToBeFilled(layer, y, x, tile) {
 		return
 	}
 
@@ -29,40 +21,55 @@ func FloodFill(layer *model.Layer, y int, x int, tile model.Tile) {
 	FloodFill(layer, y, x-1, tile) // Left
 }
 
-// FloodFillDerecursive performs a flood fill operation on a 2D grid, unrecursively to avoid stack overflows with big grids
+// FloodFillDerecursive performs a flood fill operation on a 2D grid, unrecursively
 func FloodFillDerecursive(layer *model.Layer, y int, x int, tile model.Tile) {
+	if layer.SizeY() == 0 {
+		return
+	}
 
-	queue := make(chan *model.Cell, 256) // 4^4
+	maxCells := layer.SizeY() * layer.SizeX()
 
-	queue <- layer.M[y][x]
+	queue := make(chan *model.Cell, maxCells)
+
+	if !isCellToBeFilled(layer, y, x, tile) {
+		return
+	}
+	queue <- layer.GetCell(x, y)
 
 	for len(queue) > 0 {
 
 		cellPointer := <-queue
+		if cellPointer == nil {
+			continue
+		}
 
 		layer.SetTile(cellPointer.X, cellPointer.Y, tile)
 
 		if isCellToBeFilled(layer, cellPointer.Y+1, cellPointer.X, tile) {
-			queue <- layer.M[cellPointer.Y+1][cellPointer.X]
+			queue <- layer.GetCell(cellPointer.X, cellPointer.Y+1)
 		}
 		if isCellToBeFilled(layer, cellPointer.Y-1, cellPointer.X, tile) {
-			queue <- layer.M[cellPointer.Y-1][cellPointer.X]
+			queue <- layer.GetCell(cellPointer.X, cellPointer.Y-1)
 		}
 		if isCellToBeFilled(layer, cellPointer.Y, cellPointer.X+1, tile) {
-			queue <- layer.M[cellPointer.Y][cellPointer.X+1]
+			queue <- layer.GetCell(cellPointer.X+1, cellPointer.Y)
 		}
 		if isCellToBeFilled(layer, cellPointer.Y, cellPointer.X-1, tile) {
-			queue <- layer.M[cellPointer.Y][cellPointer.X-1]
+			queue <- layer.GetCell(cellPointer.X-1, cellPointer.Y)
+		}
+		if len(queue) >= maxCells {
+			log.Fatalf("max size of the map %d reached, probably infinite loop", maxCells)
 		}
 	}
 	close(queue)
 }
 
 func isCellToBeFilled(layer *model.Layer, y int, x int, tile model.Tile) bool {
-	if y < 0 || y >= len(layer.M) || x < 0 || x >= len(layer.M[0]) {
+	if y < 0 || y >= layer.SizeY() || x < 0 || x >= layer.SizeX() {
 		return false
 	}
-	return layer.M[y][x].Tile != tile
+	cell := layer.GetCell(x, y)
+	return cell != nil && cell.Tile != tile
 }
 
 func IsInsidePolygon(x int, y int, poly []Point) bool {

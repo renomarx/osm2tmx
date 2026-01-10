@@ -3,6 +3,7 @@ package bresenham
 import (
 	"testing"
 
+	"github.com/renomarx/osm2tmx/pkg/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -10,7 +11,7 @@ func TestBresenham(t *testing.T) {
 	t.Run("right-down direction", func(t *testing.T) {
 		xa, ya, xb, yb := 0, 0, 11, 5
 
-		expected := []Point{
+		expected := []model.Point{
 			{0, 0},
 			{1, 0},
 			{2, 1},
@@ -31,7 +32,7 @@ func TestBresenham(t *testing.T) {
 	t.Run("right-top direction", func(t *testing.T) {
 		xa, ya, xb, yb := 0, 10, 11, 5
 
-		expected := []Point{
+		expected := []model.Point{
 			{0, 10},
 			{1, 10},
 			{2, 9},
@@ -52,7 +53,7 @@ func TestBresenham(t *testing.T) {
 	t.Run("left-down direction", func(t *testing.T) {
 		xa, ya, xb, yb := 22, 0, 11, 5
 
-		expected := []Point{
+		expected := []model.Point{
 			{22, 0},
 			{21, 0},
 			{20, 1},
@@ -73,7 +74,7 @@ func TestBresenham(t *testing.T) {
 	t.Run("left-top direction", func(t *testing.T) {
 		xa, ya, xb, yb := 22, 10, 11, 5
 
-		expected := []Point{
+		expected := []model.Point{
 			{22, 10},
 			{21, 10},
 			{20, 9},
@@ -97,7 +98,7 @@ func TestBresenhamWithCorners(t *testing.T) {
 	t.Run("right-down direction", func(t *testing.T) {
 		xa, ya, xb, yb := 0, 0, 11, 5
 
-		expected := []Point{
+		expected := []model.Point{
 			{0, 0},
 			{1, 0},
 			{1, 1},
@@ -123,7 +124,7 @@ func TestBresenhamWithCorners(t *testing.T) {
 	t.Run("right-top direction", func(t *testing.T) {
 		xa, ya, xb, yb := 0, 10, 11, 5
 
-		expected := []Point{
+		expected := []model.Point{
 			{0, 10},
 			{1, 10},
 			{1, 9},
@@ -149,7 +150,7 @@ func TestBresenhamWithCorners(t *testing.T) {
 	t.Run("left-down direction", func(t *testing.T) {
 		xa, ya, xb, yb := 22, 0, 11, 5
 
-		expected := []Point{
+		expected := []model.Point{
 			{22, 0},
 			{21, 0},
 			{21, 1},
@@ -175,7 +176,7 @@ func TestBresenhamWithCorners(t *testing.T) {
 	t.Run("left-top direction", func(t *testing.T) {
 		xa, ya, xb, yb := 22, 10, 11, 5
 
-		expected := []Point{
+		expected := []model.Point{
 			{22, 10},
 			{21, 10},
 			{21, 9},

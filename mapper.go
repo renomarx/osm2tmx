@@ -7,14 +7,17 @@ import (
 
 type Mapper struct {
 	// TODO add conf
+	defaultTile model.Tile
 }
 
 func NewMapper() *Mapper {
-	return &Mapper{}
+	return &Mapper{
+		defaultTile: 2,
+	}
 }
 
 func (m *Mapper) MapTagsToTile(tags osm.Tags) model.Tile {
-	var tile model.Tile = 2
+	var tile model.Tile = m.defaultTile
 	for _, tag := range tags {
 		// TODO: use atlas-index instead of hard-coded switch
 		// Get the tile ID from tiled editor, +1
@@ -38,4 +41,8 @@ func (m *Mapper) MapTagsToTile(tags osm.Tags) model.Tile {
 		}
 	}
 	return tile
+}
+
+func (m *Mapper) IsTileDefault(tile model.Tile) bool {
+	return tile == m.defaultTile || tile == 0
 }

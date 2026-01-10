@@ -13,9 +13,10 @@ import (
 func PrintCSVWithLastComma(l *model.Layer) string {
 	var csvStr strings.Builder
 
-	for y := range l.M {
-		for _, c := range l.M[y] {
+	for y := range l.SizeY() {
+		for x := range l.SizeX() {
 			var tile model.Tile = 0
+			c := l.GetCell(x, y)
 			if c != nil {
 				tile = c.Tile
 			}

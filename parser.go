@@ -72,21 +72,8 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 	// mapSizeY = 100
 
 	// init map
-	m := model.Map{
-		Layers: []model.Layer{
-			{
-				M: make([][]*model.Cell, mapSizeY),
-			},
-		},
-	}
-	for _, l := range m.Layers {
-		for y := range l.M {
-			l.M[y] = make([]*model.Cell, mapSizeX)
-			for x := range l.M[y] {
-				l.M[y][x] = &model.Cell{Tile: 0, X: x, Y: y}
-			}
-		}
-	}
+	m := model.Map{}
+	m.Init(1, mapSizeX, mapSizeY)
 
 	// fill map first layer with Tile values
 	osmNodes := []osm.Node{}
@@ -109,9 +96,9 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 				continue
 			}
 			tile := p.mapper.MapTagsToTile(node.Tags)
-			m.Layers[0].M[y][x].Tile = tile
+			m.Layers[0].SetTile(x, y, tile)
 			osmNodes = append(osmNodes, node)
-			cellsByNodeID[int64(node.ID)] = m.Layers[0].M[y][x]
+			cellsByNodeID[int64(node.ID)] = m.Layers[0].GetCell(x, y)
 		case *osm.Way:
 			way := scanner.Object().(*osm.Way)
 			osmWays[int64(way.ID)] = way
@@ -128,31 +115,31 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 	}
 
 	for _, way := range osmWays {
-		// TODO: find a way to make a relation between these nodes
 		tile := p.mapper.MapTagsToTile(way.Tags)
-		p.fillWayWithTile(&m, way, tile, cellsByNodeID)
+		if way.Nodes[0] == way.Nodes[len(way.Nodes)-1] {
+			p.drawWayArea(&m, way, tile, cellsByNodeID)
+		} else {
+			p.drawWayLine(&m, way, tile, cellsByNodeID)
+		}
 	}
 
-	// relations are made of members of type node or way,
-	// representing boundaries of the way
-	// used to represent rivers, for example
 	for _, relation := range osmRelations {
+		// relations of type multipolygon are made of members of type node or way,
+		// representing boundaries of the way
+		// used to represent rivers, for example
+		if !p.isMultipolygon(&relation) {
+			continue
+		}
 		tile := p.mapper.MapTagsToTile(relation.Tags)
+		if p.mapper.IsTileDefault(tile) {
+			continue
+		}
 		for _, member := range relation.Members {
 			switch member.Type {
 			case osm.TypeWay:
 				way, exists := osmWays[int64(member.Ref)]
 				if exists {
-					p.fillWayWithTile(&m, way, tile, cellsByNodeID)
-					// // TODO
-					// lastCellOfWay := p.fillWayWithTile(&m, way, tile, cellsByNodeID)
-					// // Get a node probably within boundaries of the polygon to apply floodfill algorithm
-					// // TODO: be sure that the node is within the boundaries
-					// if lastCellOfWay != nil {
-					// 	x, y := lastCellOfWay.X-2, lastCellOfWay.Y-2
-					// 	// floodfill from any node within
-					// 	floodfill.FloodFillDerecursive(&m.Layers[0], y, x, tile)
-					// }
+					p.drawWayLine(&m, way, tile, cellsByNodeID)
 				}
 
 			case osm.TypeNode:
@@ -162,6 +149,13 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 				}
 			}
 		}
+		// // Get a node probably within boundaries of the polygon to apply floodfill algorithm
+		// // TODO: be sure that the node is within the boundaries
+		// if lastCellOfLastWay != nil {
+		// 	x, y := lastCellOfLastWay.X-2, lastCellOfLastWay.Y-2
+		// 	// floodfill from any node within
+		// 	floodfill.FloodFill(&m.Layers[0], y, x, tile)
+		// }
 	}
 
 	return ParsingResult{
@@ -182,11 +176,10 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 	}, nil
 }
 
-func (p *Parser) fillWayWithTile(m *model.Map, way *osm.Way, tile model.Tile, casesByNodeID map[int64]*model.Cell) *model.Cell {
+func (p *Parser) drawWayLine(m *model.Map, way *osm.Way, tile model.Tile, cellsByNodeID map[int64]*model.Cell) {
 	var lastCell *model.Cell
-	var lastKnownCell *model.Cell
 	for _, nd := range way.Nodes {
-		cellPointer, exists := casesByNodeID[int64(nd.ID)]
+		cellPointer, exists := cellsByNodeID[int64(nd.ID)]
 		if !exists {
 			lastCell = nil
 			continue
@@ -200,8 +193,77 @@ func (p *Parser) fillWayWithTile(m *model.Map, way *osm.Way, tile model.Tile, ca
 			}
 		}
 		lastCell = cellPointer
-		lastKnownCell = lastCell
+	}
+}
+
+func (p *Parser) isMultipolygon(relation *osm.Relation) bool {
+	for _, tag := range relation.Tags {
+		if tag.Key == "type" && tag.Value == "multipolygon" {
+			return true
+		}
+	}
+	return false
+}
+
+func (p *Parser) drawWayArea(m *model.Map, way *osm.Way, tile model.Tile, cellsByNodeID map[int64]*model.Cell) {
+	boundaries := make(map[model.Point]*model.Cell)
+	var yMinCell *model.Cell
+	var yMaxCell *model.Cell
+	var xMinCell *model.Cell
+	var xMaxCell *model.Cell
+	// Follow the Scan Line Algorithm
+
+	// 1. Fill the boundaries of the polygon with tile,
+	// 	get the polygon vertices as an array of points,
+	//	and find the yMin & yMax points to apply the scanline algorithm
+	var lastCell *model.Cell
+	for _, nd := range way.Nodes {
+		cellPointer, exists := cellsByNodeID[int64(nd.ID)]
+		if !exists {
+			continue
+		}
+
+		// Filling all points between the last way point and the current one by the right tile
+		cellPointer.Tile = tile
+		if lastCell != nil {
+			points := bresenham.Bresenham(lastCell.X, lastCell.Y, cellPointer.X, cellPointer.Y, true)
+			for _, point := range points {
+				m.Layers[0].SetTile(point.X, point.Y, tile)
+				cell := m.Layers[0].GetCell(point.X, point.Y)
+				boundaries[point] = cell
+			}
+		}
+		lastCell = cellPointer
+
+		if yMinCell == nil || cellPointer.Y < yMinCell.Y {
+			yMinCell = cellPointer
+		}
+		if yMaxCell == nil || cellPointer.Y > yMaxCell.Y {
+			yMaxCell = cellPointer
+		}
+
+		if xMinCell == nil || cellPointer.X < xMinCell.X {
+			xMinCell = cellPointer
+		}
+		if xMaxCell == nil || cellPointer.X > xMaxCell.X {
+			xMaxCell = cellPointer
+		}
 	}
 
-	return lastKnownCell
+	// 2. Apply the scanline algorithm
+	for y := yMinCell.Y; y < yMaxCell.Y; y++ {
+		nbCrossedBoundary := 0
+		for x := xMinCell.X; x < xMaxCell.X && nbCrossedBoundary < 2; x++ {
+			_, isBoundary := boundaries[model.Point{X: x, Y: y}]
+			if isBoundary {
+				nbCrossedBoundary++
+			}
+			if nbCrossedBoundary == 1 {
+				// Inside the polygon
+				m.Layers[0].SetTile(x, y, tile)
+			} else {
+				// Ouside the polygon
+			}
+		}
+	}
 }

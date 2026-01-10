@@ -9,41 +9,12 @@ import (
 )
 
 func TestFloodfill(t *testing.T) {
-	sizeY := 6
-	sizeX := 12
-	layer := model.Layer{
-		M: make([][]*model.Cell, sizeY),
-	}
-	for y := range sizeY {
-		layer.M[y] = make([]*model.Cell, sizeX)
-		for x := range sizeX {
-			tile := model.Tile(0)
-			if (x == 1 || x == sizeX-2) && y != 0 && y != sizeY-1 {
-				tile = 2
-			}
-			if (y == 1 || y == sizeY-2) && x != 0 && x != sizeX-1 {
-				tile = 2
-			}
-			layer.M[y][x] = &model.Cell{
-				Tile: tile,
-				X:    x,
-				Y:    y,
-			}
-		}
-	}
-	layerVue := `
-0,0,0,0,0,0,0,0,0,0,0,0,
-0,2,2,2,2,2,2,2,2,2,2,0,
-0,2,0,0,0,0,0,0,0,0,2,0,
-0,2,0,0,0,0,0,0,0,0,2,0,
-0,2,2,2,2,2,2,2,2,2,2,0,
-0,0,0,0,0,0,0,0,0,0,0,0,
-`
-	require.Equal(t, layerVue, layer.String())
+	t.Run("within boundaries", func(t *testing.T) {
+		layer := generatePolygonWithinBoundaries(t)
 
-	FloodFill(&layer, 2, 8, 2)
+		FloodFill(layer, 2, 8, 2)
 
-	expectedFilledLayerVue := `
+		expectedFilledLayerVue := `
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,2,2,2,2,2,2,2,2,2,2,0,
 0,2,2,2,2,2,2,2,2,2,2,0,
@@ -51,17 +22,68 @@ func TestFloodfill(t *testing.T) {
 0,2,2,2,2,2,2,2,2,2,2,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
 `
-	assert.Equal(t, expectedFilledLayerVue, layer.String())
+		assert.Equal(t, expectedFilledLayerVue, layer.String())
+	})
+
+	t.Run("reaching layer limits", func(t *testing.T) {
+		layer := generatePolygonReachingLayerLimits(t)
+
+		FloodFill(layer, 2, 8, 2)
+
+		expectedFilledLayerVue := `
+0,0,0,0,0,0,0,0,0,0,0,0,
+2,2,2,2,2,2,2,2,2,2,2,0,
+2,2,2,2,2,2,2,2,2,2,2,0,
+2,2,2,2,2,2,2,2,2,2,2,0,
+2,2,2,2,2,2,2,2,2,2,2,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+`
+
+		assert.Equal(t, expectedFilledLayerVue, layer.String())
+	})
 }
 
 func TestFloodfillDerecursive(t *testing.T) {
+	t.Run("within boundaries", func(t *testing.T) {
+		layer := generatePolygonWithinBoundaries(t)
+
+		FloodFillDerecursive(layer, 2, 8, 2)
+
+		expectedFilledLayerVue := `
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,2,2,2,2,2,2,2,2,2,2,0,
+0,2,2,2,2,2,2,2,2,2,2,0,
+0,2,2,2,2,2,2,2,2,2,2,0,
+0,2,2,2,2,2,2,2,2,2,2,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+`
+		assert.Equal(t, expectedFilledLayerVue, layer.String())
+	})
+
+	t.Run("reaching layer limits", func(t *testing.T) {
+		layer := generatePolygonReachingLayerLimits(t)
+
+		FloodFillDerecursive(layer, 2, 8, 2)
+
+		expectedFilledLayerVue := `
+0,0,0,0,0,0,0,0,0,0,0,0,
+2,2,2,2,2,2,2,2,2,2,2,0,
+2,2,2,2,2,2,2,2,2,2,2,0,
+2,2,2,2,2,2,2,2,2,2,2,0,
+2,2,2,2,2,2,2,2,2,2,2,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+`
+
+		assert.Equal(t, expectedFilledLayerVue, layer.String())
+	})
+}
+
+func generatePolygonWithinBoundaries(t *testing.T) *model.Layer {
 	sizeY := 6
 	sizeX := 12
-	layer := model.Layer{
-		M: make([][]*model.Cell, sizeY),
-	}
+	layer := model.Layer{}
+	layer.Init(sizeX, sizeY)
 	for y := range sizeY {
-		layer.M[y] = make([]*model.Cell, sizeX)
 		for x := range sizeX {
 			tile := model.Tile(0)
 			if (x == 1 || x == sizeX-2) && y != 0 && y != sizeY-1 {
@@ -70,11 +92,7 @@ func TestFloodfillDerecursive(t *testing.T) {
 			if (y == 1 || y == sizeY-2) && x != 0 && x != sizeX-1 {
 				tile = 2
 			}
-			layer.M[y][x] = &model.Cell{
-				Tile: tile,
-				X:    x,
-				Y:    y,
-			}
+			layer.SetTile(x, y, tile)
 		}
 	}
 	layerVue := `
@@ -86,16 +104,34 @@ func TestFloodfillDerecursive(t *testing.T) {
 0,0,0,0,0,0,0,0,0,0,0,0,
 `
 	require.Equal(t, layerVue, layer.String())
+	return &layer
+}
 
-	FloodFillDerecursive(&layer, 2, 8, 2)
-
-	expectedFilledLayerVue := `
+func generatePolygonReachingLayerLimits(t *testing.T) *model.Layer {
+	sizeY := 6
+	sizeX := 12
+	layer := model.Layer{}
+	layer.Init(sizeX, sizeY)
+	for y := range sizeY {
+		for x := range sizeX {
+			tile := model.Tile(0)
+			if x == sizeX-2 && y != 0 && y != sizeY-1 {
+				tile = 2
+			}
+			if (y == 1 || y == sizeY-2) && x != sizeX-1 {
+				tile = 2
+			}
+			layer.SetTile(x, y, tile)
+		}
+	}
+	layerVue := `
 0,0,0,0,0,0,0,0,0,0,0,0,
-0,2,2,2,2,2,2,2,2,2,2,0,
-0,2,2,2,2,2,2,2,2,2,2,0,
-0,2,2,2,2,2,2,2,2,2,2,0,
-0,2,2,2,2,2,2,2,2,2,2,0,
+2,2,2,2,2,2,2,2,2,2,2,0,
+0,0,0,0,0,0,0,0,0,0,2,0,
+0,0,0,0,0,0,0,0,0,0,2,0,
+2,2,2,2,2,2,2,2,2,2,2,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
 `
-	assert.Equal(t, expectedFilledLayerVue, layer.String())
+	require.Equal(t, layerVue, layer.String())
+	return &layer
 }

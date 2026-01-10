@@ -1,12 +1,9 @@
 package bresenham
 
-type Point struct {
-	X int
-	Y int
-}
+import "github.com/renomarx/osm2tmx/pkg/model"
 
-func Bresenham(xa, ya, xb, yb int, withCorners bool) []Point {
-	var points []Point
+func Bresenham(xa, ya, xb, yb int, withCorners bool) []model.Point {
+	var points []model.Point
 
 	dx := abs(xb - xa)
 	dy := abs(yb - ya)
@@ -19,7 +16,7 @@ func Bresenham(xa, ya, xb, yb int, withCorners bool) []Point {
 	x, y := xa, ya
 
 	for {
-		points = append(points, Point{X: x, Y: y})
+		points = append(points, model.Point{X: x, Y: y})
 
 		if x == xb && y == yb {
 			break
@@ -41,7 +38,7 @@ func Bresenham(xa, ya, xb, yb int, withCorners bool) []Point {
 			if e2 > -dy && e2 < dx {
 				// we advance x & y at the same time, we want to add a point between
 				// with only y advanced, to make a corner
-				points = append(points, Point{X: x - sx, Y: y})
+				points = append(points, model.Point{X: x - sx, Y: y})
 			}
 		}
 	}
