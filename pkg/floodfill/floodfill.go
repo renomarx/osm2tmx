@@ -71,31 +71,3 @@ func isCellToBeFilled(layer *model.Layer, y int, x int, tile model.Tile) bool {
 	cell := layer.GetCell(x, y)
 	return cell != nil && cell.Tile != tile
 }
-
-func IsInsidePolygon(x int, y int, poly []Point) bool {
-	c := false
-	for i := range len(poly) {
-		a := poly[i]
-		b := poly[i-1]
-		if (x == a.X) && (y == a.Y) {
-			// point is a corner
-			return true
-		}
-		if (a.Y > y) != (b.Y > y) {
-			slope := (x-a.X)*(b.Y-a.Y) - (b.X-a.X)*(y-a.Y)
-			if slope == 0 {
-				// point is on boundary
-				return true
-			}
-			if (slope < 0) != (b.Y < a.Y) {
-				c = !c
-			}
-		}
-	}
-	return c
-}
-
-// Point represents a 2D point with x and y coordinates.
-type Point struct {
-	X, Y int
-}

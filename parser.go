@@ -8,6 +8,7 @@ import (
 	"github.com/paulmach/osm"
 	"github.com/paulmach/osm/osmpbf"
 	"github.com/renomarx/osm2tmx/pkg/bresenham"
+	"github.com/renomarx/osm2tmx/pkg/evenodd"
 	"github.com/renomarx/osm2tmx/pkg/mercator"
 	"github.com/renomarx/osm2tmx/pkg/model"
 )
@@ -95,8 +96,8 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 				osmNodesOutOfBounds = append(osmNodesOutOfBounds, node)
 				continue
 			}
-			tile := p.mapper.MapTagsToTile(node.Tags)
-			m.Layers[0].SetTile(x, y, tile)
+			// tile := p.mapper.MapTagsToTile(node.Tags)
+			// m.Layers[0].SetTile(x, y, tile)
 			osmNodes = append(osmNodes, node)
 			cellsByNodeID[int64(node.ID)] = m.Layers[0].GetCell(x, y)
 		case *osm.Way:
@@ -117,7 +118,9 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 	for _, way := range osmWays {
 		tile := p.mapper.MapTagsToTile(way.Tags)
 		if way.Nodes[0] == way.Nodes[len(way.Nodes)-1] {
-			p.drawWayArea(&m, way, tile, cellsByNodeID)
+			if !p.mapper.IsTileDefault(tile) {
+				p.drawWayArea(&m, way, tile, cellsByNodeID)
+			}
 		} else {
 			p.drawWayLine(&m, way, tile, cellsByNodeID)
 		}
@@ -149,13 +152,8 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 				}
 			}
 		}
-		// // Get a node probably within boundaries of the polygon to apply floodfill algorithm
-		// // TODO: be sure that the node is within the boundaries
-		// if lastCellOfLastWay != nil {
-		// 	x, y := lastCellOfLastWay.X-2, lastCellOfLastWay.Y-2
-		// 	// floodfill from any node within
-		// 	floodfill.FloodFill(&m.Layers[0], y, x, tile)
-		// }
+		// TODO: apply scanline + even-odd algorithm
+		// on the polygon composed of all "outer" ways
 	}
 
 	return ParsingResult{
@@ -206,7 +204,7 @@ func (p *Parser) isMultipolygon(relation *osm.Relation) bool {
 }
 
 func (p *Parser) drawWayArea(m *model.Map, way *osm.Way, tile model.Tile, cellsByNodeID map[int64]*model.Cell) {
-	boundaries := make(map[model.Point]*model.Cell)
+	polygon := make([]model.Point, 0, len(way.Nodes))
 	var yMinCell *model.Cell
 	var yMaxCell *model.Cell
 	var xMinCell *model.Cell
@@ -229,8 +227,7 @@ func (p *Parser) drawWayArea(m *model.Map, way *osm.Way, tile model.Tile, cellsB
 			points := bresenham.Bresenham(lastCell.X, lastCell.Y, cellPointer.X, cellPointer.Y, false)
 			for _, point := range points {
 				m.Layers[0].SetTile(point.X, point.Y, tile)
-				cell := m.Layers[0].GetCell(point.X, point.Y)
-				boundaries[point] = cell
+				polygon = append(polygon, point)
 			}
 		}
 		lastCell = cellPointer
@@ -250,19 +247,14 @@ func (p *Parser) drawWayArea(m *model.Map, way *osm.Way, tile model.Tile, cellsB
 		}
 	}
 
-	// 2. Apply the scanline algorithm
+	// 2. Apply the scanline + even-odd algorithm
+	if yMinCell == nil || yMaxCell == nil || xMinCell == nil || xMaxCell == nil {
+		return
+	}
 	for y := yMinCell.Y; y < yMaxCell.Y; y++ {
-		nbCrossedBoundary := 0
-		for x := xMinCell.X; x < xMaxCell.X && nbCrossedBoundary < 2; x++ {
-			_, isBoundary := boundaries[model.Point{X: x, Y: y}]
-			if isBoundary {
-				nbCrossedBoundary++
-			}
-			if nbCrossedBoundary == 1 {
-				// Inside the polygon
+		for x := xMinCell.X; x < xMaxCell.X; x++ {
+			if evenodd.IsInsidePolygon(x, y, polygon) {
 				m.Layers[0].SetTile(x, y, tile)
-			} else {
-				// Ouside the polygon
 			}
 		}
 	}
