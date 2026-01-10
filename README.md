@@ -64,14 +64,20 @@ tags:
 Les valeurs de latitude sont mesurées par rapport à l'équateur et à une plage comprise entre -90° au pôle Sud et +90° au pôle Nord. Les valeurs de longitude sont mesurées par rapport au premier méridien. Elles sont comprises entre -180° en allant vers l'ouest et 180° vers l'est.
 
 - OpenStreetMap specifications:
-    - https://planet.openstreetmap.org/
-    - https://download.geofabrik.de/
-    - https://wiki.openstreetmap.org/wiki/Map_features
-    - https://wiki.openstreetmap.org/wiki/Osmosis#Usage
-    - https://github.com/maguro/pbf/blob/master/model/elements.go
-    - https://wiki.openstreetmap.org/wiki/PBF_Format
+
+  - https://planet.openstreetmap.org/
+  - https://download.geofabrik.de/
+  - https://wiki.openstreetmap.org/wiki/Map_features
+  - https://wiki.openstreetmap.org/wiki/Osmosis#Usage
+  - https://github.com/maguro/pbf/blob/master/model/elements.go
+  - https://wiki.openstreetmap.org/wiki/PBF_Format
 
 - UI:
-    - https://github.com/hajimehoshi/ebiten/blob/main/examples/vector/main.go
-    - https://github.com/systemed/tilemaker/tree/master
-    - https://wiki.openstreetmap.org/wiki/Vector_tiles
+
+  - https://github.com/hajimehoshi/ebiten/blob/main/examples/vector/main.go
+  - https://github.com/systemed/tilemaker/tree/master
+  - https://wiki.openstreetmap.org/wiki/Vector_tiles
+
+- Inspirations:
+  - https://github.com/mapnik/mapnik/wiki/XMLConfigReference
+  - https://github.com/mapnik/mapnik/wiki/OsmPlugin
