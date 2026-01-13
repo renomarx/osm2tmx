@@ -74,7 +74,7 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 
 	// init map
 	m := model.Map{}
-	m.Init(1, mapSizeX, mapSizeY)
+	m.Init(p.mapper.Layers(), mapSizeX, mapSizeY)
 
 	// fill map first layer with Tile values
 	osmNodes := []osm.Node{}
@@ -118,11 +118,11 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 	for _, way := range osmWays {
 		tile := p.mapper.MapTagsToTile(way.Tags)
 		if way.Nodes[0] == way.Nodes[len(way.Nodes)-1] {
-			if !p.mapper.IsTileDefault(tile) {
-				p.drawWayArea(&m, way, tile, cellsByNodeID)
+			if !p.mapper.IsTileDefault(tile.Tile) {
+				p.drawWayArea(&m, way, cellsByNodeID, way.Tags)
 			}
 		} else {
-			p.drawWayLine(&m, way, tile, cellsByNodeID)
+			p.drawWayLine(&m, way, cellsByNodeID, way.Tags)
 		}
 	}
 
@@ -134,7 +134,7 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 			continue
 		}
 		tile := p.mapper.MapTagsToTile(relation.Tags)
-		if p.mapper.IsTileDefault(tile) {
+		if p.mapper.IsTileDefault(tile.Tile) {
 			continue
 		}
 		for _, member := range relation.Members {
@@ -142,13 +142,13 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 			case osm.TypeWay:
 				way, exists := osmWays[int64(member.Ref)]
 				if exists {
-					p.drawWayLine(&m, way, tile, cellsByNodeID)
+					p.drawWayLine(&m, way, cellsByNodeID, relation.Tags)
 				}
 
 			case osm.TypeNode:
 				pointerToCase, exists := cellsByNodeID[int64(member.Ref)]
 				if exists {
-					pointerToCase.Tile = tile
+					pointerToCase.Tile = tile.Tile
 				}
 			}
 		}
@@ -174,7 +174,8 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 	}, nil
 }
 
-func (p *Parser) drawWayLine(m *model.Map, way *osm.Way, tile model.Tile, cellsByNodeID map[int64]*model.Cell) {
+func (p *Parser) drawWayLine(m *model.Map, way *osm.Way, cellsByNodeID map[int64]*model.Cell, tags osm.Tags) {
+	mapTileFunc := p.getMapTileFunc(tags)
 	var lastCell *model.Cell
 	for _, nd := range way.Nodes {
 		cellPointer, exists := cellsByNodeID[int64(nd.ID)]
@@ -183,11 +184,14 @@ func (p *Parser) drawWayLine(m *model.Map, way *osm.Way, tile model.Tile, cellsB
 			continue
 		}
 		// Filling all points between the last way point and the current one by the right tile
-		cellPointer.Tile = tile
+		cellPointer.Tile = mapTileFunc().Tile
 		if lastCell != nil {
 			points := bresenham.Bresenham(lastCell.X, lastCell.Y, cellPointer.X, cellPointer.Y, true)
 			for _, point := range points {
-				m.Layers[0].SetTile(point.X, point.Y, tile)
+				mapTile := mapTileFunc()
+				for z, tile := range mapTile.ByLayer {
+					m.Layers[z].SetTile(point.X, point.Y, tile)
+				}
 			}
 		}
 		lastCell = cellPointer
@@ -203,7 +207,8 @@ func (p *Parser) isMultipolygon(relation *osm.Relation) bool {
 	return false
 }
 
-func (p *Parser) drawWayArea(m *model.Map, way *osm.Way, tile model.Tile, cellsByNodeID map[int64]*model.Cell) {
+func (p *Parser) drawWayArea(m *model.Map, way *osm.Way, cellsByNodeID map[int64]*model.Cell, tags osm.Tags) {
+	mapTileFunc := p.getMapTileFunc(tags)
 	polygon := make([]model.Point, 0, len(way.Nodes))
 	var yMinCell *model.Cell
 	var yMaxCell *model.Cell
@@ -222,11 +227,14 @@ func (p *Parser) drawWayArea(m *model.Map, way *osm.Way, tile model.Tile, cellsB
 		}
 
 		// Filling all points between the last way point and the current one by the right tile
-		cellPointer.Tile = tile
+		cellPointer.Tile = mapTileFunc().Tile
 		if lastCell != nil {
 			points := bresenham.Bresenham(lastCell.X, lastCell.Y, cellPointer.X, cellPointer.Y, false)
 			for _, point := range points {
-				m.Layers[0].SetTile(point.X, point.Y, tile)
+				mapTile := mapTileFunc()
+				for z, tile := range mapTile.ByLayer {
+					m.Layers[z].SetTile(point.X, point.Y, tile)
+				}
 				polygon = append(polygon, point)
 			}
 		}
@@ -254,8 +262,23 @@ func (p *Parser) drawWayArea(m *model.Map, way *osm.Way, tile model.Tile, cellsB
 	for y := yMinCell.Y; y < yMaxCell.Y; y++ {
 		for x := xMinCell.X; x < xMaxCell.X; x++ {
 			if evenodd.IsInsidePolygon(x, y, polygon) {
-				m.Layers[0].SetTile(x, y, tile)
+				mapTile := p.mapper.MapTagsToTile(tags)
+				for z, tile := range mapTile.ByLayer {
+					m.Layers[z].SetTile(x, y, tile)
+				}
 			}
 		}
+	}
+}
+
+func (p *Parser) getMapTileFunc(tags osm.Tags) func() MapTile {
+	mapTile := p.mapper.MapTagsToTile(tags)
+	if mapTile.Dynamic {
+		return func() MapTile {
+			return p.mapper.MapTagsToTile(tags)
+		}
+	}
+	return func() MapTile {
+		return mapTile
 	}
 }

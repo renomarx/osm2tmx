@@ -1,6 +1,10 @@
 package main
 
-import "github.com/renomarx/osm2tmx/pkg/tmx"
+import (
+	"fmt"
+
+	"github.com/renomarx/osm2tmx/pkg/tmx"
+)
 
 type TMXWriter struct{}
 
@@ -16,8 +20,20 @@ func (w *TMXWriter) Write(parsingResult ParsingResult, tmxFilename string) error
 	//  <layer id="1" name="Calque de Tuiles 1" width="100" height="100">
 	//   <data encoding="csv">
 	// TODO: optimize
-	// TODO: handle layers
-	data := tmx.PrintCSVWithLastComma(&parsingResult.Map.Layers[0])
+	layers := make([]tmx.Layer, len(parsingResult.Map.Layers))
+	for z, layer := range parsingResult.Map.Layers {
+		data := tmx.PrintCSVWithLastComma(&layer)
+		layers[z] = tmx.Layer{
+			ID:     z + 1,
+			Name:   fmt.Sprintf("Calque %d", z+1),
+			Width:  parsingResult.Meta.MapSizeX,
+			Height: parsingResult.Meta.MapSizeY,
+			Data: tmx.Data{
+				Encoding: "csv",
+				CSV:      data,
+			},
+		}
+	}
 	tmxMap := tmx.Map{
 		Version:     "1.4",
 		TiledVer:    "1.4.3",
@@ -33,18 +49,7 @@ func (w *TMXWriter) Write(parsingResult ParsingResult, tmxFilename string) error
 				Source:   "tileset/basechip_pipo.tsx",
 			},
 		},
-		Layers: []tmx.Layer{
-			{
-				ID:     1,
-				Name:   "Calque 1",
-				Width:  parsingResult.Meta.MapSizeX,
-				Height: parsingResult.Meta.MapSizeY,
-				Data: tmx.Data{
-					Encoding: "csv",
-					CSV:      data,
-				},
-			},
-		},
+		Layers: layers,
 	}
 	return tmx.SaveTMX(tmxFilename, &tmxMap)
 }

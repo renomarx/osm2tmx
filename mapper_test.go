@@ -25,8 +25,8 @@ func TestMapper(t *testing.T) {
 			},
 		}
 
-		tile := mapper.MapTagsToTile(tags)
-		assert.Equal(t, model.Tile(8), tile)
+		mapTile := mapper.MapTagsToTile(tags)
+		assert.Equal(t, model.Tile(5), mapTile.Tile)
 	})
 
 	t.Run("correctly default to 2", func(t *testing.T) {
@@ -39,8 +39,8 @@ func TestMapper(t *testing.T) {
 			},
 		}
 
-		tile := mapper.MapTagsToTile(tags)
-		assert.Equal(t, model.Tile(2), tile)
+		mapTile := mapper.MapTagsToTile(tags)
+		assert.Equal(t, model.Tile(2), mapTile.Tile)
 	})
 
 	t.Run("correctly map last known tile", func(t *testing.T) {
@@ -61,7 +61,7 @@ func TestMapper(t *testing.T) {
 			},
 		}
 
-		tile := mapper.MapTagsToTile(tags)
-		assert.Equal(t, model.Tile(417), tile)
+		mapTile := mapper.MapTagsToTile(tags)
+		assert.Equal(t, model.Tile(417), mapTile.Tile)
 	})
 }

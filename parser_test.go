@@ -17,9 +17,11 @@ func TestParser(t *testing.T) {
 
 	result, err := parser.Parse(osmfilename)
 	assert.NoError(t, err)
-	assert.Equal(t, 1, len(result.Map.Layers))
+	assert.Equal(t, 2, len(result.Map.Layers))
 	assert.Equal(t, 352, result.Map.Layers[0].SizeY())
 	assert.Equal(t, 410, result.Map.Layers[0].SizeX())
+	assert.Equal(t, 352, result.Map.Layers[1].SizeY())
+	assert.Equal(t, 410, result.Map.Layers[1].SizeX())
 	assert.Equal(t, ParsingResultMeta{
 		Bounds: osm.Bounds{
 			MinLat: 46.159768999,

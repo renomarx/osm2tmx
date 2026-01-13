@@ -43,7 +43,7 @@ tags:
 
 ## TODO
 
-- Refacto & tests
+- Refacto & tests tmx_writer
 - Handle relations, fillign areas of relation
 - Handle all relevant tags
 - Add arguments and options to handle bounded exports
