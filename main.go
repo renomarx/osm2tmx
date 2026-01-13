@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -10,26 +11,35 @@ func init() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 }
 
-func main() {
-
-	if len(os.Args) < 2 {
-		fmt.Printf(`
-Usage: %s --mapping=<my_mapping_file.yaml> <my.osm.pbf> [--out=<my.osm.tmx>]
-
+func printUsageAndExit() {
+	var Usage = fmt.Sprintf(`
+Usage: %s --mapping=<my_mapping_file.yaml> [--out=<my.osm.tmx>] <my.osm.pbf>
 - mapping: mapping file of osm tags <-> tileset pos, see below
-- out: default to my.osm.tmx
+- out: output pathname, default to my.osm.tmx
 `, os.Args[0])
-		os.Exit(1)
+	fmt.Println(Usage)
+	os.Exit(1)
+}
+
+func main() {
+	var helpFlag = flag.Bool("help", false, "display help")
+	var outputFlag = flag.String("out", "", "output pathname, default to my.osm.tmx")
+	// TODO: add mapping flag
+
+	flag.Parse()
+
+	if *helpFlag {
+		printUsageAndExit()
 	}
 
-	osmFile := os.Args[1]
-
-	osmFileExt := osmFile[len(osmFile)-8:]
-	if osmFileExt != ".osm.pbf" {
-		fmt.Printf("OSM filename in argument should match *.osm.pbf, got extension %s\n", osmFileExt)
-		os.Exit(1)
+	args := flag.Args()
+	if len(args) != 1 {
+		printUsageAndExit()
 	}
-	tmxFilename := osmFile[:len(osmFile)-4] + ".tmx"
+
+	osmFile := args[0]
+
+	tmxFilename := setTmxFilename(outputFlag, osmFile)
 	log.Printf("will write output to %s", tmxFilename)
 
 	mapper := NewMapper()
@@ -58,4 +68,17 @@ Usage: %s --mapping=<my_mapping_file.yaml> <my.osm.pbf> [--out=<my.osm.tmx>]
 	if err != nil {
 		panic(err)
 	}
+}
+
+func setTmxFilename(outputFlag *string, osmFile string) string {
+	if outputFlag != nil && *outputFlag != "" {
+		return *outputFlag
+	}
+	osmFileExt := osmFile[len(osmFile)-8:]
+	if osmFileExt != ".osm.pbf" {
+		fmt.Printf("OSM filename in argument should match *.osm.pbf, got extension %s\n", osmFileExt)
+		os.Exit(1)
+	}
+	return osmFile[:len(osmFile)-4] + ".tmx"
+
 }
