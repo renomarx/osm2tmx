@@ -43,6 +43,7 @@ tags:
 
 - Handle relations, fillign areas of relation
 - Handle all relevant tags
+- Draw way corners, area corners and buildings with different tiles
 - Add arguments and options to handle bounded exports
 
 - POC drawer 2d (ebiten, draw2d ?)
