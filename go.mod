@@ -7,7 +7,10 @@ require (
 	google.golang.org/protobuf v1.36.11 // indirect
 )
 
-require github.com/stretchr/testify v1.6.1
+require (
+	github.com/google/uuid v1.6.0
+	github.com/stretchr/testify v1.6.1
+)
 
 require (
 	github.com/DataDog/czlib v0.0.0-20240814115052-86a9592b3985 // indirect

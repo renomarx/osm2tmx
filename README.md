@@ -17,33 +17,31 @@ Util to convert osm.pbf files to tmx files, using a tileset and a tileset mappin
 Example:
 
 ```yaml
-tileset: "tileset/basechip_pipo.png"
+tileset:
+  source: "tileset/basechip_pipo.png"
+  tile_width: 16
+  tile_height: 16
 
 layers: 3
 
 tags:
   default:
     layer: 0
-    x: 0
-    y: 0
+    tile: 2
   building:
     layer: 1
-    x: 0
-    y: 493
+    tile: 38
     # values:
     #   roof:
     #     layer: 2
-    #     x: 0
-    #     y: 232
+    #     tile: 21
   highway:
     layer: 1
-    x: 120
-    y: 0
+    tile: 42
 ```
 
 ## TODO
 
-- Refacto & tests tmx_writer
 - Handle relations, fillign areas of relation
 - Handle all relevant tags
 - Add arguments and options to handle bounded exports
@@ -52,7 +50,7 @@ tags:
 
 - How to handle multiple tags ?
 - How to handle z-index and level lines ?
-- Handle the mapping.yaml file
+- Conf & handle the mapping.yaml file
 - Optimisation
 - More examples with other tilesets
 - Generate a tileset like OSM stylesheets to have a pretty map in tmx :)

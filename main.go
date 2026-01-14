@@ -63,7 +63,7 @@ func main() {
 
 	log.Printf("Number of points out of bounds: %d", len(parsingResult.NodesOutOfBounds))
 
-	writer := NewTMXWriter()
+	writer := NewTMXWriter("tileset/basechip_pipo.tsx", 16, 16) // TODO: get from conf
 	err = writer.Write(parsingResult, tmxFilename)
 	if err != nil {
 		panic(err)

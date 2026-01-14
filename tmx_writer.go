@@ -6,20 +6,21 @@ import (
 	"github.com/renomarx/osm2tmx/pkg/tmx"
 )
 
-type TMXWriter struct{}
+type TMXWriter struct {
+	tileset               string
+	tileWidth, tileHeight int
+}
 
-func NewTMXWriter() *TMXWriter {
-	return &TMXWriter{}
+func NewTMXWriter(tileset string, tileWidth, tileHeight int) *TMXWriter {
+	return &TMXWriter{
+		tileset:    tileset,
+		tileWidth:  tileWidth,
+		tileHeight: tileHeight,
+	}
 }
 
 func (w *TMXWriter) Write(parsingResult ParsingResult, tmxFilename string) error {
-
-	// 	<?xml version="1.0" encoding="UTF-8"?>
-	// <map version="1.4" tiledversion="1.4.3" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="1">
-	//  <tileset firstgid="1" source="tileset/basechip_pipo.tsx"/>
-	//  <layer id="1" name="Calque de Tuiles 1" width="100" height="100">
-	//   <data encoding="csv">
-	// TODO: optimize
+	// 	TODO add header ? <?xml version="1.0" encoding="UTF-8"?>
 	layers := make([]tmx.Layer, len(parsingResult.Map.Layers))
 	for z, layer := range parsingResult.Map.Layers {
 		data := tmx.PrintCSVWithLastComma(&layer)
@@ -41,12 +42,12 @@ func (w *TMXWriter) Write(parsingResult ParsingResult, tmxFilename string) error
 		RenderOrder: "right-down",
 		Width:       parsingResult.Meta.MapSizeX,
 		Height:      parsingResult.Meta.MapSizeY,
-		TileWidth:   16,
-		TileHeight:  16,
+		TileWidth:   w.tileWidth,
+		TileHeight:  w.tileHeight,
 		Tilesets: []tmx.Tileset{
 			{
 				FirstGID: 1,
-				Source:   "tileset/basechip_pipo.tsx",
+				Source:   w.tileset,
 			},
 		},
 		Layers: layers,
