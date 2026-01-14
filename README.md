@@ -1,18 +1,17 @@
 # osm2tmx
 
-Util to convert osm.pbf files to tmx files, using a tileset and a tileset mapping file.
+Util to convert osm.pbf files to tmx files, using a tileset and a conf file to define the mapping of the osm tags to tiles.
 
 ## Usage
 
 ```bash
-# Ile de la reunion
-./osm2tmx --mapping=<my_mapping_file.yaml> <my.osm.pbf> [--out=<my.osm.tmx>]
+./osm2tmx -conf <my_mapping_file.yaml> [-out <my.osm.tmx>] <my.osm.pbf>
 
-- mapping: mapping file of osm tags <-> tileset pos, see below
+- conf: configuration file for tileset, see below
 - out: default to my.osm.tmx
 ```
 
-### Tags mapping file format: YAML
+### Conf file format: YAML
 
 Example:
 

@@ -7,22 +7,22 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestParser(t *testing.T) {
+func TestRaster(t *testing.T) {
 
 	osmfilename := "test.osm.pbf"
 
 	mapper := NewMapper()
 
-	parser := NewParser(mapper)
+	raster := NewRaster(mapper)
 
-	result, err := parser.Parse(osmfilename)
+	result, err := raster.Parse(osmfilename)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(result.Map.Layers))
 	assert.Equal(t, 352, result.Map.Layers[0].SizeY())
 	assert.Equal(t, 410, result.Map.Layers[0].SizeX())
 	assert.Equal(t, 352, result.Map.Layers[1].SizeY())
 	assert.Equal(t, 410, result.Map.Layers[1].SizeX())
-	assert.Equal(t, ParsingResultMeta{
+	assert.Equal(t, RasterResultMeta{
 		Bounds: osm.Bounds{
 			MinLat: 46.159768999,
 			MaxLat: 46.161954,

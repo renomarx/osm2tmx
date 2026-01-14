@@ -19,16 +19,16 @@ func NewTMXWriter(tileset string, tileWidth, tileHeight int) *TMXWriter {
 	}
 }
 
-func (w *TMXWriter) Write(parsingResult ParsingResult, tmxFilename string) error {
+func (w *TMXWriter) Write(rasterResult RasterResult, tmxFilename string) error {
 	// 	TODO add header ? <?xml version="1.0" encoding="UTF-8"?>
-	layers := make([]tmx.Layer, len(parsingResult.Map.Layers))
-	for z, layer := range parsingResult.Map.Layers {
+	layers := make([]tmx.Layer, len(rasterResult.Map.Layers))
+	for z, layer := range rasterResult.Map.Layers {
 		data := tmx.PrintCSVWithLastComma(&layer)
 		layers[z] = tmx.Layer{
 			ID:     z + 1,
 			Name:   fmt.Sprintf("Calque %d", z+1),
-			Width:  parsingResult.Meta.MapSizeX,
-			Height: parsingResult.Meta.MapSizeY,
+			Width:  rasterResult.Meta.MapSizeX,
+			Height: rasterResult.Meta.MapSizeY,
 			Data: tmx.Data{
 				Encoding: "csv",
 				CSV:      data,
@@ -40,8 +40,8 @@ func (w *TMXWriter) Write(parsingResult ParsingResult, tmxFilename string) error
 		TiledVer:    "1.4.3",
 		Orientation: "orthogonal",
 		RenderOrder: "right-down",
-		Width:       parsingResult.Meta.MapSizeX,
-		Height:      parsingResult.Meta.MapSizeY,
+		Width:       rasterResult.Meta.MapSizeX,
+		Height:      rasterResult.Meta.MapSizeY,
 		TileWidth:   w.tileWidth,
 		TileHeight:  w.tileHeight,
 		Tilesets: []tmx.Tileset{

@@ -13,8 +13,8 @@ func init() {
 
 func printUsageAndExit() {
 	var Usage = fmt.Sprintf(`
-Usage: %s --mapping=<my_mapping_file.yaml> [--out=<my.osm.tmx>] <my.osm.pbf>
-- mapping: mapping file of osm tags <-> tileset pos, see below
+Usage: %s -conf <my_mapping_file.yaml> [-out <my.osm.tmx>] <my.osm.pbf>
+- conf: configuration file for tileset
 - out: output pathname, default to my.osm.tmx
 `, os.Args[0])
 	fmt.Println(Usage)
@@ -43,28 +43,28 @@ func main() {
 	log.Printf("will write output to %s", tmxFilename)
 
 	mapper := NewMapper()
-	parser := NewParser(mapper)
+	raster := NewRaster(mapper)
 
-	parsingResult, err := parser.Parse(osmFile)
+	rasterResult, err := raster.Parse(osmFile)
 	if err != nil {
 		panic(err)
 	}
 
-	log.Printf("%#v\n", parsingResult.Meta.Bounds)
-	log.Printf("Max: UTM: [east:%f,north:%f]\n", parsingResult.Meta.MaxEasting, parsingResult.Meta.MaxNorthing)
-	log.Printf("Min: UTM: [east:%f,north:%f]\n", parsingResult.Meta.MinEasting, parsingResult.Meta.MinNorthing)
-	log.Printf("Map size: (%d,%d) meters\n", parsingResult.Meta.MapSizeX, parsingResult.Meta.MapSizeY)
+	log.Printf("%#v\n", rasterResult.Meta.Bounds)
+	log.Printf("Max: UTM: [east:%f,north:%f]\n", rasterResult.Meta.MaxEasting, rasterResult.Meta.MaxNorthing)
+	log.Printf("Min: UTM: [east:%f,north:%f]\n", rasterResult.Meta.MinEasting, rasterResult.Meta.MinNorthing)
+	log.Printf("Map size: (%d,%d) meters\n", rasterResult.Meta.MapSizeX, rasterResult.Meta.MapSizeY)
 
-	log.Printf("Nodes: %d", len(parsingResult.Nodes))
-	log.Printf("Ways: %d", len(parsingResult.Ways))
-	log.Printf("Relations: %d", len(parsingResult.Relations))
+	log.Printf("Nodes: %d", len(rasterResult.Nodes))
+	log.Printf("Ways: %d", len(rasterResult.Ways))
+	log.Printf("Relations: %d", len(rasterResult.Relations))
 
-	log.Printf("Generated map: height: %d, width: %d", parsingResult.Meta.MapSizeY, parsingResult.Meta.MapSizeX)
+	log.Printf("Generated map: height: %d, width: %d", rasterResult.Meta.MapSizeY, rasterResult.Meta.MapSizeX)
 
-	log.Printf("Number of points out of bounds: %d", len(parsingResult.NodesOutOfBounds))
+	log.Printf("Number of points out of bounds: %d", len(rasterResult.NodesOutOfBounds))
 
 	writer := NewTMXWriter("tileset/basechip_pipo.tsx", 16, 16) // TODO: get from conf
-	err = writer.Write(parsingResult, tmxFilename)
+	err = writer.Write(rasterResult, tmxFilename)
 	if err != nil {
 		panic(err)
 	}

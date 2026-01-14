@@ -13,20 +13,20 @@ import (
 	"github.com/renomarx/osm2tmx/pkg/model"
 )
 
-type Parser struct {
+type Raster struct {
 	mapper *Mapper
 }
 
-type ParsingResult struct {
+type RasterResult struct {
 	Map              *model.Map
-	Meta             ParsingResultMeta
+	Meta             RasterResultMeta
 	Nodes            []osm.Node
 	Ways             map[int64]*osm.Way
 	Relations        []osm.Relation
 	NodesOutOfBounds []osm.Node
 }
 
-type ParsingResultMeta struct {
+type RasterResultMeta struct {
 	Bounds      osm.Bounds
 	MapSizeX    int
 	MapSizeY    int
@@ -36,16 +36,16 @@ type ParsingResultMeta struct {
 	MinNorthing float64
 }
 
-func NewParser(mapper *Mapper) *Parser {
-	return &Parser{
+func NewRaster(mapper *Mapper) *Raster {
+	return &Raster{
 		mapper: mapper,
 	}
 }
 
-func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
+func (r *Raster) Parse(osmFilename string) (RasterResult, error) {
 	f, err := os.Open(osmFilename)
 	if err != nil {
-		return ParsingResult{}, err
+		return RasterResult{}, err
 	}
 	defer f.Close()
 
@@ -74,7 +74,7 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 
 	// init map
 	m := model.Map{}
-	m.Init(p.mapper.Layers(), mapSizeX, mapSizeY)
+	m.Init(r.mapper.Layers(), mapSizeX, mapSizeY)
 
 	// fill map first layer with Tile values
 	osmNodes := []osm.Node{}
@@ -112,17 +112,17 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 
 	scanErr := scanner.Err()
 	if scanErr != nil {
-		return ParsingResult{}, err
+		return RasterResult{}, err
 	}
 
 	for _, way := range osmWays {
-		tile := p.mapper.MapTagsToTile(way.Tags)
+		tile := r.mapper.MapTagsToTile(way.Tags)
 		if way.Nodes[0] == way.Nodes[len(way.Nodes)-1] {
-			if !p.mapper.IsTileDefault(tile.Tile) {
-				p.drawWayArea(&m, way, cellsByNodeID, way.Tags)
+			if !r.mapper.IsTileDefault(tile.Tile) {
+				r.drawWayArea(&m, way, cellsByNodeID, way.Tags)
 			}
 		} else {
-			p.drawWayLine(&m, way, cellsByNodeID, way.Tags)
+			r.drawWayLine(&m, way, cellsByNodeID, way.Tags)
 		}
 	}
 
@@ -130,11 +130,11 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 		// relations of type multipolygon are made of members of type node or way,
 		// representing boundaries of the way
 		// used to represent rivers, for example
-		if !p.isMultipolygon(&relation) {
+		if !r.isMultipolygon(&relation) {
 			continue
 		}
-		tile := p.mapper.MapTagsToTile(relation.Tags)
-		if p.mapper.IsTileDefault(tile.Tile) {
+		tile := r.mapper.MapTagsToTile(relation.Tags)
+		if r.mapper.IsTileDefault(tile.Tile) {
 			continue
 		}
 		for _, member := range relation.Members {
@@ -142,7 +142,7 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 			case osm.TypeWay:
 				way, exists := osmWays[int64(member.Ref)]
 				if exists {
-					p.drawWayLine(&m, way, cellsByNodeID, relation.Tags)
+					r.drawWayLine(&m, way, cellsByNodeID, relation.Tags)
 				}
 
 			case osm.TypeNode:
@@ -156,9 +156,9 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 		// on the polygon composed of all "outer" ways
 	}
 
-	return ParsingResult{
+	return RasterResult{
 		Map: &m,
-		Meta: ParsingResultMeta{
+		Meta: RasterResultMeta{
 			Bounds:      *header.Bounds,
 			MapSizeX:    mapSizeX,
 			MapSizeY:    mapSizeY,
@@ -174,8 +174,8 @@ func (p *Parser) Parse(osmFilename string) (ParsingResult, error) {
 	}, nil
 }
 
-func (p *Parser) drawWayLine(m *model.Map, way *osm.Way, cellsByNodeID map[int64]*model.Cell, tags osm.Tags) {
-	mapTileFunc := p.getMapTileFunc(tags)
+func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, cellsByNodeID map[int64]*model.Cell, tags osm.Tags) {
+	mapTileFunc := r.getMapTileFunc(tags)
 	var lastCell *model.Cell
 	for _, nd := range way.Nodes {
 		cellPointer, exists := cellsByNodeID[int64(nd.ID)]
@@ -198,7 +198,7 @@ func (p *Parser) drawWayLine(m *model.Map, way *osm.Way, cellsByNodeID map[int64
 	}
 }
 
-func (p *Parser) isMultipolygon(relation *osm.Relation) bool {
+func (r *Raster) isMultipolygon(relation *osm.Relation) bool {
 	for _, tag := range relation.Tags {
 		if tag.Key == "type" && tag.Value == "multipolygon" {
 			return true
@@ -207,8 +207,8 @@ func (p *Parser) isMultipolygon(relation *osm.Relation) bool {
 	return false
 }
 
-func (p *Parser) drawWayArea(m *model.Map, way *osm.Way, cellsByNodeID map[int64]*model.Cell, tags osm.Tags) {
-	mapTileFunc := p.getMapTileFunc(tags)
+func (r *Raster) drawWayArea(m *model.Map, way *osm.Way, cellsByNodeID map[int64]*model.Cell, tags osm.Tags) {
+	mapTileFunc := r.getMapTileFunc(tags)
 	polygon := make([]model.Point, 0, len(way.Nodes))
 	var yMinCell *model.Cell
 	var yMaxCell *model.Cell
@@ -262,7 +262,7 @@ func (p *Parser) drawWayArea(m *model.Map, way *osm.Way, cellsByNodeID map[int64
 	for y := yMinCell.Y; y < yMaxCell.Y; y++ {
 		for x := xMinCell.X; x < xMaxCell.X; x++ {
 			if evenodd.IsInsidePolygon(x, y, polygon) {
-				mapTile := p.mapper.MapTagsToTile(tags)
+				mapTile := r.mapper.MapTagsToTile(tags)
 				for z, tile := range mapTile.ByLayer {
 					m.Layers[z].SetTile(x, y, tile)
 				}
@@ -271,11 +271,11 @@ func (p *Parser) drawWayArea(m *model.Map, way *osm.Way, cellsByNodeID map[int64
 	}
 }
 
-func (p *Parser) getMapTileFunc(tags osm.Tags) func() MapTile {
-	mapTile := p.mapper.MapTagsToTile(tags)
+func (r *Raster) getMapTileFunc(tags osm.Tags) func() MapTile {
+	mapTile := r.mapper.MapTagsToTile(tags)
 	if mapTile.Dynamic {
 		return func() MapTile {
-			return p.mapper.MapTagsToTile(tags)
+			return r.mapper.MapTagsToTile(tags)
 		}
 	}
 	return func() MapTile {

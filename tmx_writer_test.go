@@ -21,9 +21,9 @@ func TestTMXWriter(t *testing.T) {
 			*generateLayerTest(t),
 		},
 	}
-	parsingResult := ParsingResult{
+	rasterResult := RasterResult{
 		Map: &m,
-		Meta: ParsingResultMeta{
+		Meta: RasterResultMeta{
 			MapSizeX: 12,
 			MapSizeY: 6,
 		},
@@ -33,7 +33,7 @@ func TestTMXWriter(t *testing.T) {
 	require.NoError(t, err)
 	defer os.Remove(f.Name())
 
-	writer.Write(parsingResult, f.Name())
+	writer.Write(rasterResult, f.Name())
 
 	bytes, err := os.ReadFile(f.Name())
 	require.NoError(t, err)
