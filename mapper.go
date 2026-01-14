@@ -14,9 +14,8 @@ type Mapper struct {
 }
 
 type MapTile struct {
-	Tile    model.Tile
 	ByLayer []model.Tile
-	Dynamic bool
+	dynamic bool
 }
 
 func NewMapper() *Mapper {
@@ -63,7 +62,7 @@ func (m *Mapper) MapTagsToTile(tags osm.Tags) MapTile {
 				byLayer := make([]model.Tile, 2)
 				byLayer[0] = tile
 				byLayer[1] = layer1tile
-				return MapTile{Tile: tile, ByLayer: byLayer, Dynamic: true}
+				return MapTile{ByLayer: byLayer, dynamic: true}
 			case "heath":
 				tile = 6
 			case "mash":
@@ -95,7 +94,7 @@ func (m *Mapper) MapTagsToTile(tags osm.Tags) MapTile {
 				byLayer := make([]model.Tile, 2)
 				byLayer[0] = tile
 				byLayer[1] = layer1tile
-				return MapTile{Tile: tile, ByLayer: byLayer, Dynamic: true}
+				return MapTile{ByLayer: byLayer, dynamic: true}
 			case "industrial":
 				tile = 8
 			}
@@ -104,9 +103,23 @@ func (m *Mapper) MapTagsToTile(tags osm.Tags) MapTile {
 
 	// by default, only one tile
 	// TODO: return in each case ?
-	return MapTile{Tile: tile, ByLayer: []model.Tile{tile}}
+	return MapTile{ByLayer: []model.Tile{tile}}
 }
 
-func (m *Mapper) IsTileDefault(tile model.Tile) bool {
-	return tile == m.defaultTile || tile == 0
+func (m *Mapper) IsTileDefault(mapTile MapTile) bool {
+	return len(mapTile.ByLayer) == 0 || mapTile.ByLayer[0] == m.defaultTile
+}
+
+// GetMapTileFunc returns a function that returns the mapTile mapped to the tags
+// The interest of using this function is to cache non-dynamic tile (will always return the same tile for the same tags)
+func (m *Mapper) GetMapTileFunc(tags osm.Tags) func() MapTile {
+	mapTile := m.MapTagsToTile(tags)
+	if mapTile.dynamic {
+		return func() MapTile {
+			return m.MapTagsToTile(tags)
+		}
+	}
+	return func() MapTile {
+		return mapTile
+	}
 }

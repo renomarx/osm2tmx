@@ -118,7 +118,7 @@ func (r *Raster) Parse(osmFilename string) (RasterResult, error) {
 	for _, way := range osmWays {
 		tile := r.mapper.MapTagsToTile(way.Tags)
 		if way.Nodes[0] == way.Nodes[len(way.Nodes)-1] {
-			if !r.mapper.IsTileDefault(tile.Tile) {
+			if !r.mapper.IsTileDefault(tile) {
 				r.drawWayArea(&m, way, cellsByNodeID, way.Tags)
 			}
 		} else {
@@ -134,7 +134,7 @@ func (r *Raster) Parse(osmFilename string) (RasterResult, error) {
 			continue
 		}
 		tile := r.mapper.MapTagsToTile(relation.Tags)
-		if r.mapper.IsTileDefault(tile.Tile) {
+		if r.mapper.IsTileDefault(tile) {
 			continue
 		}
 		r.drawRelationArea(&m, &relation, osmWays, cellsByNodeID, relation.Tags)
@@ -159,7 +159,7 @@ func (r *Raster) Parse(osmFilename string) (RasterResult, error) {
 }
 
 func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, cellsByNodeID map[int64]*model.Cell, tags osm.Tags) {
-	mapTileFunc := r.getMapTileFunc(tags)
+	mapTileFunc := r.mapper.GetMapTileFunc(tags)
 	var lastCell *model.Cell
 	for _, nd := range way.Nodes {
 		cellPointer, exists := cellsByNodeID[int64(nd.ID)]
@@ -168,7 +168,6 @@ func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, cellsByNodeID map[int64
 			continue
 		}
 		// Filling all points between the last way point and the current one by the right tile
-		cellPointer.Tile = mapTileFunc().Tile
 		if lastCell != nil {
 			points := bresenham.Bresenham(lastCell.X, lastCell.Y, cellPointer.X, cellPointer.Y, true)
 			for _, point := range points {
@@ -192,7 +191,7 @@ func (r *Raster) isMultipolygon(relation *osm.Relation) bool {
 }
 
 func (r *Raster) drawWayArea(m *model.Map, way *osm.Way, cellsByNodeID map[int64]*model.Cell, tags osm.Tags) {
-	mapTileFunc := r.getMapTileFunc(tags)
+	mapTileFunc := r.mapper.GetMapTileFunc(tags)
 	polygon := make([]model.Point, 0, len(way.Nodes))
 	var yMinCell *model.Cell
 	var yMaxCell *model.Cell
@@ -211,7 +210,6 @@ func (r *Raster) drawWayArea(m *model.Map, way *osm.Way, cellsByNodeID map[int64
 		}
 
 		// Filling all points between the last way point and the current one by the right tile
-		cellPointer.Tile = mapTileFunc().Tile
 		if lastCell != nil {
 			points := bresenham.Bresenham(lastCell.X, lastCell.Y, cellPointer.X, cellPointer.Y, false)
 			for _, point := range points {
@@ -256,7 +254,7 @@ func (r *Raster) drawWayArea(m *model.Map, way *osm.Way, cellsByNodeID map[int64
 }
 
 func (r *Raster) drawRelationArea(m *model.Map, relation *osm.Relation, osmWays map[int64]*osm.Way, cellsByNodeID map[int64]*model.Cell, tags osm.Tags) {
-	mapTileFunc := r.getMapTileFunc(tags)
+	mapTileFunc := r.mapper.GetMapTileFunc(tags)
 	polygon := make([]model.Point, 0, len(relation.Members))
 	var yMinCell *model.Cell
 	var yMaxCell *model.Cell
@@ -282,7 +280,6 @@ func (r *Raster) drawRelationArea(m *model.Map, relation *osm.Relation, osmWays 
 				}
 
 				// Filling all points between the last way point and the current one by the right tile
-				cellPointer.Tile = mapTileFunc().Tile
 				if lastCell != nil {
 					points := bresenham.Bresenham(lastCell.X, lastCell.Y, cellPointer.X, cellPointer.Y, false)
 					for _, point := range points {
@@ -336,17 +333,5 @@ func (r *Raster) drawRelationArea(m *model.Map, relation *osm.Relation, osmWays 
 				}
 			}
 		}
-	}
-}
-
-func (r *Raster) getMapTileFunc(tags osm.Tags) func() MapTile {
-	mapTile := r.mapper.MapTagsToTile(tags)
-	if mapTile.Dynamic {
-		return func() MapTile {
-			return r.mapper.MapTagsToTile(tags)
-		}
-	}
-	return func() MapTile {
-		return mapTile
 	}
 }
