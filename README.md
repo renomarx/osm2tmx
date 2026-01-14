@@ -47,7 +47,6 @@ tags:
 
 - POC drawer 2d (ebiten, draw2d ?)
 
-- How to handle multiple tags ?
 - How to handle z-index and level lines ?
 - Conf & handle the mapping.yaml file
 - Optimisation

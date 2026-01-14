@@ -17,7 +17,7 @@ func TestRaster(t *testing.T) {
 
 	result, err := raster.Parse(osmfilename)
 	assert.NoError(t, err)
-	assert.Equal(t, 2, len(result.Map.Layers))
+	assert.Equal(t, 3, len(result.Map.Layers))
 	assert.Equal(t, 352, result.Map.Layers[0].SizeY())
 	assert.Equal(t, 410, result.Map.Layers[0].SizeX())
 	assert.Equal(t, 352, result.Map.Layers[1].SizeY())

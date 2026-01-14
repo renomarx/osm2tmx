@@ -78,7 +78,7 @@ func (r *Raster) Parse(osmFilename string) (RasterResult, error) {
 
 	// fill map first layer with Tile values
 	osmNodes := []osm.Node{}
-	cellsByNodeID := make(map[int64]*model.Cell)
+	pointsByNodeID := make(map[int64]model.Point)
 	osmWays := make(map[int64]*osm.Way)
 	osmRelations := []osm.Relation{}
 	osmNodesOutOfBounds := []osm.Node{}
@@ -99,7 +99,7 @@ func (r *Raster) Parse(osmFilename string) (RasterResult, error) {
 			// tile := p.mapper.MapTagsToTile(node.Tags)
 			// m.Layers[0].SetTile(x, y, tile)
 			osmNodes = append(osmNodes, node)
-			cellsByNodeID[int64(node.ID)] = m.Layers[0].GetCell(x, y)
+			pointsByNodeID[int64(node.ID)] = model.Point{X: x, Y: y}
 		case *osm.Way:
 			way := scanner.Object().(*osm.Way)
 			osmWays[int64(way.ID)] = way
@@ -119,10 +119,10 @@ func (r *Raster) Parse(osmFilename string) (RasterResult, error) {
 		tile := r.mapper.MapTagsToTile(way.Tags)
 		if way.Nodes[0] == way.Nodes[len(way.Nodes)-1] {
 			if !r.mapper.IsTileDefault(tile) {
-				r.drawWayArea(&m, way, cellsByNodeID, way.Tags)
+				r.drawWayArea(&m, way, pointsByNodeID, way.Tags)
 			}
 		} else {
-			r.drawWayLine(&m, way, cellsByNodeID, way.Tags)
+			r.drawWayLine(&m, way, pointsByNodeID, way.Tags)
 		}
 	}
 
@@ -137,7 +137,7 @@ func (r *Raster) Parse(osmFilename string) (RasterResult, error) {
 		if r.mapper.IsTileDefault(tile) {
 			continue
 		}
-		r.drawRelationArea(&m, &relation, osmWays, cellsByNodeID, relation.Tags)
+		r.drawRelationArea(&m, &relation, osmWays, pointsByNodeID, relation.Tags)
 	}
 
 	return RasterResult{
@@ -158,18 +158,18 @@ func (r *Raster) Parse(osmFilename string) (RasterResult, error) {
 	}, nil
 }
 
-func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, cellsByNodeID map[int64]*model.Cell, tags osm.Tags) {
+func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, pointsByNodeID map[int64]model.Point, tags osm.Tags) {
 	mapTileFunc := r.mapper.GetMapTileFunc(tags)
-	var lastCell *model.Cell
+	var lastPoint *model.Point
 	for _, nd := range way.Nodes {
-		cellPointer, exists := cellsByNodeID[int64(nd.ID)]
+		nodePoint, exists := pointsByNodeID[int64(nd.ID)]
 		if !exists {
-			lastCell = nil
+			lastPoint = nil
 			continue
 		}
 		// Filling all points between the last way point and the current one by the right tile
-		if lastCell != nil {
-			points := bresenham.Bresenham(lastCell.X, lastCell.Y, cellPointer.X, cellPointer.Y, true)
+		if lastPoint != nil {
+			points := bresenham.Bresenham(lastPoint.X, lastPoint.Y, nodePoint.X, nodePoint.Y, true)
 			for _, point := range points {
 				mapTile := mapTileFunc()
 				for z, tile := range mapTile.ByLayer {
@@ -177,7 +177,7 @@ func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, cellsByNodeID map[int64
 				}
 			}
 		}
-		lastCell = cellPointer
+		lastPoint = &nodePoint
 	}
 }
 
@@ -190,28 +190,28 @@ func (r *Raster) isMultipolygon(relation *osm.Relation) bool {
 	return false
 }
 
-func (r *Raster) drawWayArea(m *model.Map, way *osm.Way, cellsByNodeID map[int64]*model.Cell, tags osm.Tags) {
+func (r *Raster) drawWayArea(m *model.Map, way *osm.Way, pointsByNodeID map[int64]model.Point, tags osm.Tags) {
 	mapTileFunc := r.mapper.GetMapTileFunc(tags)
 	polygon := make([]model.Point, 0, len(way.Nodes))
-	var yMinCell *model.Cell
-	var yMaxCell *model.Cell
-	var xMinCell *model.Cell
-	var xMaxCell *model.Cell
+	var yMinPoint *model.Point
+	var yMaxPoint *model.Point
+	var xMinPoint *model.Point
+	var xMaxPoint *model.Point
 	// Follow the Scan Line Algorithm
 
 	// 1. Fill the boundaries of the polygon with tile,
 	// 	get the polygon vertices as an array of points,
 	//	and find the yMin & yMax points to apply the scanline algorithm
-	var lastCell *model.Cell
+	var lastPoint *model.Point
 	for _, nd := range way.Nodes {
-		cellPointer, exists := cellsByNodeID[int64(nd.ID)]
+		nodePoint, exists := pointsByNodeID[int64(nd.ID)]
 		if !exists {
 			continue
 		}
 
 		// Filling all points between the last way point and the current one by the right tile
-		if lastCell != nil {
-			points := bresenham.Bresenham(lastCell.X, lastCell.Y, cellPointer.X, cellPointer.Y, false)
+		if lastPoint != nil {
+			points := bresenham.Bresenham(lastPoint.X, lastPoint.Y, nodePoint.X, nodePoint.Y, false)
 			for _, point := range points {
 				mapTile := mapTileFunc()
 				for z, tile := range mapTile.ByLayer {
@@ -220,29 +220,29 @@ func (r *Raster) drawWayArea(m *model.Map, way *osm.Way, cellsByNodeID map[int64
 				polygon = append(polygon, point)
 			}
 		}
-		lastCell = cellPointer
+		lastPoint = &nodePoint
 
-		if yMinCell == nil || cellPointer.Y < yMinCell.Y {
-			yMinCell = cellPointer
+		if yMinPoint == nil || nodePoint.Y < yMinPoint.Y {
+			yMinPoint = &nodePoint
 		}
-		if yMaxCell == nil || cellPointer.Y > yMaxCell.Y {
-			yMaxCell = cellPointer
+		if yMaxPoint == nil || nodePoint.Y > yMaxPoint.Y {
+			yMaxPoint = &nodePoint
 		}
 
-		if xMinCell == nil || cellPointer.X < xMinCell.X {
-			xMinCell = cellPointer
+		if xMinPoint == nil || nodePoint.X < xMinPoint.X {
+			xMinPoint = &nodePoint
 		}
-		if xMaxCell == nil || cellPointer.X > xMaxCell.X {
-			xMaxCell = cellPointer
+		if xMaxPoint == nil || nodePoint.X > xMaxPoint.X {
+			xMaxPoint = &nodePoint
 		}
 	}
 
 	// 2. Apply the scanline + even-odd algorithm
-	if yMinCell == nil || yMaxCell == nil || xMinCell == nil || xMaxCell == nil {
+	if yMinPoint == nil || yMaxPoint == nil || xMinPoint == nil || xMaxPoint == nil {
 		return
 	}
-	for y := yMinCell.Y; y < yMaxCell.Y; y++ {
-		for x := xMinCell.X; x < xMaxCell.X; x++ {
+	for y := yMinPoint.Y; y < yMaxPoint.Y; y++ {
+		for x := xMinPoint.X; x < xMaxPoint.X; x++ {
 			if evenodd.IsInsidePolygon(x, y, polygon) {
 				mapTile := r.mapper.MapTagsToTile(tags)
 				for z, tile := range mapTile.ByLayer {
@@ -253,13 +253,13 @@ func (r *Raster) drawWayArea(m *model.Map, way *osm.Way, cellsByNodeID map[int64
 	}
 }
 
-func (r *Raster) drawRelationArea(m *model.Map, relation *osm.Relation, osmWays map[int64]*osm.Way, cellsByNodeID map[int64]*model.Cell, tags osm.Tags) {
+func (r *Raster) drawRelationArea(m *model.Map, relation *osm.Relation, osmWays map[int64]*osm.Way, cellsByNodeID map[int64]model.Point, tags osm.Tags) {
 	mapTileFunc := r.mapper.GetMapTileFunc(tags)
 	polygon := make([]model.Point, 0, len(relation.Members))
-	var yMinCell *model.Cell
-	var yMaxCell *model.Cell
-	var xMinCell *model.Cell
-	var xMaxCell *model.Cell
+	var yMinPoint *model.Point
+	var yMaxPoint *model.Point
+	var xMinPoint *model.Point
+	var xMaxPoint *model.Point
 	// Follow the Scan Line Algorithm
 
 	// 1. Fill the boundaries of the polygon with tile,
@@ -272,16 +272,16 @@ func (r *Raster) drawRelationArea(m *model.Map, relation *osm.Relation, osmWays 
 			if !exists {
 				continue
 			}
-			var lastCell *model.Cell
+			var lastPoint *model.Point
 			for _, nd := range way.Nodes {
-				cellPointer, exists := cellsByNodeID[int64(nd.ID)]
+				nodePoint, exists := cellsByNodeID[int64(nd.ID)]
 				if !exists {
 					continue
 				}
 
 				// Filling all points between the last way point and the current one by the right tile
-				if lastCell != nil {
-					points := bresenham.Bresenham(lastCell.X, lastCell.Y, cellPointer.X, cellPointer.Y, false)
+				if lastPoint != nil {
+					points := bresenham.Bresenham(lastPoint.X, lastPoint.Y, nodePoint.X, nodePoint.Y, false)
 					for _, point := range points {
 						mapTile := mapTileFunc()
 						for z, tile := range mapTile.ByLayer {
@@ -290,20 +290,20 @@ func (r *Raster) drawRelationArea(m *model.Map, relation *osm.Relation, osmWays 
 						polygon = append(polygon, point)
 					}
 				}
-				lastCell = cellPointer
+				lastPoint = &nodePoint
 
-				if yMinCell == nil || cellPointer.Y < yMinCell.Y {
-					yMinCell = cellPointer
+				if yMinPoint == nil || nodePoint.Y < yMinPoint.Y {
+					yMinPoint = &nodePoint
 				}
-				if yMaxCell == nil || cellPointer.Y > yMaxCell.Y {
-					yMaxCell = cellPointer
+				if yMaxPoint == nil || nodePoint.Y > yMaxPoint.Y {
+					yMaxPoint = &nodePoint
 				}
 
-				if xMinCell == nil || cellPointer.X < xMinCell.X {
-					xMinCell = cellPointer
+				if xMinPoint == nil || nodePoint.X < xMinPoint.X {
+					xMinPoint = &nodePoint
 				}
-				if xMaxCell == nil || cellPointer.X > xMaxCell.X {
-					xMaxCell = cellPointer
+				if xMaxPoint == nil || nodePoint.X > xMaxPoint.X {
+					xMaxPoint = &nodePoint
 				}
 			}
 
@@ -321,11 +321,11 @@ func (r *Raster) drawRelationArea(m *model.Map, relation *osm.Relation, osmWays 
 	}
 
 	// 2. Apply the scanline + even-odd algorithm
-	if yMinCell == nil || yMaxCell == nil || xMinCell == nil || xMaxCell == nil {
+	if yMinPoint == nil || yMaxPoint == nil || xMinPoint == nil || xMaxPoint == nil {
 		return
 	}
-	for y := yMinCell.Y; y < yMaxCell.Y; y++ {
-		for x := xMinCell.X; x < xMaxCell.X; x++ {
+	for y := yMinPoint.Y; y < yMaxPoint.Y; y++ {
+		for x := xMinPoint.X; x < xMaxPoint.X; x++ {
 			if evenodd.IsInsidePolygon(x, y, polygon) {
 				mapTile := r.mapper.MapTagsToTile(tags)
 				for z, tile := range mapTile.ByLayer {

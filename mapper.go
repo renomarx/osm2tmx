@@ -14,15 +14,19 @@ type Mapper struct {
 }
 
 type MapTile struct {
-	ByLayer []model.Tile
+	ByLayer map[int]model.Tile
 	dynamic bool
 }
 
 func NewMapper() *Mapper {
 	return &Mapper{
 		defaultTile: 2,
-		layers:      2,
+		layers:      3,
 	}
+}
+
+func (m *Mapper) GetDefaultTile() model.Tile {
+	return m.defaultTile
 }
 
 func (m *Mapper) Layers() int {
@@ -30,23 +34,24 @@ func (m *Mapper) Layers() int {
 }
 
 func (m *Mapper) MapTagsToTile(tags osm.Tags) MapTile {
-	var tile model.Tile = m.defaultTile
+	byLayer := make(map[int]model.Tile)
+	byLayer[0] = m.defaultTile
 	for _, tag := range tags {
 		// TODO: use atlas-index instead of hard-coded switch
 		// Get the tile ID from tiled editor, +1
 		switch tag.Key {
 		case "building":
-			tile = 417
+			// TODO: see why buildings are not displayed when layer != 0
+			byLayer[0] = 417
 		case "highway":
-			tile = 5
+			byLayer[2] = 5
 		case "waterway", "water":
-			tile = 318
+			byLayer[2] = 318
 		case "natural":
 			switch tag.Value {
 			case "water":
-				tile = 318
+				byLayer[2] = 318
 			case "wood":
-				tile = 1
 				layer1tile := model.Tile(1)
 				r := rand.Intn(100)
 				switch {
@@ -59,26 +64,23 @@ func (m *Mapper) MapTagsToTile(tags osm.Tags) MapTile {
 				case r >= 95 && r < 100:
 					layer1tile = 44
 				}
-				byLayer := make([]model.Tile, 2)
-				byLayer[0] = tile
+				byLayer[0] = 1
 				byLayer[1] = layer1tile
-				return MapTile{ByLayer: byLayer, dynamic: true}
 			case "heath":
-				tile = 6
+				byLayer[0] = 6
 			case "mash":
-				tile = 60
+				byLayer[0] = 60
 			}
 		case "surface":
 			switch tag.Value {
 			case "sand":
-				tile = 5
+				byLayer[0] = 5
 			case "asphalt":
-				tile = 8
+				byLayer[0] = 8
 			}
 		case "landuse":
 			switch tag.Value {
 			case "forest":
-				tile = 1
 				layer1tile := model.Tile(1)
 				r := rand.Intn(100)
 				switch {
@@ -91,19 +93,18 @@ func (m *Mapper) MapTagsToTile(tags osm.Tags) MapTile {
 				case r >= 95 && r < 100:
 					layer1tile = 44
 				}
-				byLayer := make([]model.Tile, 2)
-				byLayer[0] = tile
+				byLayer[0] = 1
 				byLayer[1] = layer1tile
 				return MapTile{ByLayer: byLayer, dynamic: true}
 			case "industrial":
-				tile = 8
+				byLayer[0] = 8
 			}
 		}
 	}
 
 	// by default, only one tile
 	// TODO: return in each case ?
-	return MapTile{ByLayer: []model.Tile{tile}}
+	return MapTile{ByLayer: byLayer}
 }
 
 func (m *Mapper) IsTileDefault(mapTile MapTile) bool {
