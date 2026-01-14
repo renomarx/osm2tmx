@@ -96,8 +96,6 @@ func (r *Raster) Parse(osmFilename string) (RasterResult, error) {
 				osmNodesOutOfBounds = append(osmNodesOutOfBounds, node)
 				continue
 			}
-			// tile := p.mapper.MapTagsToTile(node.Tags)
-			// m.Layers[0].SetTile(x, y, tile)
 			osmNodes = append(osmNodes, node)
 			pointsByNodeID[int64(node.ID)] = model.Point{X: x, Y: y}
 		case *osm.Way:
@@ -244,7 +242,7 @@ func (r *Raster) drawWayArea(m *model.Map, way *osm.Way, pointsByNodeID map[int6
 	for y := yMinPoint.Y; y < yMaxPoint.Y; y++ {
 		for x := xMinPoint.X; x < xMaxPoint.X; x++ {
 			if evenodd.IsInsidePolygon(x, y, polygon) {
-				mapTile := r.mapper.MapTagsToTile(tags)
+				mapTile := mapTileFunc()
 				for z, tile := range mapTile.ByLayer {
 					m.Layers[z].SetTile(x, y, tile)
 				}
@@ -327,7 +325,7 @@ func (r *Raster) drawRelationArea(m *model.Map, relation *osm.Relation, osmWays 
 	for y := yMinPoint.Y; y < yMaxPoint.Y; y++ {
 		for x := xMinPoint.X; x < xMaxPoint.X; x++ {
 			if evenodd.IsInsidePolygon(x, y, polygon) {
-				mapTile := r.mapper.MapTagsToTile(tags)
+				mapTile := mapTileFunc()
 				for z, tile := range mapTile.ByLayer {
 					m.Layers[z].SetTile(x, y, tile)
 				}

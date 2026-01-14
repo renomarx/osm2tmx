@@ -36,13 +36,13 @@ func (m *Mapper) Layers() int {
 func (m *Mapper) MapTagsToTile(tags osm.Tags) MapTile {
 	byLayer := make(map[int]model.Tile)
 	byLayer[0] = m.defaultTile
+	dynamic := false
 	for _, tag := range tags {
 		// TODO: use atlas-index instead of hard-coded switch
 		// Get the tile ID from tiled editor, +1
 		switch tag.Key {
 		case "building":
-			// TODO: see why buildings are not displayed when layer != 0
-			byLayer[0] = 417
+			byLayer[2] = 417
 		case "highway":
 			byLayer[2] = 5
 		case "waterway", "water":
@@ -66,6 +66,7 @@ func (m *Mapper) MapTagsToTile(tags osm.Tags) MapTile {
 				}
 				byLayer[0] = 1
 				byLayer[1] = layer1tile
+				dynamic = true
 			case "heath":
 				byLayer[0] = 6
 			case "mash":
@@ -95,7 +96,7 @@ func (m *Mapper) MapTagsToTile(tags osm.Tags) MapTile {
 				}
 				byLayer[0] = 1
 				byLayer[1] = layer1tile
-				return MapTile{ByLayer: byLayer, dynamic: true}
+				dynamic = true
 			case "industrial":
 				byLayer[0] = 8
 			}
@@ -104,11 +105,11 @@ func (m *Mapper) MapTagsToTile(tags osm.Tags) MapTile {
 
 	// by default, only one tile
 	// TODO: return in each case ?
-	return MapTile{ByLayer: byLayer}
+	return MapTile{ByLayer: byLayer, dynamic: dynamic}
 }
 
 func (m *Mapper) IsTileDefault(mapTile MapTile) bool {
-	return len(mapTile.ByLayer) == 0 || mapTile.ByLayer[0] == m.defaultTile
+	return len(mapTile.ByLayer) == 0 || (len(mapTile.ByLayer) == 1 && mapTile.ByLayer[0] == m.defaultTile)
 }
 
 // GetMapTileFunc returns a function that returns the mapTile mapped to the tags
