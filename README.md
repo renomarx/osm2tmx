@@ -77,3 +77,7 @@ Les valeurs de latitude sont mesurées par rapport à l'équateur et à une plag
 - Inspirations:
   - https://github.com/mapnik/mapnik/wiki/XMLConfigReference
   - https://github.com/mapnik/mapnik/wiki/OsmPlugin
+  - https://github.com/maplibre/maplibre-gl-js?tab=readme-ov-file
+
+- 3D
+  - https://maplibre.org/maplibre-gl-js/docs/examples/animate-map-camera-around-a-point/
