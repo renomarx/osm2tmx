@@ -132,8 +132,12 @@ func (m *Mapper) MapTagsToTile(tags osm.Tags) MapTile {
 					byLayer[1] = 44
 				}
 				dynamic = true
-			case "industrial":
+			case "industrial", "residential", "construction":
 				byLayer[0] = 8
+			case "cemetery":
+				byLayer[0] = 251
+			case "meadow":
+				byLayer[0] = 1
 			}
 		}
 	}
