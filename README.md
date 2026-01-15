@@ -41,13 +41,15 @@ tags:
 
 ## TODO
 
-- Draw way corners, area corners and buildings with different tiles
+- Draw way corners, area corners and buildings with different tiles:
+  - evenodd.IsInsidePolygon return a struct{Left,Right,Top,Bottom} representing the distance between the point and the nearest boundary
+  - then the mapper can use these values to select the right tile
 - Add arguments and options to handle bounded exports
 
 - POC drawer 2d (ebiten, draw2d ?)
 
 - How to handle z-index and level lines ?
-    - Not included in OSM data, we'll have to find another way
+  - Not included in OSM data, we'll have to find another way
 - Conf & handle the mapping.yaml file
 - Optimisation
 - More examples with other tilesets
@@ -76,6 +78,7 @@ Les valeurs de latitude sont mesurées par rapport à l'équateur et à une plag
   - https://wiki.openstreetmap.org/wiki/Vector_tiles
 
 - Inspirations:
+
   - https://github.com/mapnik/mapnik/wiki/XMLConfigReference
   - https://github.com/mapnik/mapnik/wiki/OsmPlugin
   - https://github.com/maplibre/maplibre-gl-js?tab=readme-ov-file
