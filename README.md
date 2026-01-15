@@ -41,13 +41,13 @@ tags:
 
 ## TODO
 
-- Handle all relevant tags
 - Draw way corners, area corners and buildings with different tiles
 - Add arguments and options to handle bounded exports
 
 - POC drawer 2d (ebiten, draw2d ?)
 
 - How to handle z-index and level lines ?
+    - Not included in OSM data, we'll have to find another way
 - Conf & handle the mapping.yaml file
 - Optimisation
 - More examples with other tilesets
@@ -67,6 +67,7 @@ Les valeurs de latitude sont mesurées par rapport à l'équateur et à une plag
   - https://wiki.openstreetmap.org/wiki/Osmosis#Usage
   - https://github.com/maguro/pbf/blob/master/model/elements.go
   - https://wiki.openstreetmap.org/wiki/PBF_Format
+  - https://wiki.openstreetmap.org/wiki/Altitude
 
 - UI:
 

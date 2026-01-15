@@ -41,10 +41,47 @@ func (m *Mapper) MapTagsToTile(tags osm.Tags) MapTile {
 		// TODO: use atlas-index instead of hard-coded switch
 		// Get the tile ID from tiled editor, +1
 		switch tag.Key {
+		case "aerialway":
+			byLayer[1] = 647
+		case "aeroway":
+			byLayer[1] = 847
 		case "building":
 			byLayer[2] = 417
+			switch tag.Value {
+			case "apartments":
+				byLayer[2] = 450
+			case "detached", "house":
+				byLayer[2] = 434
+			case "hotel", "residential":
+				byLayer[2] = 402
+			case "religious", "cathedral", "chapel", "church":
+				byLayer[2] = 483
+			case "commercial", "industrial", "kiosk", "office", "retail", "supermarket", "warehouse":
+				byLayer[2] = 385
+			case "hospital":
+				byLayer[2] = 417 // TODO
+			case "museum":
+				byLayer[2] = 417 // TODO
+			case "school":
+				byLayer[2] = 417 // TODO
+			case "train_station":
+				byLayer[2] = 417 // TODO
+			case "university":
+				byLayer[2] = 417 // TODO
+			case "fire_station":
+				byLayer[2] = 417 // TODO
+			case "government", "public":
+				byLayer[2] = 417 // TODO
+			}
+			// apartments
 		case "highway":
 			byLayer[2] = 5
+			switch tag.Value {
+			case "pedestrian":
+				byLayer[2] = 5
+			case "road":
+				byLayer[2] = 8
+			}
 		case "waterway", "water":
 			byLayer[2] = 318
 		case "natural":
@@ -101,8 +138,6 @@ func (m *Mapper) MapTagsToTile(tags osm.Tags) MapTile {
 		}
 	}
 
-	// by default, only one tile
-	// TODO: return in each case ?
 	return MapTile{ByLayer: byLayer, dynamic: dynamic}
 }
 
