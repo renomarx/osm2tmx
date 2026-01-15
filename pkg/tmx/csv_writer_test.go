@@ -11,7 +11,7 @@ func TestPrintCSVWithLastComma(t *testing.T) {
 	sizeY := 6
 	sizeX := 12
 	layer := model.Layer{}
-	layer.Init(sizeX, sizeY)
+	layer.Init(sizeX, sizeY, 0)
 	for y := range sizeY {
 		for x := range sizeX {
 			layer.SetTile(x, y, model.Tile(x*y%3))

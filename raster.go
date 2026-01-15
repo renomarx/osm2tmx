@@ -74,7 +74,7 @@ func (r *Raster) Parse(osmFilename string) (RasterResult, error) {
 
 	// init map
 	m := model.Map{}
-	m.Init(r.mapper.Layers(), mapSizeX, mapSizeY)
+	m.Init(r.mapper.Layers(), mapSizeX, mapSizeY, r.mapper.GetDefaultTile())
 
 	// fill map first layer with Tile values
 	osmNodes := []osm.Node{}
@@ -95,6 +95,10 @@ func (r *Raster) Parse(osmFilename string) (RasterResult, error) {
 			if x >= mapSizeX || x < 0 || y < 0 || y >= mapSizeY {
 				osmNodesOutOfBounds = append(osmNodesOutOfBounds, node)
 				continue
+			}
+			mapTile := r.mapper.MapTagsToTile(node.Tags)
+			for z, tile := range mapTile.ByLayer {
+				m.Layers[z].SetTile(x, y, tile)
 			}
 			osmNodes = append(osmNodes, node)
 			pointsByNodeID[int64(node.ID)] = model.Point{X: x, Y: y}

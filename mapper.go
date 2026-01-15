@@ -52,25 +52,25 @@ func (m *Mapper) MapTagsToTile(tags osm.Tags) MapTile {
 			case "water":
 				byLayer[2] = 318
 			case "wood":
-				layer1tile := model.Tile(1)
 				r := rand.Intn(100)
+				byLayer[0] = 4
 				switch {
 				case r >= 80 && r < 85:
-					layer1tile = 41
+					byLayer[1] = 41
 				case r >= 85 && r < 90:
-					layer1tile = 42
+					byLayer[1] = 42
 				case r >= 90 && r < 95:
-					layer1tile = 43
+					byLayer[1] = 43
 				case r >= 95 && r < 100:
-					layer1tile = 44
+					byLayer[1] = 44
 				}
-				byLayer[0] = 1
-				byLayer[1] = layer1tile
 				dynamic = true
 			case "heath":
 				byLayer[0] = 6
 			case "mash":
 				byLayer[0] = 60
+			case "tree":
+				byLayer[1] = 41
 			}
 		case "surface":
 			switch tag.Value {
@@ -82,20 +82,18 @@ func (m *Mapper) MapTagsToTile(tags osm.Tags) MapTile {
 		case "landuse":
 			switch tag.Value {
 			case "forest":
-				layer1tile := model.Tile(1)
 				r := rand.Intn(100)
+				byLayer[0] = 4
 				switch {
 				case r >= 80 && r < 85:
-					layer1tile = 41
+					byLayer[1] = 41
 				case r >= 85 && r < 90:
-					layer1tile = 42
+					byLayer[1] = 42
 				case r >= 90 && r < 95:
-					layer1tile = 43
+					byLayer[1] = 43
 				case r >= 95 && r < 100:
-					layer1tile = 44
+					byLayer[1] = 44
 				}
-				byLayer[0] = 1
-				byLayer[1] = layer1tile
 				dynamic = true
 			case "industrial":
 				byLayer[0] = 8

@@ -30,7 +30,7 @@ func TestMapper(t *testing.T) {
 		assert.False(t, mapper.IsTileDefault(mapTile))
 	})
 
-	t.Run("correctly default to 2", func(t *testing.T) {
+	t.Run("correctly default to defaultTile", func(t *testing.T) {
 		mapper := NewMapper()
 
 		tags := osm.Tags{
@@ -64,7 +64,7 @@ func TestMapper(t *testing.T) {
 		}
 
 		mapTile := mapper.MapTagsToTile(tags)
-		assert.Equal(t, model.Tile(1), mapTile.ByLayer[0])
+		assert.Equal(t, model.Tile(4), mapTile.ByLayer[0])
 		assert.Equal(t, model.Tile(417), mapTile.ByLayer[2])
 		assert.False(t, mapper.IsTileDefault(mapTile))
 	})

@@ -21,20 +21,26 @@ type Cell struct {
 
 type Tile int
 
-func (m *Map) Init(layers, mapSizeX, mapSizeY int) {
+func (m *Map) Init(layers, mapSizeX, mapSizeY int, defaultTile Tile) {
 	m.Layers = make([]Layer, layers)
-	for z := range layers {
+	if layers == 0 {
+		return
+	}
+	// Important: we only set default tile for the layer 0, keeping empty other layers,
+	// to avoid overloading all future other layer[0] tiles
+	m.Layers[0].Init(mapSizeX, mapSizeY, defaultTile)
+	for z := 1; z < layers; z++ {
 		m.Layers[z] = Layer{}
-		m.Layers[z].Init(mapSizeX, mapSizeY)
+		m.Layers[z].Init(mapSizeX, mapSizeY, 0)
 	}
 }
 
-func (l *Layer) Init(mapSizeX, mapSizeY int) {
+func (l *Layer) Init(mapSizeX, mapSizeY int, tile Tile) {
 	l.m = make([][]*Cell, mapSizeY)
 	for y := range l.m {
 		l.m[y] = make([]*Cell, mapSizeX)
 		for x := range l.m[y] {
-			l.m[y][x] = &Cell{Tile: 0, X: x, Y: y}
+			l.m[y][x] = &Cell{Tile: tile, X: x, Y: y}
 		}
 	}
 }

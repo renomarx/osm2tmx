@@ -82,7 +82,7 @@ func generatePolygonWithinBoundaries(t *testing.T) *model.Layer {
 	sizeY := 6
 	sizeX := 12
 	layer := model.Layer{}
-	layer.Init(sizeX, sizeY)
+	layer.Init(sizeX, sizeY, 0)
 	for y := range sizeY {
 		for x := range sizeX {
 			tile := model.Tile(0)
@@ -111,7 +111,7 @@ func generatePolygonReachingLayerLimits(t *testing.T) *model.Layer {
 	sizeY := 6
 	sizeX := 12
 	layer := model.Layer{}
-	layer.Init(sizeX, sizeY)
+	layer.Init(sizeX, sizeY, 0)
 	for y := range sizeY {
 		for x := range sizeX {
 			tile := model.Tile(0)
