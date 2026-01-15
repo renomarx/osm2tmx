@@ -15,12 +15,8 @@ func PrintCSVWithLastComma(l *model.Layer) string {
 
 	for y := range l.SizeY() {
 		for x := range l.SizeX() {
-			var tile model.Tile = 0
 			c := l.GetCell(x, y)
-			if c != nil {
-				tile = c.Tile
-			}
-			csvStr.WriteString(fmt.Sprintf("%d,", tile))
+			csvStr.WriteString(fmt.Sprintf("%d,", c.Tile))
 		}
 		csvStr.WriteString("\n")
 	}

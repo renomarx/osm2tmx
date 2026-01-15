@@ -29,7 +29,7 @@ func FloodFillDerecursive(layer *model.Layer, y int, x int, tile model.Tile) {
 
 	maxCells := layer.SizeY() * layer.SizeX()
 
-	queue := make(chan *model.Cell, maxCells)
+	queue := make(chan model.Cell, maxCells)
 
 	if !isCellToBeFilled(layer, y, x, tile) {
 		return
@@ -39,9 +39,6 @@ func FloodFillDerecursive(layer *model.Layer, y int, x int, tile model.Tile) {
 	for len(queue) > 0 {
 
 		cellPointer := <-queue
-		if cellPointer == nil {
-			continue
-		}
 
 		layer.SetTile(cellPointer.X, cellPointer.Y, tile)
 
@@ -69,5 +66,5 @@ func isCellToBeFilled(layer *model.Layer, y int, x int, tile model.Tile) bool {
 		return false
 	}
 	cell := layer.GetCell(x, y)
-	return cell != nil && cell.Tile != tile
+	return cell.Tile != tile
 }

@@ -10,7 +10,7 @@ type Map struct {
 }
 
 type Layer struct {
-	m [][]*Cell // M[y][x]
+	m [][]Cell // M[y][x]
 }
 
 type Cell struct {
@@ -36,11 +36,11 @@ func (m *Map) Init(layers, mapSizeX, mapSizeY int, defaultTile Tile) {
 }
 
 func (l *Layer) Init(mapSizeX, mapSizeY int, tile Tile) {
-	l.m = make([][]*Cell, mapSizeY)
+	l.m = make([][]Cell, mapSizeY)
 	for y := range l.m {
-		l.m[y] = make([]*Cell, mapSizeX)
+		l.m[y] = make([]Cell, mapSizeX)
 		for x := range l.m[y] {
-			l.m[y][x] = &Cell{Tile: tile, X: x, Y: y}
+			l.m[y][x] = Cell{Tile: tile, X: x, Y: y}
 		}
 	}
 }
@@ -56,22 +56,20 @@ func (l *Layer) SizeX() int {
 	return len(l.m[0])
 }
 
-func (l *Layer) Row(y int) []*Cell {
+func (l *Layer) Row(y int) []Cell {
 	return l.m[y]
 }
 
-func (l *Layer) GetCell(x, y int) *Cell {
+func (l *Layer) GetCell(x, y int) Cell {
 	return l.m[y][x]
 }
 
 func (l *Layer) SetTile(x, y int, tile Tile) {
-	if l.m[y][x] == nil {
-		l.m[y][x] = &Cell{
-			X: x,
-			Y: y,
-		}
+	l.m[y][x] = Cell{
+		X:    x,
+		Y:    y,
+		Tile: tile,
 	}
-	l.m[y][x].Tile = tile
 }
 
 func (m *Map) Print() {
@@ -90,11 +88,7 @@ func (l *Layer) String() string {
 	line.WriteString("\n")
 	for y := range l.m {
 		for _, c := range l.m[y] {
-			var tile Tile = 0
-			if c != nil {
-				tile = c.Tile
-			}
-			line.WriteString(fmt.Sprintf("%d,", tile))
+			line.WriteString(fmt.Sprintf("%d,", c.Tile))
 		}
 		line.WriteString("\n")
 	}
