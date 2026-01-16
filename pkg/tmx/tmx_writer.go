@@ -1,9 +1,9 @@
-package main
+package tmx
 
 import (
 	"fmt"
 
-	"github.com/renomarx/osm2tmx/pkg/tmx"
+	"github.com/renomarx/osm2tmx/pkg/model"
 )
 
 type TMXWriter struct {
@@ -11,7 +11,7 @@ type TMXWriter struct {
 	tileWidth, tileHeight int
 }
 
-func NewTMXWriter(tileset string, tileWidth, tileHeight int) *TMXWriter {
+func NewWriter(tileset string, tileWidth, tileHeight int) *TMXWriter {
 	return &TMXWriter{
 		tileset:    tileset,
 		tileWidth:  tileWidth,
@@ -19,23 +19,23 @@ func NewTMXWriter(tileset string, tileWidth, tileHeight int) *TMXWriter {
 	}
 }
 
-func (w *TMXWriter) Write(rasterResult RasterResult, tmxFilename string) error {
+func (w *TMXWriter) Write(rasterResult model.RasterMap, tmxFilename string) error {
 	// 	TODO add header ? <?xml version="1.0" encoding="UTF-8"?>
-	layers := make([]tmx.Layer, len(rasterResult.Map.Layers))
+	layers := make([]Layer, len(rasterResult.Map.Layers))
 	for z, layer := range rasterResult.Map.Layers {
-		data := tmx.PrintCSVWithLastComma(&layer)
-		layers[z] = tmx.Layer{
+		data := PrintCSVWithLastComma(&layer)
+		layers[z] = Layer{
 			ID:     z + 1,
 			Name:   fmt.Sprintf("Calque %d", z+1),
 			Width:  rasterResult.Meta.MapSizeX,
 			Height: rasterResult.Meta.MapSizeY,
-			Data: tmx.Data{
+			Data: Data{
 				Encoding: "csv",
 				CSV:      data,
 			},
 		}
 	}
-	tmxMap := tmx.Map{
+	tmxMap := Map{
 		Version:     "1.4",
 		TiledVer:    "1.4.3",
 		Orientation: "orthogonal",
@@ -44,7 +44,7 @@ func (w *TMXWriter) Write(rasterResult RasterResult, tmxFilename string) error {
 		Height:      rasterResult.Meta.MapSizeY,
 		TileWidth:   w.tileWidth,
 		TileHeight:  w.tileHeight,
-		Tilesets: []tmx.Tileset{
+		Tilesets: []Tileset{
 			{
 				FirstGID: 1,
 				Source:   w.tileset,
@@ -52,5 +52,5 @@ func (w *TMXWriter) Write(rasterResult RasterResult, tmxFilename string) error {
 		},
 		Layers: layers,
 	}
-	return tmx.SaveTMX(tmxFilename, &tmxMap)
+	return SaveTMX(tmxFilename, &tmxMap)
 }

@@ -1,4 +1,4 @@
-package main
+package mapper
 
 import (
 	"testing"
@@ -12,7 +12,7 @@ func TestMapper(t *testing.T) {
 
 	t.Run("correctly map single tag", func(t *testing.T) {
 		// TODO: table test for each tag
-		mapper := NewMapper()
+		mapper := New()
 
 		tags := osm.Tags{
 			osm.Tag{
@@ -31,7 +31,7 @@ func TestMapper(t *testing.T) {
 	})
 
 	t.Run("correctly default to defaultTile", func(t *testing.T) {
-		mapper := NewMapper()
+		mapper := New()
 
 		tags := osm.Tags{
 			osm.Tag{
@@ -46,7 +46,7 @@ func TestMapper(t *testing.T) {
 	})
 
 	t.Run("correctly map all tiles for multiple tags", func(t *testing.T) {
-		mapper := NewMapper()
+		mapper := New()
 
 		tags := osm.Tags{
 			osm.Tag{

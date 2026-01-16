@@ -1,4 +1,4 @@
-package main
+package mapper
 
 import (
 	"math/rand"
@@ -18,7 +18,7 @@ type MapTile struct {
 	dynamic bool
 }
 
-func NewMapper() *Mapper {
+func New() *Mapper {
 	return &Mapper{
 		defaultTile: 2,
 		layers:      3,

@@ -1,9 +1,11 @@
-package main
+package raster
 
 import (
 	"testing"
 
 	"github.com/paulmach/osm"
+	"github.com/renomarx/osm2tmx/pkg/mapper"
+	"github.com/renomarx/osm2tmx/pkg/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -11,9 +13,9 @@ func TestRaster(t *testing.T) {
 
 	osmfilename := "test.osm.pbf"
 
-	mapper := NewMapper()
+	mapper := mapper.New()
 
-	raster := NewRaster(mapper)
+	raster := New(mapper)
 
 	result, err := raster.Parse(osmfilename)
 	assert.NoError(t, err)
@@ -22,7 +24,7 @@ func TestRaster(t *testing.T) {
 	assert.Equal(t, 410, result.Map.Layers[0].SizeX())
 	assert.Equal(t, 352, result.Map.Layers[1].SizeY())
 	assert.Equal(t, 410, result.Map.Layers[1].SizeX())
-	assert.Equal(t, RasterResultMeta{
+	assert.Equal(t, model.RasterMapMeta{
 		Bounds: osm.Bounds{
 			MinLat: 46.159768999,
 			MaxLat: 46.161954,

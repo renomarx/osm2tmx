@@ -1,4 +1,4 @@
-package main
+package tmx
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ import (
 
 func TestTMXWriter(t *testing.T) {
 
-	writer := NewTMXWriter("tileset/basechip_pipo.tsx", 16, 16)
+	writer := NewWriter("tileset/basechip_pipo.tsx", 16, 16)
 
 	m := model.Map{
 		Layers: []model.Layer{
@@ -21,9 +21,9 @@ func TestTMXWriter(t *testing.T) {
 			*generateLayerTest(t),
 		},
 	}
-	rasterResult := RasterResult{
+	rasterResult := model.RasterMap{
 		Map: &m,
-		Meta: RasterResultMeta{
+		Meta: model.RasterMapMeta{
 			MapSizeX: 12,
 			MapSizeY: 6,
 		},

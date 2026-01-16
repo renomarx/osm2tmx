@@ -1,4 +1,4 @@
-package main
+package raster
 
 import (
 	"context"
@@ -9,43 +9,25 @@ import (
 	"github.com/paulmach/osm/osmpbf"
 	"github.com/renomarx/osm2tmx/pkg/bresenham"
 	"github.com/renomarx/osm2tmx/pkg/evenodd"
+	"github.com/renomarx/osm2tmx/pkg/mapper"
 	"github.com/renomarx/osm2tmx/pkg/mercator"
 	"github.com/renomarx/osm2tmx/pkg/model"
 )
 
 type Raster struct {
-	mapper *Mapper
+	mapper *mapper.Mapper
 }
 
-type RasterResult struct {
-	Map              *model.Map
-	Meta             RasterResultMeta
-	Nodes            []osm.Node
-	Ways             map[int64]*osm.Way
-	Relations        []osm.Relation
-	NodesOutOfBounds []osm.Node
-}
-
-type RasterResultMeta struct {
-	Bounds      osm.Bounds
-	MapSizeX    int
-	MapSizeY    int
-	MaxEasting  float64
-	MaxNorthing float64
-	MinEasting  float64
-	MinNorthing float64
-}
-
-func NewRaster(mapper *Mapper) *Raster {
+func New(mapper *mapper.Mapper) *Raster {
 	return &Raster{
 		mapper: mapper,
 	}
 }
 
-func (r *Raster) Parse(osmFilename string) (RasterResult, error) {
+func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 	f, err := os.Open(osmFilename)
 	if err != nil {
-		return RasterResult{}, err
+		return model.RasterMap{}, err
 	}
 	defer f.Close()
 
@@ -114,7 +96,7 @@ func (r *Raster) Parse(osmFilename string) (RasterResult, error) {
 
 	scanErr := scanner.Err()
 	if scanErr != nil {
-		return RasterResult{}, err
+		return model.RasterMap{}, err
 	}
 
 	for _, way := range osmWays {
@@ -142,9 +124,9 @@ func (r *Raster) Parse(osmFilename string) (RasterResult, error) {
 		r.drawRelationArea(&m, &relation, osmWays, pointsByNodeID, relation.Tags)
 	}
 
-	return RasterResult{
+	return model.RasterMap{
 		Map: &m,
-		Meta: RasterResultMeta{
+		Meta: model.RasterMapMeta{
 			Bounds:      *header.Bounds,
 			MapSizeX:    mapSizeX,
 			MapSizeY:    mapSizeY,

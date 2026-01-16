@@ -5,6 +5,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+
+	"github.com/renomarx/osm2tmx/pkg/mapper"
+	"github.com/renomarx/osm2tmx/pkg/raster"
+	"github.com/renomarx/osm2tmx/pkg/tmx"
 )
 
 func init() {
@@ -42,29 +46,29 @@ func main() {
 	tmxFilename := setTmxFilename(outputFlag, osmFile)
 	log.Printf("will write output to %s", tmxFilename)
 
-	mapper := NewMapper()
-	raster := NewRaster(mapper)
+	mp := mapper.New()
+	rst := raster.New(mp)
 
-	rasterResult, err := raster.Parse(osmFile)
+	rstMap, err := rst.Parse(osmFile)
 	if err != nil {
 		panic(err)
 	}
 
-	log.Printf("%#v\n", rasterResult.Meta.Bounds)
-	log.Printf("Max: UTM: [east:%f,north:%f]\n", rasterResult.Meta.MaxEasting, rasterResult.Meta.MaxNorthing)
-	log.Printf("Min: UTM: [east:%f,north:%f]\n", rasterResult.Meta.MinEasting, rasterResult.Meta.MinNorthing)
-	log.Printf("Map size: (%d,%d) meters\n", rasterResult.Meta.MapSizeX, rasterResult.Meta.MapSizeY)
+	log.Printf("%#v\n", rstMap.Meta.Bounds)
+	log.Printf("Max: UTM: [east:%f,north:%f]\n", rstMap.Meta.MaxEasting, rstMap.Meta.MaxNorthing)
+	log.Printf("Min: UTM: [east:%f,north:%f]\n", rstMap.Meta.MinEasting, rstMap.Meta.MinNorthing)
+	log.Printf("Map size: (%d,%d) meters\n", rstMap.Meta.MapSizeX, rstMap.Meta.MapSizeY)
 
-	log.Printf("Nodes: %d", len(rasterResult.Nodes))
-	log.Printf("Ways: %d", len(rasterResult.Ways))
-	log.Printf("Relations: %d", len(rasterResult.Relations))
+	log.Printf("Nodes: %d", len(rstMap.Nodes))
+	log.Printf("Ways: %d", len(rstMap.Ways))
+	log.Printf("Relations: %d", len(rstMap.Relations))
 
-	log.Printf("Generated map: height: %d, width: %d", rasterResult.Meta.MapSizeY, rasterResult.Meta.MapSizeX)
+	log.Printf("Generated map: height: %d, width: %d", rstMap.Meta.MapSizeY, rstMap.Meta.MapSizeX)
 
-	log.Printf("Number of points out of bounds: %d", len(rasterResult.NodesOutOfBounds))
+	log.Printf("Number of points out of bounds: %d", len(rstMap.NodesOutOfBounds))
 
-	writer := NewTMXWriter("tileset/basechip_pipo.tsx", 16, 16) // TODO: get from conf
-	err = writer.Write(rasterResult, tmxFilename)
+	writer := tmx.NewWriter("tileset/basechip_pipo.tsx", 16, 16) // TODO: get from conf
+	err = writer.Write(rstMap, tmxFilename)
 	if err != nil {
 		panic(err)
 	}
