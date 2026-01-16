@@ -78,7 +78,7 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 				osmNodesOutOfBounds = append(osmNodesOutOfBounds, node)
 				continue
 			}
-			mapTile := r.mapper.MapToTiles(node.Tags, model.Position{})
+			mapTile := r.mapper.GetMapTileFunc(node.Tags)(&model.Position{}) //TODO: fill position
 			for z, tile := range mapTile.ByLayer {
 				m.Layers[z].SetTile(x, y, tile)
 			}
@@ -100,13 +100,13 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 	}
 
 	for _, way := range osmWays {
-		tile := r.mapper.MapToTiles(way.Tags, model.Position{})
+		mapTileFunc := r.mapper.GetMapTileFunc(way.Tags)
 		if way.Nodes[0] == way.Nodes[len(way.Nodes)-1] {
-			if !r.mapper.IsTileDefault(tile) {
-				r.drawWayArea(&m, way, pointsByNodeID, way.Tags)
+			if !r.mapper.IsTileDefault(mapTileFunc(nil)) {
+				r.drawWayArea(&m, way, pointsByNodeID, mapTileFunc)
 			}
 		} else {
-			r.drawWayLine(&m, way, pointsByNodeID, way.Tags)
+			r.drawWayLine(&m, way, pointsByNodeID, mapTileFunc, &Polygon{}, true)
 		}
 	}
 
@@ -117,11 +117,12 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 		if !r.isMultipolygon(&relation) {
 			continue
 		}
-		tile := r.mapper.MapToTiles(relation.Tags, model.Position{})
+		mapTileFunc := r.mapper.GetMapTileFunc(relation.Tags)
+		tile := mapTileFunc(nil)
 		if r.mapper.IsTileDefault(tile) {
 			continue
 		}
-		r.drawRelationArea(&m, &relation, osmWays, pointsByNodeID, relation.Tags)
+		r.drawRelationArea(&m, &relation, osmWays, pointsByNodeID, mapTileFunc)
 	}
 
 	return model.RasterMap{
@@ -142,26 +143,39 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 	}, nil
 }
 
-func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, pointsByNodeID map[int64]model.Point, tags osm.Tags) {
-	mapTileFunc := r.mapper.GetMapTileFunc(tags)
+func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, pointsByNodeID map[int64]model.Point, mapTileFunc mapper.MapTileFunc, polygon *Polygon, withCorners bool) {
 	var lastPoint *model.Point
 	for _, nd := range way.Nodes {
 		nodePoint, exists := pointsByNodeID[int64(nd.ID)]
 		if !exists {
-			lastPoint = nil
 			continue
 		}
 		// Filling all points between the last way point and the current one by the right tile
 		if lastPoint != nil {
-			points := bresenham.Bresenham(lastPoint.X, lastPoint.Y, nodePoint.X, nodePoint.Y, true)
+			points := bresenham.Bresenham(lastPoint.X, lastPoint.Y, nodePoint.X, nodePoint.Y, withCorners)
 			for _, point := range points {
-				mapTile := mapTileFunc(model.Position{}) // TODO: fill position
+				mapTile := mapTileFunc(&model.Position{}) // TODO: fill position
 				for z, tile := range mapTile.ByLayer {
 					m.Layers[z].SetTile(point.X, point.Y, tile)
 				}
+				polygon.Points = append(polygon.Points, point)
 			}
 		}
 		lastPoint = &nodePoint
+
+		if polygon.YMin == nil || nodePoint.Y < polygon.YMin.Y {
+			polygon.YMin = &nodePoint
+		}
+		if polygon.YMax == nil || nodePoint.Y > polygon.YMax.Y {
+			polygon.YMax = &nodePoint
+		}
+
+		if polygon.XMin == nil || nodePoint.X < polygon.XMin.X {
+			polygon.XMin = &nodePoint
+		}
+		if polygon.XMax == nil || nodePoint.X > polygon.XMax.X {
+			polygon.XMax = &nodePoint
+		}
 	}
 }
 
@@ -174,61 +188,29 @@ func (r *Raster) isMultipolygon(relation *osm.Relation) bool {
 	return false
 }
 
-func (r *Raster) drawWayArea(m *model.Map, way *osm.Way, pointsByNodeID map[int64]model.Point, tags osm.Tags) {
-	mapTileFunc := r.mapper.GetMapTileFunc(tags)
-	polygon := make([]model.Point, 0, len(way.Nodes))
-	var yMinPoint *model.Point
-	var yMaxPoint *model.Point
-	var xMinPoint *model.Point
-	var xMaxPoint *model.Point
+func (r *Raster) drawWayArea(m *model.Map, way *osm.Way, pointsByNodeID map[int64]model.Point, mapTileFunc mapper.MapTileFunc) {
+	polygon := Polygon{
+		Points: make([]model.Point, 0, len(way.Nodes)),
+	}
 	// Follow the Scan Line Algorithm
 
 	// 1. Fill the boundaries of the polygon with tile,
 	// 	get the polygon vertices as an array of points,
 	//	and find the yMin & yMax points to apply the scanline algorithm
-	var lastPoint *model.Point
-	for _, nd := range way.Nodes {
-		nodePoint, exists := pointsByNodeID[int64(nd.ID)]
-		if !exists {
-			continue
-		}
-
-		// Filling all points between the last way point and the current one by the right tile
-		if lastPoint != nil {
-			points := bresenham.Bresenham(lastPoint.X, lastPoint.Y, nodePoint.X, nodePoint.Y, false)
-			for _, point := range points {
-				mapTile := mapTileFunc(model.Position{}) // TODO: fill position
-				for z, tile := range mapTile.ByLayer {
-					m.Layers[z].SetTile(point.X, point.Y, tile)
-				}
-				polygon = append(polygon, point)
-			}
-		}
-		lastPoint = &nodePoint
-
-		if yMinPoint == nil || nodePoint.Y < yMinPoint.Y {
-			yMinPoint = &nodePoint
-		}
-		if yMaxPoint == nil || nodePoint.Y > yMaxPoint.Y {
-			yMaxPoint = &nodePoint
-		}
-
-		if xMinPoint == nil || nodePoint.X < xMinPoint.X {
-			xMinPoint = &nodePoint
-		}
-		if xMaxPoint == nil || nodePoint.X > xMaxPoint.X {
-			xMaxPoint = &nodePoint
-		}
-	}
+	r.drawWayLine(m, way, pointsByNodeID, mapTileFunc, &polygon, false)
 
 	// 2. Apply the scanline + even-odd algorithm
-	if yMinPoint == nil || yMaxPoint == nil || xMinPoint == nil || xMaxPoint == nil {
+	r.fillPolygon(m, mapTileFunc, &polygon)
+}
+
+func (r *Raster) fillPolygon(m *model.Map, mapTileFunc mapper.MapTileFunc, polygon *Polygon) {
+	if polygon.YMin == nil || polygon.YMax == nil || polygon.XMin == nil || polygon.XMax == nil {
 		return
 	}
-	for y := yMinPoint.Y; y < yMaxPoint.Y; y++ {
-		for x := xMinPoint.X; x < xMaxPoint.X; x++ {
-			if evenodd.IsInsidePolygon(x, y, polygon) {
-				mapTile := mapTileFunc(model.Position{}) // TODO: fill position
+	for y := polygon.YMin.Y; y < polygon.YMax.Y; y++ {
+		for x := polygon.XMin.X; x < polygon.XMax.X; x++ {
+			if evenodd.IsInsidePolygon(x, y, polygon.Points) {
+				mapTile := mapTileFunc(&model.Position{}) // TODO: fill position
 				for z, tile := range mapTile.ByLayer {
 					m.Layers[z].SetTile(x, y, tile)
 				}
@@ -237,13 +219,10 @@ func (r *Raster) drawWayArea(m *model.Map, way *osm.Way, pointsByNodeID map[int6
 	}
 }
 
-func (r *Raster) drawRelationArea(m *model.Map, relation *osm.Relation, osmWays map[int64]*osm.Way, cellsByNodeID map[int64]model.Point, tags osm.Tags) {
-	mapTileFunc := r.mapper.GetMapTileFunc(tags)
-	polygon := make([]model.Point, 0, len(relation.Members))
-	var yMinPoint *model.Point
-	var yMaxPoint *model.Point
-	var xMinPoint *model.Point
-	var xMaxPoint *model.Point
+func (r *Raster) drawRelationArea(m *model.Map, relation *osm.Relation, osmWays map[int64]*osm.Way, pointsByNodeID map[int64]model.Point, mapTileFunc mapper.MapTileFunc) {
+	polygon := Polygon{
+		Points: make([]model.Point, 0, len(relation.Members)),
+	}
 	// Follow the Scan Line Algorithm
 
 	// 1. Fill the boundaries of the polygon with tile,
@@ -256,66 +235,21 @@ func (r *Raster) drawRelationArea(m *model.Map, relation *osm.Relation, osmWays 
 			if !exists {
 				continue
 			}
-			var lastPoint *model.Point
-			for _, nd := range way.Nodes {
-				nodePoint, exists := cellsByNodeID[int64(nd.ID)]
-				if !exists {
-					continue
-				}
-
-				// Filling all points between the last way point and the current one by the right tile
-				if lastPoint != nil {
-					points := bresenham.Bresenham(lastPoint.X, lastPoint.Y, nodePoint.X, nodePoint.Y, false)
-					for _, point := range points {
-						mapTile := mapTileFunc(model.Position{}) // TODO: fill position
-						for z, tile := range mapTile.ByLayer {
-							m.Layers[z].SetTile(point.X, point.Y, tile)
-						}
-						polygon = append(polygon, point)
-					}
-				}
-				lastPoint = &nodePoint
-
-				if yMinPoint == nil || nodePoint.Y < yMinPoint.Y {
-					yMinPoint = &nodePoint
-				}
-				if yMaxPoint == nil || nodePoint.Y > yMaxPoint.Y {
-					yMaxPoint = &nodePoint
-				}
-
-				if xMinPoint == nil || nodePoint.X < xMinPoint.X {
-					xMinPoint = &nodePoint
-				}
-				if xMaxPoint == nil || nodePoint.X > xMaxPoint.X {
-					xMaxPoint = &nodePoint
-				}
-			}
+			r.drawWayLine(m, way, pointsByNodeID, mapTileFunc, &polygon, false)
 
 		case osm.TypeNode:
-			pointerToCase, exists := cellsByNodeID[int64(member.Ref)]
+			pointerToCase, exists := pointsByNodeID[int64(member.Ref)]
 			if !exists {
 				continue
 			}
-			mapTile := mapTileFunc(model.Position{}) // TODO: fill position
+			mapTile := mapTileFunc(&model.Position{}) // TODO: fill position
 			for z, tile := range mapTile.ByLayer {
 				m.Layers[z].SetTile(pointerToCase.X, pointerToCase.Y, tile)
 			}
-			polygon = append(polygon, model.Point{X: pointerToCase.X, Y: pointerToCase.Y})
+			polygon.Points = append(polygon.Points, model.Point{X: pointerToCase.X, Y: pointerToCase.Y})
 		}
 	}
 
 	// 2. Apply the scanline + even-odd algorithm
-	if yMinPoint == nil || yMaxPoint == nil || xMinPoint == nil || xMaxPoint == nil {
-		return
-	}
-	for y := yMinPoint.Y; y < yMaxPoint.Y; y++ {
-		for x := xMinPoint.X; x < xMaxPoint.X; x++ {
-			if evenodd.IsInsidePolygon(x, y, polygon) {
-				mapTile := mapTileFunc(model.Position{}) // TODO: fill position
-				for z, tile := range mapTile.ByLayer {
-					m.Layers[z].SetTile(x, y, tile)
-				}
-			}
-		}
-	}
+	r.fillPolygon(m, mapTileFunc, &polygon)
 }

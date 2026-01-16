@@ -13,6 +13,8 @@ type Mapper struct {
 	layers      int
 }
 
+// MapTileFunc is a function that maps a position to a MapTile
+type MapTileFunc func(pos *model.Position) MapTile
 type MapTile struct {
 	ByLayer map[int]model.Tile
 	dynamic bool
@@ -25,6 +27,20 @@ func New() *Mapper {
 	}
 }
 
+// GetMapTileFunc returns a function that returns the mapTile mapped to the tags
+// The interest of using this function is to cache non-dynamic tile (will always return the same tile for the same tags)
+func (m *Mapper) GetMapTileFunc(tags osm.Tags) MapTileFunc {
+	mapTile := m.mapToTiles(tags, nil)
+	if mapTile.dynamic {
+		return func(pos *model.Position) MapTile {
+			return m.mapToTiles(tags, pos)
+		}
+	}
+	return func(pos *model.Position) MapTile {
+		return mapTile
+	}
+}
+
 func (m *Mapper) GetDefaultTile() model.Tile {
 	return m.defaultTile
 }
@@ -33,7 +49,11 @@ func (m *Mapper) Layers() int {
 	return m.layers
 }
 
-func (m *Mapper) MapToTiles(tags osm.Tags, pos model.Position) MapTile {
+func (m *Mapper) IsTileDefault(mapTile MapTile) bool {
+	return len(mapTile.ByLayer) == 0 || (len(mapTile.ByLayer) == 1 && mapTile.ByLayer[0] == m.defaultTile)
+}
+
+func (m *Mapper) mapToTiles(tags osm.Tags, pos *model.Position) MapTile {
 	// TODO: handle pos
 	byLayer := make(map[int]model.Tile)
 	byLayer[0] = m.defaultTile
@@ -144,22 +164,4 @@ func (m *Mapper) MapToTiles(tags osm.Tags, pos model.Position) MapTile {
 	}
 
 	return MapTile{ByLayer: byLayer, dynamic: dynamic}
-}
-
-func (m *Mapper) IsTileDefault(mapTile MapTile) bool {
-	return len(mapTile.ByLayer) == 0 || (len(mapTile.ByLayer) == 1 && mapTile.ByLayer[0] == m.defaultTile)
-}
-
-// GetMapTileFunc returns a function that returns the mapTile mapped to the tags
-// The interest of using this function is to cache non-dynamic tile (will always return the same tile for the same tags)
-func (m *Mapper) GetMapTileFunc(tags osm.Tags) func(pos model.Position) MapTile {
-	mapTile := m.MapToTiles(tags, model.Position{})
-	if mapTile.dynamic {
-		return func(pos model.Position) MapTile {
-			return m.MapToTiles(tags, pos)
-		}
-	}
-	return func(pos model.Position) MapTile {
-		return mapTile
-	}
 }

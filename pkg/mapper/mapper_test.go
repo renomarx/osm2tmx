@@ -25,7 +25,7 @@ func TestMapper(t *testing.T) {
 			},
 		}
 
-		mapTile := mapper.MapToTiles(tags, model.Position{})
+		mapTile := mapper.GetMapTileFunc(tags)(nil)
 		assert.Equal(t, model.Tile(5), mapTile.ByLayer[2])
 		assert.False(t, mapper.IsTileDefault(mapTile))
 	})
@@ -40,7 +40,7 @@ func TestMapper(t *testing.T) {
 			},
 		}
 
-		mapTile := mapper.MapToTiles(tags, model.Position{})
+		mapTile := mapper.GetMapTileFunc(tags)(nil)
 		assert.Equal(t, model.Tile(2), mapTile.ByLayer[0])
 		assert.True(t, mapper.IsTileDefault(mapTile))
 	})
@@ -63,7 +63,7 @@ func TestMapper(t *testing.T) {
 			},
 		}
 
-		mapTile := mapper.MapToTiles(tags, model.Position{})
+		mapTile := mapper.GetMapTileFunc(tags)(nil)
 		assert.Equal(t, model.Tile(4), mapTile.ByLayer[0])
 		assert.Equal(t, model.Tile(417), mapTile.ByLayer[2])
 		assert.False(t, mapper.IsTileDefault(mapTile))
