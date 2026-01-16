@@ -33,7 +33,8 @@ func (m *Mapper) Layers() int {
 	return m.layers
 }
 
-func (m *Mapper) MapTagsToTile(tags osm.Tags) MapTile {
+func (m *Mapper) MapToTiles(tags osm.Tags, pos model.Position) MapTile {
+	// TODO: handle pos
 	byLayer := make(map[int]model.Tile)
 	byLayer[0] = m.defaultTile
 	dynamic := false
@@ -151,14 +152,14 @@ func (m *Mapper) IsTileDefault(mapTile MapTile) bool {
 
 // GetMapTileFunc returns a function that returns the mapTile mapped to the tags
 // The interest of using this function is to cache non-dynamic tile (will always return the same tile for the same tags)
-func (m *Mapper) GetMapTileFunc(tags osm.Tags) func() MapTile {
-	mapTile := m.MapTagsToTile(tags)
+func (m *Mapper) GetMapTileFunc(tags osm.Tags) func(pos model.Position) MapTile {
+	mapTile := m.MapToTiles(tags, model.Position{})
 	if mapTile.dynamic {
-		return func() MapTile {
-			return m.MapTagsToTile(tags)
+		return func(pos model.Position) MapTile {
+			return m.MapToTiles(tags, pos)
 		}
 	}
-	return func() MapTile {
+	return func(pos model.Position) MapTile {
 		return mapTile
 	}
 }

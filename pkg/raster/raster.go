@@ -78,7 +78,7 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 				osmNodesOutOfBounds = append(osmNodesOutOfBounds, node)
 				continue
 			}
-			mapTile := r.mapper.MapTagsToTile(node.Tags)
+			mapTile := r.mapper.MapToTiles(node.Tags, model.Position{})
 			for z, tile := range mapTile.ByLayer {
 				m.Layers[z].SetTile(x, y, tile)
 			}
@@ -100,7 +100,7 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 	}
 
 	for _, way := range osmWays {
-		tile := r.mapper.MapTagsToTile(way.Tags)
+		tile := r.mapper.MapToTiles(way.Tags, model.Position{})
 		if way.Nodes[0] == way.Nodes[len(way.Nodes)-1] {
 			if !r.mapper.IsTileDefault(tile) {
 				r.drawWayArea(&m, way, pointsByNodeID, way.Tags)
@@ -117,7 +117,7 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 		if !r.isMultipolygon(&relation) {
 			continue
 		}
-		tile := r.mapper.MapTagsToTile(relation.Tags)
+		tile := r.mapper.MapToTiles(relation.Tags, model.Position{})
 		if r.mapper.IsTileDefault(tile) {
 			continue
 		}
@@ -155,7 +155,7 @@ func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, pointsByNodeID map[int6
 		if lastPoint != nil {
 			points := bresenham.Bresenham(lastPoint.X, lastPoint.Y, nodePoint.X, nodePoint.Y, true)
 			for _, point := range points {
-				mapTile := mapTileFunc()
+				mapTile := mapTileFunc(model.Position{}) // TODO: fill position
 				for z, tile := range mapTile.ByLayer {
 					m.Layers[z].SetTile(point.X, point.Y, tile)
 				}
@@ -197,7 +197,7 @@ func (r *Raster) drawWayArea(m *model.Map, way *osm.Way, pointsByNodeID map[int6
 		if lastPoint != nil {
 			points := bresenham.Bresenham(lastPoint.X, lastPoint.Y, nodePoint.X, nodePoint.Y, false)
 			for _, point := range points {
-				mapTile := mapTileFunc()
+				mapTile := mapTileFunc(model.Position{}) // TODO: fill position
 				for z, tile := range mapTile.ByLayer {
 					m.Layers[z].SetTile(point.X, point.Y, tile)
 				}
@@ -228,7 +228,7 @@ func (r *Raster) drawWayArea(m *model.Map, way *osm.Way, pointsByNodeID map[int6
 	for y := yMinPoint.Y; y < yMaxPoint.Y; y++ {
 		for x := xMinPoint.X; x < xMaxPoint.X; x++ {
 			if evenodd.IsInsidePolygon(x, y, polygon) {
-				mapTile := mapTileFunc()
+				mapTile := mapTileFunc(model.Position{}) // TODO: fill position
 				for z, tile := range mapTile.ByLayer {
 					m.Layers[z].SetTile(x, y, tile)
 				}
@@ -267,7 +267,7 @@ func (r *Raster) drawRelationArea(m *model.Map, relation *osm.Relation, osmWays 
 				if lastPoint != nil {
 					points := bresenham.Bresenham(lastPoint.X, lastPoint.Y, nodePoint.X, nodePoint.Y, false)
 					for _, point := range points {
-						mapTile := mapTileFunc()
+						mapTile := mapTileFunc(model.Position{}) // TODO: fill position
 						for z, tile := range mapTile.ByLayer {
 							m.Layers[z].SetTile(point.X, point.Y, tile)
 						}
@@ -296,7 +296,7 @@ func (r *Raster) drawRelationArea(m *model.Map, relation *osm.Relation, osmWays 
 			if !exists {
 				continue
 			}
-			mapTile := mapTileFunc()
+			mapTile := mapTileFunc(model.Position{}) // TODO: fill position
 			for z, tile := range mapTile.ByLayer {
 				m.Layers[z].SetTile(pointerToCase.X, pointerToCase.Y, tile)
 			}
@@ -311,7 +311,7 @@ func (r *Raster) drawRelationArea(m *model.Map, relation *osm.Relation, osmWays 
 	for y := yMinPoint.Y; y < yMaxPoint.Y; y++ {
 		for x := xMinPoint.X; x < xMaxPoint.X; x++ {
 			if evenodd.IsInsidePolygon(x, y, polygon) {
-				mapTile := mapTileFunc()
+				mapTile := mapTileFunc(model.Position{}) // TODO: fill position
 				for z, tile := range mapTile.ByLayer {
 					m.Layers[z].SetTile(x, y, tile)
 				}
