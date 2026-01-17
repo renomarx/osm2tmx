@@ -76,7 +76,7 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 				osmNodesOutOfBounds = append(osmNodesOutOfBounds, node)
 				continue
 			}
-			mapTile := r.mapper.GetMapTileFunc(node.Tags)(&model.Position{}) //TODO: fill position
+			mapTile := r.mapper.GetMapTileFunc(node.Tags)(&model.Position{X: x, Y: y})
 			for z, tile := range mapTile.ByLayer {
 				m.Layers[z].SetTile(x, y, tile)
 			}
@@ -85,10 +85,8 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 		case *osm.Way:
 			way := scanner.Object().(*osm.Way)
 			osmWays[int64(way.ID)] = way
-			// TODO
 		case *osm.Relation:
 			osmRelations = append(osmRelations, *scanner.Object().(*osm.Relation))
-			// TODO
 		}
 	}
 
