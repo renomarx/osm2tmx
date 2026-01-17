@@ -68,4 +68,25 @@ func TestMapper(t *testing.T) {
 		assert.Equal(t, model.Tile(417), mapTile.ByLayer[2])
 		assert.False(t, mapper.IsTileDefault(mapTile))
 	})
+
+	t.Run("correctly map with pos", func(t *testing.T) {
+		// TODO: table test for each tag
+		mapper := New()
+
+		tags := osm.Tags{
+			osm.Tag{
+				Key:   "highway",
+				Value: "pedestrian",
+			},
+			osm.Tag{
+				Key:   "another_tag",
+				Value: "another_value",
+			},
+		}
+
+		mapTileFunc := mapper.GetMapTileFunc(tags)
+		assert.Equal(t, model.Tile(120), mapTileFunc(nil).ByLayer[2])
+		assert.Equal(t, model.Tile(128), mapTileFunc(&model.Position{Top: 0, Bottom: 0, Left: 0, Right: 0}).ByLayer[2])
+		assert.Equal(t, model.Tile(128), mapTileFunc(&model.Position{Top: 0, Bottom: 0, Left: 0, Right: 0}).ByLayer[2])
+	})
 }

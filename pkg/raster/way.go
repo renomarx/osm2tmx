@@ -9,6 +9,7 @@ import (
 
 func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, pointsByNodeID map[int64]model.Point, mapTileFunc mapper.MapTileFunc, polygon *Polygon, withCorners bool) {
 	var lastPoint *model.Point
+	wayPoints := make(map[model.Point]bool)
 	for _, nd := range way.Nodes {
 		nodePoint, exists := pointsByNodeID[int64(nd.ID)]
 		if !exists {
@@ -18,11 +19,8 @@ func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, pointsByNodeID map[int6
 		if lastPoint != nil {
 			points := bresenham.Bresenham(lastPoint.X, lastPoint.Y, nodePoint.X, nodePoint.Y, withCorners)
 			for _, point := range points {
-				mapTile := mapTileFunc(&model.Position{}) // TODO: fill position
-				for z, tile := range mapTile.ByLayer {
-					m.Layers[z].SetTile(point.X, point.Y, tile)
-				}
 				polygon.Points = append(polygon.Points, point)
+				wayPoints[point] = true
 			}
 		}
 		lastPoint = &nodePoint
@@ -39,6 +37,44 @@ func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, pointsByNodeID map[int6
 		}
 		if polygon.XMax == nil || nodePoint.X > polygon.XMax.X {
 			polygon.XMax = &nodePoint
+		}
+	}
+	for point := range wayPoints {
+		top := 0
+		for {
+			_, exists := wayPoints[model.Point{X: point.X, Y: point.Y - top - 1}]
+			if !exists {
+				break
+			}
+			top++
+		}
+		bottom := 0
+		for {
+			_, exists := wayPoints[model.Point{X: point.X, Y: point.Y + bottom + 1}]
+			if !exists {
+				break
+			}
+			bottom++
+		}
+		left := 0
+		for {
+			_, exists := wayPoints[model.Point{X: point.X - left - 1, Y: point.Y}]
+			if !exists {
+				break
+			}
+			left++
+		}
+		right := 0
+		for {
+			_, exists := wayPoints[model.Point{X: point.X + right + 1, Y: point.Y}]
+			if !exists {
+				break
+			}
+			right++
+		}
+		mapTile := mapTileFunc(&model.Position{X: point.X, Y: point.Y, Top: top, Left: left, Right: right, Bottom: bottom})
+		for z, tile := range mapTile.ByLayer {
+			m.Layers[z].SetTile(point.X, point.Y, tile)
 		}
 	}
 }

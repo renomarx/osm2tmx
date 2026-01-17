@@ -99,7 +99,41 @@ func (m *Mapper) mapToTiles(tags osm.Tags, pos *model.Position) MapTile {
 			byLayer[2] = 5
 			switch tag.Value {
 			case "pedestrian":
-				byLayer[2] = 5
+				byLayer[2] = 120
+				dynamic = true
+				switch {
+				case pos == nil:
+				case pos.IsStandalone():
+					byLayer[2] = 128
+				case pos.IsCornerTopLeft():
+					byLayer[2] = 113
+				case pos.IsCornerTopRight():
+					byLayer[2] = 115
+				case pos.IsCornerBottomLeft():
+					byLayer[2] = 129
+				case pos.IsCornerBottomRight():
+					byLayer[2] = 131
+				case pos.IsBorderTop():
+					byLayer[2] = 114
+				case pos.IsBorderBottom():
+					byLayer[2] = 130
+				case pos.IsBorderLeft():
+					byLayer[2] = 121
+				case pos.IsBorderRight():
+					byLayer[2] = 123
+				case pos.IsBorderLeftAndRight():
+					byLayer[2] = 144
+				case pos.IsBorderTopAndBottom():
+					byLayer[2] = 149
+				case pos.IsEndWayRight():
+					byLayer[2] = 150
+				case pos.IsEndWayLeft():
+					byLayer[2] = 148
+				case pos.IsEndWayBottom():
+					byLayer[2] = 152
+				case pos.IsEndWayTop():
+					byLayer[2] = 135
+				}
 			case "road":
 				byLayer[2] = 8
 			}
