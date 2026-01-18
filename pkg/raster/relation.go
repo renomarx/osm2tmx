@@ -16,9 +16,7 @@ func (r *Raster) isMultipolygon(relation *osm.Relation) bool {
 }
 
 func (r *Raster) drawRelationArea(m *model.Map, relation *osm.Relation, osmWays map[int64]*osm.Way, pointsByNodeID map[int64]model.Point, mapTileFunc mapper.MapTileFunc) {
-	polygon := Polygon{
-		Points: make([]model.Point, 0, len(relation.Members)),
-	}
+	polygon := model.NewPolygon()
 	// Follow the Scan Line Algorithm
 
 	// 1. Fill the boundaries of the polygon with tile,
@@ -31,21 +29,22 @@ func (r *Raster) drawRelationArea(m *model.Map, relation *osm.Relation, osmWays 
 			if !exists {
 				continue
 			}
-			r.drawWayLine(m, way, pointsByNodeID, mapTileFunc, &polygon, false)
+			r.drawWayLine(m, way, pointsByNodeID, mapTileFunc, polygon, false)
 
 		case osm.TypeNode:
-			pointerToCase, exists := pointsByNodeID[int64(member.Ref)]
+			point, exists := pointsByNodeID[int64(member.Ref)]
 			if !exists {
 				continue
 			}
-			mapTile := mapTileFunc(&model.Position{}) // TODO: fill position
+			pos := polygon.GetPositionFromLine(point)
+			mapTile := mapTileFunc(&pos)
 			for z, tile := range mapTile.ByLayer {
-				m.Layers[z].SetTile(pointerToCase.X, pointerToCase.Y, tile)
+				m.Layers[z].SetTile(point.X, point.Y, tile)
 			}
-			polygon.Points = append(polygon.Points, model.Point{X: pointerToCase.X, Y: pointerToCase.Y})
+			polygon.Points = append(polygon.Points, model.Point{X: point.X, Y: point.Y})
 		}
 	}
 
 	// 2. Apply the scanline + even-odd algorithm
-	r.fillPolygon(m, mapTileFunc, &polygon)
+	r.fillPolygon(m, mapTileFunc, polygon)
 }

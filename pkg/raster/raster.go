@@ -7,6 +7,7 @@ import (
 
 	"github.com/paulmach/osm"
 	"github.com/paulmach/osm/osmpbf"
+	"github.com/renomarx/osm2tmx/pkg/evenodd"
 	"github.com/renomarx/osm2tmx/pkg/mapper"
 	"github.com/renomarx/osm2tmx/pkg/mercator"
 	"github.com/renomarx/osm2tmx/pkg/model"
@@ -102,7 +103,7 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 				r.drawWayArea(&m, way, pointsByNodeID, mapTileFunc)
 			}
 		} else {
-			r.drawWayLine(&m, way, pointsByNodeID, mapTileFunc, &Polygon{}, true)
+			r.drawWayLine(&m, way, pointsByNodeID, mapTileFunc, model.NewPolygon(), true)
 		}
 	}
 
@@ -137,4 +138,22 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 		Relations:        osmRelations,
 		NodesOutOfBounds: osmNodesOutOfBounds,
 	}, nil
+}
+
+func (r *Raster) fillPolygon(m *model.Map, mapTileFunc mapper.MapTileFunc, polygon *model.Polygon) {
+	if polygon.YMin == nil || polygon.YMax == nil || polygon.XMin == nil || polygon.XMax == nil {
+		return
+	}
+	for y := polygon.YMin.Y; y <= polygon.YMax.Y; y++ {
+		for x := polygon.XMin.X; x <= polygon.XMax.X; x++ {
+			if evenodd.IsInsidePolygon(x, y, polygon.Points) {
+				pos := polygon.GetPositionFromBoundaries(model.Point{X: x, Y: y})
+				// fmt.Printf("%#v\n", pos)
+				mapTile := mapTileFunc(&pos)
+				for z, tile := range mapTile.ByLayer {
+					m.Layers[z].SetTile(x, y, tile)
+				}
+			}
+		}
+	}
 }

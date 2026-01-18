@@ -7,9 +7,8 @@ import (
 	"github.com/renomarx/osm2tmx/pkg/model"
 )
 
-func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, pointsByNodeID map[int64]model.Point, mapTileFunc mapper.MapTileFunc, polygon *Polygon, withCorners bool) {
+func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, pointsByNodeID map[int64]model.Point, mapTileFunc mapper.MapTileFunc, polygon *model.Polygon, withCorners bool) {
 	var lastPoint *model.Point
-	wayPoints := make(map[model.Point]bool)
 	for _, nd := range way.Nodes {
 		nodePoint, exists := pointsByNodeID[int64(nd.ID)]
 		if !exists {
@@ -19,8 +18,7 @@ func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, pointsByNodeID map[int6
 		if lastPoint != nil {
 			points := bresenham.Bresenham(lastPoint.X, lastPoint.Y, nodePoint.X, nodePoint.Y, withCorners)
 			for _, point := range points {
-				polygon.Points = append(polygon.Points, point)
-				wayPoints[point] = true
+				polygon.AddPoint(point)
 			}
 		}
 		lastPoint = &nodePoint
@@ -39,40 +37,12 @@ func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, pointsByNodeID map[int6
 			polygon.XMax = &nodePoint
 		}
 	}
-	for point := range wayPoints {
-		top := 0
-		for {
-			_, exists := wayPoints[model.Point{X: point.X, Y: point.Y - top - 1}]
-			if !exists {
-				break
-			}
-			top++
-		}
-		bottom := 0
-		for {
-			_, exists := wayPoints[model.Point{X: point.X, Y: point.Y + bottom + 1}]
-			if !exists {
-				break
-			}
-			bottom++
-		}
-		left := 0
-		for {
-			_, exists := wayPoints[model.Point{X: point.X - left - 1, Y: point.Y}]
-			if !exists {
-				break
-			}
-			left++
-		}
-		right := 0
-		for {
-			_, exists := wayPoints[model.Point{X: point.X + right + 1, Y: point.Y}]
-			if !exists {
-				break
-			}
-			right++
-		}
-		mapTile := mapTileFunc(&model.Position{X: point.X, Y: point.Y, Top: top, Left: left, Right: right, Bottom: bottom})
+
+	// range over line to get the relative position of each point of the line,
+	// and select corresponding tile to fill the map
+	for _, point := range polygon.Points {
+		pos := polygon.GetPositionFromLine(point)
+		mapTile := mapTileFunc(&pos)
 		for z, tile := range mapTile.ByLayer {
 			m.Layers[z].SetTile(point.X, point.Y, tile)
 		}
@@ -87,16 +57,14 @@ func (r *Raster) isPolygon(way *osm.Way) bool {
 }
 
 func (r *Raster) drawWayArea(m *model.Map, way *osm.Way, pointsByNodeID map[int64]model.Point, mapTileFunc mapper.MapTileFunc) {
-	polygon := Polygon{
-		Points: make([]model.Point, 0, len(way.Nodes)),
-	}
+	polygon := model.NewPolygon()
 	// Follow the Scan Line Algorithm
 
 	// 1. Fill the boundaries of the polygon with tile,
 	// 	get the polygon vertices as an array of points,
 	//	and find the yMin & yMax points to apply the scanline algorithm
-	r.drawWayLine(m, way, pointsByNodeID, mapTileFunc, &polygon, false)
+	r.drawWayLine(m, way, pointsByNodeID, mapTileFunc, polygon, false)
 
 	// 2. Apply the scanline + even-odd algorithm
-	r.fillPolygon(m, mapTileFunc, &polygon)
+	r.fillPolygon(m, mapTileFunc, polygon)
 }

@@ -67,82 +67,82 @@ func (m *Mapper) mapToTiles(tags osm.Tags, pos *model.Position) MapTile {
 		case "aeroway":
 			byLayer[1] = 847
 		case "building":
-			byLayer[2] = 417
+			byLayer[1] = 417
+			dynamic = true
 			switch tag.Value {
 			case "apartments":
-				byLayer[2] = 450
 			case "detached", "house":
-				byLayer[2] = 434
 			case "hotel", "residential":
-				byLayer[2] = 402
 			case "religious", "cathedral", "chapel", "church":
-				byLayer[2] = 483
+				switch {
+				case pos == nil:
+				case pos.Bottom == 0 && pos.Top >= 3:
+					byLayer[1] = 489
+				case pos.Bottom == 1 && pos.Top >= 2:
+					byLayer[1] = 481
+				case pos.Bottom == 2 && pos.Top >= 1:
+					byLayer[1] = 473
+				default:
+					byLayer[1] = 465
+				}
 			case "commercial", "industrial", "kiosk", "office", "retail", "supermarket", "warehouse":
-				byLayer[2] = 385
 			case "hospital":
-				byLayer[2] = 417 // TODO
 			case "museum":
-				byLayer[2] = 417 // TODO
 			case "school":
-				byLayer[2] = 417 // TODO
 			case "train_station":
-				byLayer[2] = 417 // TODO
 			case "university":
-				byLayer[2] = 417 // TODO
 			case "fire_station":
-				byLayer[2] = 417 // TODO
 			case "government", "public":
-				byLayer[2] = 417 // TODO
 			}
 			// apartments
 		case "highway":
-			byLayer[2] = 5
+			byLayer[1] = 120
+			dynamic = true
+			switch {
+			case pos == nil:
+			case pos.IsStandalone():
+				byLayer[1] = 128
+			case pos.IsCornerTopLeft():
+				byLayer[1] = 113
+			case pos.IsCornerTopRight():
+				byLayer[1] = 115
+			case pos.IsCornerBottomLeft():
+				byLayer[1] = 129
+			case pos.IsCornerBottomRight():
+				byLayer[1] = 131
+			case pos.IsBorderTop():
+				byLayer[1] = 114
+			case pos.IsBorderBottom():
+				byLayer[1] = 130
+			case pos.IsBorderLeft():
+				byLayer[1] = 121
+			case pos.IsBorderRight():
+				byLayer[1] = 123
+			case pos.IsBorderLeftAndRight():
+				byLayer[1] = 144
+			case pos.IsBorderTopAndBottom():
+				byLayer[1] = 149
+			case pos.IsEndWayRight():
+				byLayer[1] = 150
+			case pos.IsEndWayLeft():
+				byLayer[1] = 148
+			case pos.IsEndWayBottom():
+				byLayer[1] = 152
+			case pos.IsEndWayTop():
+				byLayer[1] = 135
+			}
 			switch tag.Value {
-			case "pedestrian":
-				byLayer[2] = 120
-				dynamic = true
-				switch {
-				case pos == nil:
-				case pos.IsStandalone():
-					byLayer[2] = 128
-				case pos.IsCornerTopLeft():
-					byLayer[2] = 113
-				case pos.IsCornerTopRight():
-					byLayer[2] = 115
-				case pos.IsCornerBottomLeft():
-					byLayer[2] = 129
-				case pos.IsCornerBottomRight():
-					byLayer[2] = 131
-				case pos.IsBorderTop():
-					byLayer[2] = 114
-				case pos.IsBorderBottom():
-					byLayer[2] = 130
-				case pos.IsBorderLeft():
-					byLayer[2] = 121
-				case pos.IsBorderRight():
-					byLayer[2] = 123
-				case pos.IsBorderLeftAndRight():
-					byLayer[2] = 144
-				case pos.IsBorderTopAndBottom():
-					byLayer[2] = 149
-				case pos.IsEndWayRight():
-					byLayer[2] = 150
-				case pos.IsEndWayLeft():
-					byLayer[2] = 148
-				case pos.IsEndWayBottom():
-					byLayer[2] = 152
-				case pos.IsEndWayTop():
-					byLayer[2] = 135
-				}
-			case "road":
-				byLayer[2] = 8
+			case "motorway", "trunk", "primary", "secondary", "tertiary", "road":
+			case "steps":
+			case "pedestrian", "footway":
+			case "service":
 			}
 		case "waterway", "water":
-			byLayer[2] = 318
+			byLayer[0] = 318
 		case "natural":
 			switch tag.Value {
 			case "water":
-				byLayer[2] = 318
+				byLayer[0] = 318
 			case "wood":
 				r := rand.Intn(100)
 				byLayer[0] = 4

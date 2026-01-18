@@ -26,7 +26,7 @@ func TestMapper(t *testing.T) {
 		}
 
 		mapTile := mapper.GetMapTileFunc(tags)(nil)
-		assert.Equal(t, model.Tile(5), mapTile.ByLayer[2])
+		assert.Equal(t, model.Tile(120), mapTile.ByLayer[1])
 		assert.False(t, mapper.IsTileDefault(mapTile))
 	})
 
@@ -54,8 +54,8 @@ func TestMapper(t *testing.T) {
 				Value: "appartments",
 			},
 			osm.Tag{
-				Key:   "natural",
-				Value: "wood",
+				Key:   "surface",
+				Value: "asphalt",
 			},
 			osm.Tag{
 				Key:   "another_tag",
@@ -64,8 +64,8 @@ func TestMapper(t *testing.T) {
 		}
 
 		mapTile := mapper.GetMapTileFunc(tags)(nil)
-		assert.Equal(t, model.Tile(4), mapTile.ByLayer[0])
-		assert.Equal(t, model.Tile(417), mapTile.ByLayer[2])
+		assert.Equal(t, model.Tile(8), mapTile.ByLayer[0])
+		assert.Equal(t, model.Tile(417), mapTile.ByLayer[1])
 		assert.False(t, mapper.IsTileDefault(mapTile))
 	})
 
@@ -85,8 +85,8 @@ func TestMapper(t *testing.T) {
 		}
 
 		mapTileFunc := mapper.GetMapTileFunc(tags)
-		assert.Equal(t, model.Tile(120), mapTileFunc(nil).ByLayer[2])
-		assert.Equal(t, model.Tile(128), mapTileFunc(&model.Position{Top: 0, Bottom: 0, Left: 0, Right: 0}).ByLayer[2])
-		assert.Equal(t, model.Tile(128), mapTileFunc(&model.Position{Top: 0, Bottom: 0, Left: 0, Right: 0}).ByLayer[2])
+		assert.Equal(t, model.Tile(120), mapTileFunc(nil).ByLayer[1])
+		assert.Equal(t, model.Tile(128), mapTileFunc(&model.Position{Top: 0, Bottom: 0, Left: 0, Right: 0}).ByLayer[1])
+		assert.Equal(t, model.Tile(113), mapTileFunc(&model.Position{Top: 0, Bottom: 1, Left: 0, Right: 1}).ByLayer[1])
 	})
 }
