@@ -2,6 +2,7 @@ package raster
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"os"
 
@@ -148,7 +149,7 @@ func (r *Raster) fillPolygon(m *model.Map, mapTileFunc mapper.MapTileFunc, polyg
 		for x := polygon.XMin.X; x <= polygon.XMax.X; x++ {
 			if evenodd.IsInsidePolygon(x, y, polygon.Points) {
 				pos := polygon.GetPositionFromBoundaries(model.Point{X: x, Y: y})
-				// fmt.Printf("%#v\n", pos)
+				fmt.Printf("%#v\n", pos)
 				mapTile := mapTileFunc(&pos)
 				for z, tile := range mapTile.ByLayer {
 					m.Layers[z].SetTile(x, y, tile)

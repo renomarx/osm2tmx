@@ -96,13 +96,12 @@ func TestDrawWayArea(t *testing.T) {
 
 	r.drawWayArea(&m, &way, pointsByNodeID, r.mapper.GetMapTileFunc(way.Tags))
 
-	// TODO: fix test, it's not the expected result (see mapper)
 	expectedFilledLayerVue := `
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,465,465,465,465,465,465,465,0,0,0,0,
-0,465,465,465,465,465,465,465,465,465,465,0,
-0,465,465,465,465,465,465,465,465,465,465,0,
-0,0,465,465,465,465,465,465,465,0,0,0,
+0,419,473,473,473,473,473,473,465,465,465,0,
+0,419,481,481,481,481,481,481,419,419,419,0,
+0,0,489,489,489,489,489,489,419,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
 `
 	assert.Equal(t, expectedFilledLayerVue, m.Layers[1].String())
