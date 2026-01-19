@@ -71,27 +71,23 @@ func (p *Polygon) GetPositionFromBoundaries(point Point) Position {
 			break
 		}
 	}
-	bottom = point.Y - bottom
+	bottom = bottom - point.Y
 
-	for bottom <= (p.YMax.Y - point.Y) {
-		if p.IsBoundary(Point{X: point.X, Y: point.Y + bottom + 1}) {
-			break
-		}
-		bottom++
-	}
 	left := 0
-	for left <= (point.X - p.XMin.X) {
-		if p.IsBoundary(Point{X: point.X - left - 1, Y: point.Y}) {
+	for left = p.XMin.X; left < point.X; left++ {
+		if p.IsBoundary(Point{X: left, Y: point.Y}) {
 			break
 		}
-		left++
 	}
+	left = point.X - left
+
 	right := 0
-	for right <= (p.XMax.X - point.X) {
-		if p.IsBoundary(Point{X: point.X + right + 1, Y: point.Y}) {
+	for right = p.XMax.X; right > point.Y; right-- {
+		if p.IsBoundary(Point{X: right, Y: point.Y}) {
 			break
 		}
-		right++
 	}
+	right = right - point.Y
+
 	return Position{X: point.X, Y: point.Y, Top: top, Left: left, Right: right, Bottom: bottom}
 }

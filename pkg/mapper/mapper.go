@@ -84,7 +84,7 @@ func (m *Mapper) mapToTiles(tags osm.Tags, pos *model.Position) MapTile {
 					byLayer[1] = 473
 				case pos.Bottom == 0 && pos.Top < 3:
 					byLayer[1] = 419
-				case pos.Bottom == 1 && pos.Top < 2:
+				case pos.Bottom == 1 && pos.Top > 0 && pos.Top < 2:
 					byLayer[1] = 419
 				case pos.IsStandalone():
 					byLayer[1] = 431
