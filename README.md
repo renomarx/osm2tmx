@@ -52,6 +52,9 @@ tags:
   - Not included in OSM data, we'll have to find another way
 - Conf & handle the mapping.yaml file
 - Optimisation
+  - Scanline & even-odd optimization (could do all in once instead of parsing all the line in the polygon for each point of the line)
+  - Goroutines & workers to handle ways & areas
+  - See simd/archisimd in go1.26
 - More examples with other tilesets
 - Generate a tileset like OSM stylesheets to have a pretty map in tmx :)
 
