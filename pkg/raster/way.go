@@ -22,20 +22,6 @@ func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, pointsByNodeID map[int6
 			}
 		}
 		lastPoint = &nodePoint
-
-		if polygon.YMin == nil || nodePoint.Y < polygon.YMin.Y {
-			polygon.YMin = &nodePoint
-		}
-		if polygon.YMax == nil || nodePoint.Y > polygon.YMax.Y {
-			polygon.YMax = &nodePoint
-		}
-
-		if polygon.XMin == nil || nodePoint.X < polygon.XMin.X {
-			polygon.XMin = &nodePoint
-		}
-		if polygon.XMax == nil || nodePoint.X > polygon.XMax.X {
-			polygon.XMax = &nodePoint
-		}
 	}
 
 	// range over line to get the relative position of each point of the line,

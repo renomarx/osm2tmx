@@ -1,9 +1,14 @@
 package model
 
+import (
+	"fmt"
+	"strings"
+)
+
 type Polygon struct {
 	Points                 []Point
 	PointsCache            map[Point]bool
-	YMin, YMax, XMin, XMax *Point
+	YMin, YMax, XMin, XMax Point
 }
 
 func NewPolygon() *Polygon {
@@ -13,8 +18,24 @@ func NewPolygon() *Polygon {
 }
 
 func (p *Polygon) AddPoint(point Point) {
+	if len(p.Points) == 0 {
+		// first point added, we initialize the limits of the polygon to this point
+		p.YMin, p.YMax, p.XMin, p.XMax = point, point, point, point
+	}
 	p.Points = append(p.Points, point)
 	p.PointsCache[point] = true
+	if point.Y < p.YMin.Y {
+		p.YMin = point
+	}
+	if point.Y > p.YMax.Y {
+		p.YMax = point
+	}
+	if point.X < p.XMin.X {
+		p.XMin = point
+	}
+	if point.X > p.XMax.X {
+		p.XMax = point
+	}
 }
 
 func (p *Polygon) IsBoundary(point Point) bool {
@@ -90,4 +111,23 @@ func (p *Polygon) GetPositionFromBoundaries(point Point) Position {
 	right = right - point.Y
 
 	return Position{X: point.X, Y: point.Y, Top: top, Left: left, Right: right, Bottom: bottom}
+}
+
+func (p *Polygon) Print() {
+	fmt.Print(p.String())
+}
+
+func (p *Polygon) String() string {
+	var line strings.Builder
+	for y := p.YMin.Y; y <= p.YMax.Y; y++ {
+		for x := p.XMin.X; x <= p.XMax.X; x++ {
+			char := "0"
+			if p.IsBoundary(Point{X: x, Y: y}) {
+				char = "x"
+			}
+			line.WriteString(fmt.Sprintf("%s,", char))
+		}
+		line.WriteString("\n")
+	}
+	return line.String()
 }

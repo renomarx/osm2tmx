@@ -141,9 +141,6 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 }
 
 func (r *Raster) fillPolygon(m *model.Map, mapTileFunc mapper.MapTileFunc, polygon *model.Polygon) {
-	if polygon.YMin == nil || polygon.YMax == nil || polygon.XMin == nil || polygon.XMax == nil {
-		return
-	}
 	for y := polygon.YMin.Y; y <= polygon.YMax.Y; y++ {
 		for x := polygon.XMin.X; x <= polygon.XMax.X; x++ {
 			if evenodd.IsInsidePolygon(x, y, polygon.Points) {
