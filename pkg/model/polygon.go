@@ -131,3 +131,16 @@ func (p *Polygon) String() string {
 	}
 	return line.String()
 }
+
+func (p *Polygon) Parse(view string, offsetX, offsetY int) {
+	rows := strings.Split(view, "\n")
+	for y, row := range rows {
+		cells := strings.Split(row, ",")
+		// We want to ignore the last split because the row finishes with ','
+		for x := 0; x < len(cells)-1; x++ {
+			if cells[x] == "x" {
+				p.AddPoint(Point{X: offsetX + x, Y: offsetY + y})
+			}
+		}
+	}
+}

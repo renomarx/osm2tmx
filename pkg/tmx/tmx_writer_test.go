@@ -58,7 +58,7 @@ func generateLayerTest(t *testing.T) *model.Layer {
 			layer.SetTile(x, y, tile)
 		}
 	}
-	layerVue := `
+	layerView := `
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,2,2,2,2,2,2,2,2,2,2,0,
 0,2,0,0,0,0,0,0,0,0,2,0,
@@ -66,7 +66,7 @@ func generateLayerTest(t *testing.T) *model.Layer {
 0,2,2,2,2,2,2,2,2,2,2,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
 `
-	require.Equal(t, layerVue, layer.String())
+	require.Equal(t, layerView, layer.String())
 	return &layer
 }
 

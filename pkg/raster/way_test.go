@@ -47,7 +47,7 @@ func TestDrawWayLine(t *testing.T) {
 
 	r.drawWayLine(&m, &way, pointsByNodeID, r.mapper.GetMapTileFunc(way.Tags), model.NewPolygon(), true)
 
-	expectedFilledLayerVue := `
+	expectedFilledLayerView := `
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,113,149,149,149,149,149,115,0,0,0,0,
 0,144,0,0,0,0,0,129,149,114,115,0,
@@ -55,7 +55,7 @@ func TestDrawWayLine(t *testing.T) {
 0,0,129,149,149,149,149,149,149,131,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
 `
-	assert.Equal(t, expectedFilledLayerVue, m.Layers[1].String())
+	assert.Equal(t, expectedFilledLayerView, m.Layers[1].String())
 }
 
 func TestDrawWayArea(t *testing.T) {
@@ -96,7 +96,7 @@ func TestDrawWayArea(t *testing.T) {
 
 	r.drawWayArea(&m, &way, pointsByNodeID, r.mapper.GetMapTileFunc(way.Tags))
 
-	expectedFilledLayerVue := `
+	expectedFilledLayerView := `
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,465,465,465,465,465,465,465,0,0,0,0,
 0,419,473,473,473,473,473,473,465,465,465,0,
@@ -104,5 +104,5 @@ func TestDrawWayArea(t *testing.T) {
 0,0,489,489,489,489,489,489,419,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
 `
-	assert.Equal(t, expectedFilledLayerVue, m.Layers[1].String())
+	assert.Equal(t, expectedFilledLayerView, m.Layers[1].String())
 }

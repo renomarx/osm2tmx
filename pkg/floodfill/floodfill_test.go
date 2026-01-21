@@ -14,7 +14,7 @@ func TestFloodfill(t *testing.T) {
 
 		FloodFill(layer, 2, 8, 2)
 
-		expectedFilledLayerVue := `
+		expectedFilledLayerView := `
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,2,2,2,2,2,2,2,2,2,2,0,
 0,2,2,2,2,2,2,2,2,2,2,0,
@@ -22,7 +22,7 @@ func TestFloodfill(t *testing.T) {
 0,2,2,2,2,2,2,2,2,2,2,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
 `
-		assert.Equal(t, expectedFilledLayerVue, layer.String())
+		assert.Equal(t, expectedFilledLayerView, layer.String())
 	})
 
 	t.Run("reaching layer limits", func(t *testing.T) {
@@ -30,7 +30,7 @@ func TestFloodfill(t *testing.T) {
 
 		FloodFill(layer, 2, 8, 2)
 
-		expectedFilledLayerVue := `
+		expectedFilledLayerView := `
 0,0,0,0,0,0,0,0,0,0,0,0,
 2,2,2,2,2,2,2,2,2,2,2,0,
 2,2,2,2,2,2,2,2,2,2,2,0,
@@ -39,7 +39,7 @@ func TestFloodfill(t *testing.T) {
 0,0,0,0,0,0,0,0,0,0,0,0,
 `
 
-		assert.Equal(t, expectedFilledLayerVue, layer.String())
+		assert.Equal(t, expectedFilledLayerView, layer.String())
 	})
 }
 
@@ -49,7 +49,7 @@ func TestFloodfillDerecursive(t *testing.T) {
 
 		FloodFillDerecursive(layer, 2, 8, 2)
 
-		expectedFilledLayerVue := `
+		expectedFilledLayerView := `
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,2,2,2,2,2,2,2,2,2,2,0,
 0,2,2,2,2,2,2,2,2,2,2,0,
@@ -57,7 +57,7 @@ func TestFloodfillDerecursive(t *testing.T) {
 0,2,2,2,2,2,2,2,2,2,2,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
 `
-		assert.Equal(t, expectedFilledLayerVue, layer.String())
+		assert.Equal(t, expectedFilledLayerView, layer.String())
 	})
 
 	t.Run("reaching layer limits", func(t *testing.T) {
@@ -65,7 +65,7 @@ func TestFloodfillDerecursive(t *testing.T) {
 
 		FloodFillDerecursive(layer, 2, 8, 2)
 
-		expectedFilledLayerVue := `
+		expectedFilledLayerView := `
 0,0,0,0,0,0,0,0,0,0,0,0,
 2,2,2,2,2,2,2,2,2,2,2,0,
 2,2,2,2,2,2,2,2,2,2,2,0,
@@ -74,7 +74,7 @@ func TestFloodfillDerecursive(t *testing.T) {
 0,0,0,0,0,0,0,0,0,0,0,0,
 `
 
-		assert.Equal(t, expectedFilledLayerVue, layer.String())
+		assert.Equal(t, expectedFilledLayerView, layer.String())
 	})
 }
 
@@ -95,7 +95,7 @@ func generatePolygonWithinBoundaries(t *testing.T) *model.Layer {
 			layer.SetTile(x, y, tile)
 		}
 	}
-	layerVue := `
+	layerView := `
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,2,2,2,2,2,2,2,2,2,2,0,
 0,2,0,0,0,0,0,0,0,0,2,0,
@@ -103,7 +103,7 @@ func generatePolygonWithinBoundaries(t *testing.T) *model.Layer {
 0,2,2,2,2,2,2,2,2,2,2,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
 `
-	require.Equal(t, layerVue, layer.String())
+	require.Equal(t, layerView, layer.String())
 	return &layer
 }
 
@@ -124,7 +124,7 @@ func generatePolygonReachingLayerLimits(t *testing.T) *model.Layer {
 			layer.SetTile(x, y, tile)
 		}
 	}
-	layerVue := `
+	layerView := `
 0,0,0,0,0,0,0,0,0,0,0,0,
 2,2,2,2,2,2,2,2,2,2,2,0,
 0,0,0,0,0,0,0,0,0,0,2,0,
@@ -132,6 +132,6 @@ func generatePolygonReachingLayerLimits(t *testing.T) *model.Layer {
 2,2,2,2,2,2,2,2,2,2,2,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
 `
-	require.Equal(t, layerVue, layer.String())
+	require.Equal(t, layerView, layer.String())
 	return &layer
 }

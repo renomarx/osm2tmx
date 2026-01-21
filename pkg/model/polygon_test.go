@@ -11,39 +11,17 @@ func TestGetPositionFromBoundaries(t *testing.T) {
 
 	t.Run("simple", func(t *testing.T) {
 		polygon := NewPolygon()
-		polygon.AddPoint(Point{X: 1, Y: 1})
-		polygon.AddPoint(Point{X: 2, Y: 1})
-		polygon.AddPoint(Point{X: 3, Y: 1})
-		polygon.AddPoint(Point{X: 4, Y: 1})
-		polygon.AddPoint(Point{X: 5, Y: 1})
-		polygon.AddPoint(Point{X: 5, Y: 2})
-		polygon.AddPoint(Point{X: 6, Y: 2})
-		polygon.AddPoint(Point{X: 7, Y: 2})
-		polygon.AddPoint(Point{X: 8, Y: 2})
-		polygon.AddPoint(Point{X: 9, Y: 2})
-		polygon.AddPoint(Point{X: 10, Y: 2})
-		polygon.AddPoint(Point{X: 10, Y: 3})
-		polygon.AddPoint(Point{X: 9, Y: 3})
-		polygon.AddPoint(Point{X: 9, Y: 4})
-		polygon.AddPoint(Point{X: 8, Y: 4})
-		polygon.AddPoint(Point{X: 7, Y: 4})
-		polygon.AddPoint(Point{X: 6, Y: 4})
-		polygon.AddPoint(Point{X: 5, Y: 4})
-		polygon.AddPoint(Point{X: 4, Y: 4})
-		polygon.AddPoint(Point{X: 3, Y: 4})
-		polygon.AddPoint(Point{X: 3, Y: 3})
-		polygon.AddPoint(Point{X: 2, Y: 3})
-		polygon.AddPoint(Point{X: 1, Y: 3})
-		polygon.AddPoint(Point{X: 1, Y: 2})
-		polygon.AddPoint(Point{X: 1, Y: 1})
 
-		expectedVue := `
+		view := `
 x,x,x,x,x,0,0,0,0,0,
 x,0,0,0,x,x,x,x,x,x,
 x,x,x,0,0,0,0,0,x,x,
 0,0,x,x,x,x,x,x,x,0,
 `
-		require.Equal(t, expectedVue, "\n"+polygon.String())
+		polygon.Parse(view, 1, 1)
+		require.Equal(t, view, "\n"+polygon.String())
+		require.Equal(t, 1, polygon.XMin.X)
+		require.Equal(t, 1, polygon.YMin.Y)
 
 		expectedPositions := []Position{
 			{X: 1, Y: 1, Top: 0, Left: 0, Right: 4, Bottom: 2},
@@ -96,5 +74,26 @@ x,x,x,0,0,0,0,0,x,x,
 			}
 		}
 		assert.Equal(t, expectedPositions, positions)
+	})
+
+	t.Run("complex", func(t *testing.T) {
+		polygon := NewPolygon()
+
+		view := `
+x,x,x,x,x,0,0,0,0,0,
+x,0,0,0,x,x,x,x,x,x,
+x,x,x,0,0,0,0,0,x,x,
+0,0,x,0,0,0,0,0,x,0,
+0,0,x,x,x,x,x,0,x,0,
+x,x,x,x,x,0,x,0,x,0,
+x,x,0,0,x,0,x,0,x,0,
+0,x,x,x,x,x,x,x,x,0,
+`
+		polygon.Parse(view, 1, 1)
+		require.Equal(t, view, "\n"+polygon.String())
+		require.Equal(t, polygon.XMin, Point{X: 1, Y: 1})
+		require.Equal(t, polygon.YMin, Point{X: 1, Y: 1})
+
+		// TODO: test positions on complex points
 	})
 }
