@@ -19,8 +19,7 @@ func (r *Raster) drawRelationArea(m *model.Map, relation *osm.Relation, osmWays 
 	polygon := model.NewPolygon()
 	// Follow the Scan Line Algorithm
 
-	// 1. Fill the boundaries of the polygon with tile,
-	// 	get the polygon vertices as an array of points,
+	// 1. Get the polygon vertices as an array of points,
 	//	and find the yMin & yMax points to apply the scanline algorithm
 	for _, member := range relation.Members {
 		switch member.Type {
@@ -29,17 +28,18 @@ func (r *Raster) drawRelationArea(m *model.Map, relation *osm.Relation, osmWays 
 			if !exists {
 				continue
 			}
-			r.drawWayLine(m, way, pointsByNodeID, mapTileFunc, polygon, false)
+			for _, nd := range way.Nodes {
+				point, exists := pointsByNodeID[int64(nd.ID)]
+				if !exists {
+					continue
+				}
+				polygon.AddPoint(point)
+			}
 
 		case osm.TypeNode:
 			point, exists := pointsByNodeID[int64(member.Ref)]
 			if !exists {
 				continue
-			}
-			pos := polygon.GetPositionFromLine(point)
-			mapTile := mapTileFunc(&pos)
-			for z, tile := range mapTile.ByLayer {
-				m.Layers[z].SetTile(point.X, point.Y, tile)
 			}
 			polygon.Points = append(polygon.Points, model.Point{X: point.X, Y: point.Y})
 		}

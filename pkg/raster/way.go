@@ -46,10 +46,15 @@ func (r *Raster) drawWayArea(m *model.Map, way *osm.Way, pointsByNodeID map[int6
 	polygon := model.NewPolygon()
 	// Follow the Scan Line Algorithm
 
-	// 1. Fill the boundaries of the polygon with tile,
-	// 	get the polygon vertices as an array of points,
+	// 1. Get the polygon vertices as an array of points,
 	//	and find the yMin & yMax points to apply the scanline algorithm
-	r.drawWayLine(m, way, pointsByNodeID, mapTileFunc, polygon, false)
+	for _, nd := range way.Nodes {
+		point, exists := pointsByNodeID[int64(nd.ID)]
+		if !exists {
+			continue
+		}
+		polygon.AddPoint(point)
+	}
 
 	// 2. Apply the scanline + even-odd algorithm
 	r.fillPolygon(m, mapTileFunc, polygon)
