@@ -45,7 +45,7 @@ func TestDrawWayLine(t *testing.T) {
 	pointsByNodeID[8] = model.Point{X: 1, Y: 2}
 	pointsByNodeID[9] = model.Point{X: 1, Y: 1}
 
-	r.drawWayLine(&m, &way, pointsByNodeID, r.mapper.GetMapTileFunc(way.Tags), model.NewPolygon(), true)
+	r.drawWayLine(&m, &way, pointsByNodeID, r.mapper.GetMapTileFunc(way.Tags))
 
 	expectedFilledLayerView := `
 0,0,0,0,0,0,0,0,0,0,0,0,

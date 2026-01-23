@@ -7,8 +7,9 @@ import (
 	"github.com/renomarx/osm2tmx/pkg/model"
 )
 
-func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, pointsByNodeID map[int64]model.Point, mapTileFunc mapper.MapTileFunc, polygon *model.Polygon, withCorners bool) {
+func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, pointsByNodeID map[int64]model.Point, mapTileFunc mapper.MapTileFunc) {
 	var lastPoint *model.Point
+	line := model.NewLine()
 	for _, nd := range way.Nodes {
 		nodePoint, exists := pointsByNodeID[int64(nd.ID)]
 		if !exists {
@@ -16,9 +17,9 @@ func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, pointsByNodeID map[int6
 		}
 		// Filling all points between the last way point and the current one by the right tile
 		if lastPoint != nil {
-			points := bresenham.Bresenham(lastPoint.X, lastPoint.Y, nodePoint.X, nodePoint.Y, withCorners)
+			points := bresenham.Bresenham(lastPoint.X, lastPoint.Y, nodePoint.X, nodePoint.Y, true)
 			for _, point := range points {
-				polygon.AddPoint(point)
+				line.AddPoint(point)
 			}
 		}
 		lastPoint = &nodePoint
@@ -26,8 +27,8 @@ func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, pointsByNodeID map[int6
 
 	// range over line to get the relative position of each point of the line,
 	// and select corresponding tile to fill the map
-	for _, point := range polygon.Points {
-		pos := polygon.GetPositionFromLine(point)
+	for _, point := range line.Points {
+		pos := line.GetPosition(point)
 		mapTile := mapTileFunc(&pos)
 		for z, tile := range mapTile.ByLayer {
 			m.Layers[z].SetTile(point.X, point.Y, tile)

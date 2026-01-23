@@ -103,7 +103,7 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 				r.drawWayArea(&m, way, pointsByNodeID, mapTileFunc)
 			}
 		} else {
-			r.drawWayLine(&m, way, pointsByNodeID, mapTileFunc, model.NewPolygon(), true)
+			r.drawWayLine(&m, way, pointsByNodeID, mapTileFunc)
 		}
 	}
 

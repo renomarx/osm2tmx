@@ -43,38 +43,6 @@ func (p *Polygon) IsBoundary(point Point) bool {
 	return exists
 }
 
-func (p *Polygon) GetPositionFromLine(point Point) Position {
-	top := 0
-	for {
-		if !p.IsBoundary(Point{X: point.X, Y: point.Y - top - 1}) {
-			break
-		}
-		top++
-	}
-	bottom := 0
-	for {
-		if !p.IsBoundary(Point{X: point.X, Y: point.Y + bottom + 1}) {
-			break
-		}
-		bottom++
-	}
-	left := 0
-	for {
-		if !p.IsBoundary(Point{X: point.X - left - 1, Y: point.Y}) {
-			break
-		}
-		left++
-	}
-	right := 0
-	for {
-		if !p.IsBoundary(Point{X: point.X + right + 1, Y: point.Y}) {
-			break
-		}
-		right++
-	}
-	return Position{X: point.X, Y: point.Y, Top: top, Left: left, Right: right, Bottom: bottom}
-}
-
 func (p *Polygon) GetPositionFromBoundaries(point Point) Position {
 	// Today, get first border crossed: does not work with multi-polygons or complex polygons:
 	// TODO: get last border crossed
