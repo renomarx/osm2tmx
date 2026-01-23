@@ -54,7 +54,7 @@ func (r *Raster) drawWayArea(m *model.Map, way *osm.Way, pointsByNodeID map[int6
 		if !exists {
 			continue
 		}
-		polygon.AddPoint(point)
+		polygon.AddVertex(point)
 	}
 
 	// 2. Apply the scanline + even-odd algorithm

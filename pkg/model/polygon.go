@@ -6,24 +6,24 @@ import (
 )
 
 type Polygon struct {
-	Points                 []Point
-	PointsCache            map[Point]bool
+	Vertices               []Point
+	VerticesCache          map[Point]bool
 	YMin, YMax, XMin, XMax Point
 }
 
 func NewPolygon() *Polygon {
 	return &Polygon{
-		PointsCache: make(map[Point]bool),
+		VerticesCache: make(map[Point]bool),
 	}
 }
 
-func (p *Polygon) AddPoint(point Point) {
-	if len(p.Points) == 0 {
+func (p *Polygon) AddVertex(point Point) {
+	if len(p.Vertices) == 0 {
 		// first point added, we initialize the limits of the polygon to this point
 		p.YMin, p.YMax, p.XMin, p.XMax = point, point, point, point
 	}
-	p.Points = append(p.Points, point)
-	p.PointsCache[point] = true
+	p.Vertices = append(p.Vertices, point)
+	p.VerticesCache[point] = true
 	if point.Y < p.YMin.Y {
 		p.YMin = point
 	}
@@ -39,46 +39,8 @@ func (p *Polygon) AddPoint(point Point) {
 }
 
 func (p *Polygon) IsBoundary(point Point) bool {
-	_, exists := p.PointsCache[point]
+	_, exists := p.VerticesCache[point]
 	return exists
-}
-
-func (p *Polygon) GetPositionFromBoundaries(point Point) Position {
-	// Today, get first border crossed: does not work with multi-polygons or complex polygons:
-	// TODO: get last border crossed
-	top := 0
-	for top = p.YMin.Y; top < point.Y; top++ {
-		if p.IsBoundary(Point{X: point.X, Y: top}) {
-			break
-		}
-	}
-	top = point.Y - top
-
-	bottom := 0
-	for bottom = p.YMax.Y; bottom > point.Y; bottom-- {
-		if p.IsBoundary(Point{X: point.X, Y: bottom}) {
-			break
-		}
-	}
-	bottom = bottom - point.Y
-
-	left := 0
-	for left = p.XMin.X; left < point.X; left++ {
-		if p.IsBoundary(Point{X: left, Y: point.Y}) {
-			break
-		}
-	}
-	left = point.X - left
-
-	right := 0
-	for right = p.XMax.X; right > point.Y; right-- {
-		if p.IsBoundary(Point{X: right, Y: point.Y}) {
-			break
-		}
-	}
-	right = right - point.Y
-
-	return Position{X: point.X, Y: point.Y, Top: top, Left: left, Right: right, Bottom: bottom}
 }
 
 func (p *Polygon) Print() {
@@ -98,17 +60,4 @@ func (p *Polygon) String() string {
 		line.WriteString("\n")
 	}
 	return line.String()
-}
-
-func (p *Polygon) Parse(view string, offsetX, offsetY int) {
-	rows := strings.Split(view, "\n")
-	for y, row := range rows {
-		cells := strings.Split(row, ",")
-		// We want to ignore the last split because the row finishes with ','
-		for x := 0; x < len(cells)-1; x++ {
-			if cells[x] == "x" {
-				p.AddPoint(Point{X: offsetX + x, Y: offsetY + y})
-			}
-		}
-	}
 }

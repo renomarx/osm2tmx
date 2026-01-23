@@ -33,7 +33,7 @@ func (r *Raster) drawRelationArea(m *model.Map, relation *osm.Relation, osmWays 
 				if !exists {
 					continue
 				}
-				polygon.AddPoint(point)
+				polygon.AddVertex(point)
 			}
 
 		case osm.TypeNode:
@@ -41,7 +41,7 @@ func (r *Raster) drawRelationArea(m *model.Map, relation *osm.Relation, osmWays 
 			if !exists {
 				continue
 			}
-			polygon.Points = append(polygon.Points, model.Point{X: point.X, Y: point.Y})
+			polygon.Vertices = append(polygon.Vertices, model.Point{X: point.X, Y: point.Y})
 		}
 	}
 
