@@ -38,14 +38,28 @@ x,0,x,0,0,0,0,0,x,x,
 		require.Equal(t, 4, polygon.YMax.Y)
 
 		positions := []model.Position{
+			// edge
 			{X: 4, Y: 1, Top: 0, Left: 3, Right: 1, Bottom: 3},
+			// vertex
 			{X: 5, Y: 1, Top: 0, Left: 4, Right: 0, Bottom: 3},
+			// inside
 			{X: 2, Y: 2, Top: 1, Left: 1, Right: 8, Bottom: 1},
+			// center
+			{X: 6, Y: 3, Top: 1, Bottom: 1, Left: 5, Right: 4},
+			// vertex
+			{X: 1, Y: 1, Top: 0, Bottom: 2, Left: 0, Right: 4},
 		}
 		for _, position := range positions {
-			pos, inside := PositionInPolygon2(position.X, position.Y, polygon.Vertices)
+			pos, inside := PositionInPolygon(position.X, position.Y, polygon.Vertices)
 			assert.True(t, inside)
 			assert.Equal(t, position, pos)
+		}
+		outsidePoints := []model.Point{
+			{X: 1, Y: 4},
+		}
+		for _, point := range outsidePoints {
+			_, inside := PositionInPolygon(point.X, point.Y, polygon.Vertices)
+			assert.False(t, inside)
 		}
 	})
 
@@ -85,7 +99,16 @@ x,0,0,0,0,0,0,0,0,0,
 		require.Equal(t, polygon.XMin, model.Point{X: 1, Y: 1})
 		require.Equal(t, polygon.YMin, model.Point{X: 1, Y: 1})
 
-		// TODO: test positions on complex points
+		positions := []model.Position{
+			// edge
+			{X: 4, Y: 1, Top: 0, Left: 3, Right: 1, Bottom: 7},
+			{X: 4, Y: 5, Top: 4, Left: 2, Right: 5, Bottom: 3},
+		}
+		for _, position := range positions {
+			pos, inside := PositionInPolygon(position.X, position.Y, polygon.Vertices)
+			assert.True(t, inside)
+			assert.Equal(t, position, pos)
+		}
 	})
 
 }

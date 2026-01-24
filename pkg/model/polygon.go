@@ -7,14 +7,11 @@ import (
 
 type Polygon struct {
 	Vertices               []Point
-	VerticesCache          map[Point]bool
 	YMin, YMax, XMin, XMax Point
 }
 
 func NewPolygon() *Polygon {
-	return &Polygon{
-		VerticesCache: make(map[Point]bool),
-	}
+	return &Polygon{}
 }
 
 func (p *Polygon) AddVertex(point Point) {
@@ -23,7 +20,6 @@ func (p *Polygon) AddVertex(point Point) {
 		p.YMin, p.YMax, p.XMin, p.XMax = point, point, point, point
 	}
 	p.Vertices = append(p.Vertices, point)
-	p.VerticesCache[point] = true
 	if point.Y < p.YMin.Y {
 		p.YMin = point
 	}
@@ -38,24 +34,25 @@ func (p *Polygon) AddVertex(point Point) {
 	}
 }
 
-func (p *Polygon) IsBoundary(point Point) bool {
-	_, exists := p.VerticesCache[point]
-	return exists
-}
-
 func (p *Polygon) Print() {
 	fmt.Print(p.String())
 }
 
 func (p *Polygon) String() string {
-	var line strings.Builder
+	view := make([][]string, p.YMax.Y-p.YMin.Y+1)
 	for y := p.YMin.Y; y <= p.YMax.Y; y++ {
+		view[y-p.YMin.Y] = make([]string, p.XMax.X-p.XMin.X+1)
 		for x := p.XMin.X; x <= p.XMax.X; x++ {
-			char := "0"
-			if p.IsBoundary(Point{X: x, Y: y}) {
-				char = "x"
-			}
-			line.WriteString(fmt.Sprintf("%s,", char))
+			view[y-p.YMin.Y][x-p.XMin.X] = "0"
+		}
+	}
+	for _, point := range p.Vertices {
+		view[point.Y-p.YMin.Y][point.X-p.XMin.X] = "x"
+	}
+	var line strings.Builder
+	for y := range view {
+		for x := range view[y] {
+			line.WriteString(fmt.Sprintf("%s,", view[y][x]))
 		}
 		line.WriteString("\n")
 	}
