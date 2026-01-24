@@ -101,6 +101,7 @@ x,0,0,0,0,0,0,0,0,0,
 
 		positions := []model.Position{
 			// edge
+			{X: 1, Y: 1, Top: 0, Left: 0, Right: 4, Bottom: 2},
 			{X: 4, Y: 1, Top: 0, Left: 3, Right: 1, Bottom: 7},
 			{X: 4, Y: 5, Top: 4, Left: 2, Right: 5, Bottom: 3},
 		}
