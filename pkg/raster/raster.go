@@ -16,12 +16,19 @@ import (
 type Raster struct {
 	mapper    *mapper.Mapper
 	downscale int
+	bounds    Bounds
 }
 
-func New(mapper *mapper.Mapper, downscale int) *Raster {
+type Bounds struct {
+	OffsetX, OffsetY int
+	LimitX, LimitY   int
+}
+
+func New(mapper *mapper.Mapper, downscale int, bounds Bounds) *Raster {
 	return &Raster{
 		mapper:    mapper,
 		downscale: downscale,
+		bounds:    bounds,
 	}
 }
 
@@ -46,14 +53,18 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 	minNorthing := math.Floor(mercator.Lat2y(header.Bounds.MinLat)*100) / 100
 	minEasting := math.Floor(mercator.Lon2x(header.Bounds.MinLon)*100) / 100
 
-	maxY := int(math.Ceil(maxNorthing)) / r.downscale
-	minX := int(math.Floor(minEasting)) / r.downscale
+	maxY := (int(math.Ceil(maxNorthing)) / r.downscale) - r.bounds.OffsetY
+	minX := (int(math.Floor(minEasting)) / r.downscale) + r.bounds.OffsetX
 	mapSizeY := int(math.Ceil(maxNorthing-minNorthing)) / r.downscale
 	mapSizeX := int(math.Ceil(maxEasting-minEasting)) / r.downscale
 
-	// // Temporary overload map size
-	// mapSizeX = 100
-	// mapSizeY = 100
+	// If any limit, overload map size
+	if r.bounds.LimitY > 0 {
+		mapSizeY = min(r.bounds.LimitY, mapSizeY)
+	}
+	if r.bounds.LimitX > 0 {
+		mapSizeX = min(r.bounds.LimitX, mapSizeX)
+	}
 
 	// init map
 	m := model.Map{}

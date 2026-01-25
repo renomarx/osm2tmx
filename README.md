@@ -41,8 +41,6 @@ tags:
 
 ## TODO
 
-- Add arguments and options to handle bounded exports
-
 - POC drawer 2d (ebiten, draw2d ?)
 
 - How to handle z-index and level lines ?

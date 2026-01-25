@@ -20,9 +20,14 @@ func printUsageAndExit() {
 Usage: %s -conf <my_mapping_file.yaml> [-out <my.osm.tmx>] <my.osm.pbf>
 
 Options:
+-help: display usage and exit
 -conf: configuration file for tileset
 -out: output pathname, default to my.osm.tmx
 -downscale: downscale factor (int): for example, -downscale 10 will reduce the map to 10 times its original size
+-offset-x: offset x (after downscale if any)
+-offset-y: offset y (after downscale if any)
+-limit-x: limit x (after downscale if any)
+-limit-y: limit y (after downscale if any)
 `, os.Args[0])
 	fmt.Println(Usage)
 	os.Exit(1)
@@ -33,6 +38,10 @@ func main() {
 	var outputFlag = flag.String("out", "", "output pathname, default to my.osm.tmx")
 	// TODO: add mapping flag
 	var downscaleFlag = flag.Int("downscale", 1, "downscale factor (int): for example, -downscale 10 will reduce the map to 10 times its original size")
+	var offsetXFlag = flag.Int("offset-x", 0, "offset x (after downscale if any)")
+	var offsetYFlag = flag.Int("offset-y", 0, "offset y (after downscale if any)")
+	var limitXFlag = flag.Int("limit-x", 0, "limit x (after downscale if any)")
+	var limitYFlag = flag.Int("limit-y", 0, "limit y (after downscale if any)")
 
 	flag.Parse()
 
@@ -51,7 +60,14 @@ func main() {
 	log.Printf("will write output to %s", tmxFilename)
 
 	mp := mapper.New()
-	rst := raster.New(mp, *downscaleFlag)
+
+	bounds := raster.Bounds{
+		OffsetX: *offsetXFlag,
+		OffsetY: *offsetYFlag,
+		LimitX:  *limitXFlag,
+		LimitY:  *limitYFlag,
+	}
+	rst := raster.New(mp, *downscaleFlag, bounds)
 
 	rstMap, err := rst.Parse(osmFile)
 	if err != nil {
