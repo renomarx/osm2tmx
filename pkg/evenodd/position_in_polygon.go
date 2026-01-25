@@ -24,19 +24,25 @@ func (ps *PolygonScanner) PositionInPolygon(x, y int) (model.Position, bool) {
 		return model.Position{}, false
 	}
 
+	// order optimized to scan polygon from left to right and from top to bottom
+	right := ps.getRight(x, y)
+	bottom := ps.getBottom(x, y)
+	left := ps.getLeft(x, y)
+	top := ps.getTop(x, y)
+
 	return model.Position{
 		X:      x,
 		Y:      y,
-		Top:    ps.getTop(x, y),
-		Bottom: ps.getBottom(x, y),
-		Left:   ps.getLeft(x, y),
-		Right:  ps.getRight(x, y),
+		Top:    top,
+		Bottom: bottom,
+		Left:   left,
+		Right:  right,
 	}, true
 }
 
 func (ps *PolygonScanner) getTop(x, y int) int {
 	top := 0
-	for ps.pointInPolygonOrEdge(x, y-top-1) {
+	for ps.pointInPolygonOrEdge(x, y-top-1) && y-top >= ps.polygon.YMin.Y {
 		top++
 	}
 	return top
@@ -44,7 +50,7 @@ func (ps *PolygonScanner) getTop(x, y int) int {
 
 func (ps *PolygonScanner) getBottom(x, y int) int {
 	bottom := 0
-	for ps.pointInPolygonOrEdge(x, y+bottom+1) {
+	for ps.pointInPolygonOrEdge(x, y+bottom+1) && y+bottom <= ps.polygon.YMax.Y {
 		bottom++
 	}
 	return bottom
@@ -52,7 +58,7 @@ func (ps *PolygonScanner) getBottom(x, y int) int {
 
 func (ps *PolygonScanner) getLeft(x, y int) int {
 	left := 0
-	for ps.pointInPolygonOrEdge(x-left-1, y) {
+	for ps.pointInPolygonOrEdge(x-left-1, y) && x-left >= ps.polygon.XMin.X {
 		left++
 	}
 	return left
@@ -60,7 +66,7 @@ func (ps *PolygonScanner) getLeft(x, y int) int {
 
 func (ps *PolygonScanner) getRight(x, y int) int {
 	right := 0
-	for ps.pointInPolygonOrEdge(x+right+1, y) {
+	for ps.pointInPolygonOrEdge(x+right+1, y) && x+right <= ps.polygon.XMax.X {
 		right++
 	}
 	return right
