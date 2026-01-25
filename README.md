@@ -41,9 +41,6 @@ tags:
 
 ## TODO
 
-- Draw way corners, area corners and buildings with different tiles:
-  - evenodd.IsInsidePolygon return a struct{Left,Right,Top,Bottom} representing the distance between the point and the nearest boundary
-  - then the mapper can use these values to select the right tile
 - Add arguments and options to handle bounded exports
 
 - POC drawer 2d (ebiten, draw2d ?)

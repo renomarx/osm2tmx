@@ -14,8 +14,6 @@ func TestPositionInPolygon(t *testing.T) {
 
 	t.Run("simple", func(t *testing.T) {
 		polygon := model.NewPolygon()
-		ps := NewPolygonScanner(polygon)
-
 		polygon.AddVertex(model.Point{X: 1, Y: 1})
 		polygon.AddVertex(model.Point{X: 5, Y: 1})
 		polygon.AddVertex(model.Point{X: 5, Y: 2})
@@ -27,6 +25,8 @@ func TestPositionInPolygon(t *testing.T) {
 		polygon.AddVertex(model.Point{X: 3, Y: 3})
 		polygon.AddVertex(model.Point{X: 1, Y: 3})
 		polygon.AddVertex(model.Point{X: 1, Y: 1})
+
+		ps := NewPolygonScanner(polygon)
 
 		view := `
 x,0,0,0,x,0,0,0,0,0,
@@ -84,8 +84,6 @@ x,x,x,x,x,x,x,x,x,x,
 
 	t.Run("simple2", func(t *testing.T) {
 		polygon := model.NewPolygon()
-		ps := NewPolygonScanner(polygon)
-
 		polygon.AddVertex(model.Point{X: 1, Y: 1})
 		polygon.AddVertex(model.Point{X: 5, Y: 1})
 		polygon.AddVertex(model.Point{X: 10, Y: 2})
@@ -95,6 +93,8 @@ x,x,x,x,x,x,x,x,x,x,
 		polygon.AddVertex(model.Point{X: 1, Y: 3})
 		polygon.AddVertex(model.Point{X: 1, Y: 2})
 		polygon.AddVertex(model.Point{X: 1, Y: 1})
+
+		ps := NewPolygonScanner(polygon)
 
 		view := `
 x,0,0,0,x,0,0,0,0,0,
@@ -137,8 +137,6 @@ x,x,x,x,x,x,x,x,x,x,
 
 	t.Run("complex", func(t *testing.T) {
 		polygon := model.NewPolygon()
-		ps := NewPolygonScanner(polygon)
-
 		polygon.AddVertex(model.Point{X: 1, Y: 1})
 		polygon.AddVertex(model.Point{X: 5, Y: 1})
 		polygon.AddVertex(model.Point{X: 5, Y: 2})
@@ -157,6 +155,8 @@ x,x,x,x,x,x,x,x,x,x,
 		polygon.AddVertex(model.Point{X: 2, Y: 6})
 		polygon.AddVertex(model.Point{X: 1, Y: 3})
 		polygon.AddVertex(model.Point{X: 1, Y: 1})
+
+		ps := NewPolygonScanner(polygon)
 
 		view := `
 x,0,0,0,x,0,0,0,0,0,
