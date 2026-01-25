@@ -14,12 +14,14 @@ import (
 )
 
 type Raster struct {
-	mapper *mapper.Mapper
+	mapper    *mapper.Mapper
+	downscale int
 }
 
-func New(mapper *mapper.Mapper) *Raster {
+func New(mapper *mapper.Mapper, downscale int) *Raster {
 	return &Raster{
-		mapper: mapper,
+		mapper:    mapper,
+		downscale: downscale,
 	}
 }
 
@@ -44,10 +46,10 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 	minNorthing := math.Floor(mercator.Lat2y(header.Bounds.MinLat)*100) / 100
 	minEasting := math.Floor(mercator.Lon2x(header.Bounds.MinLon)*100) / 100
 
-	maxY := int(math.Ceil(maxNorthing))
-	minX := int(math.Floor(minEasting))
-	mapSizeY := int(math.Ceil(maxNorthing - minNorthing))
-	mapSizeX := int(math.Ceil(maxEasting - minEasting))
+	maxY := int(math.Ceil(maxNorthing)) / r.downscale
+	minX := int(math.Floor(minEasting)) / r.downscale
+	mapSizeY := int(math.Ceil(maxNorthing-minNorthing)) / r.downscale
+	mapSizeX := int(math.Ceil(maxEasting-minEasting)) / r.downscale
 
 	// // Temporary overload map size
 	// mapSizeX = 100
@@ -64,15 +66,14 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 	osmRelations := []osm.Relation{}
 	osmNodesOutOfBounds := []osm.Node{}
 	for scanner.Scan() {
-		// do something
 		switch scanner.Object().(type) {
 		case *osm.Node:
 			node := *scanner.Object().(*osm.Node)
 			north := mercator.Lat2y(node.Lat)
 			east := mercator.Lon2x(node.Lon)
 			// we want to have point 0,0 at minEasting,maxNorthing
-			x := int(math.Floor(east)) - minX
-			y := maxY - int(math.Floor(north))
+			x := (int(math.Floor(east)) / r.downscale) - minX
+			y := maxY - (int(math.Floor(north)) / r.downscale)
 			if x >= mapSizeX || x < 0 || y < 0 || y >= mapSizeY {
 				osmNodesOutOfBounds = append(osmNodesOutOfBounds, node)
 				continue

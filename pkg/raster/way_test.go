@@ -10,7 +10,7 @@ import (
 )
 
 func TestDrawWayLine(t *testing.T) {
-	r := New(mapper.New())
+	r := New(mapper.New(), 1)
 
 	m := model.Map{}
 	m.Init(3, 12, 6, 0)
@@ -59,7 +59,7 @@ func TestDrawWayLine(t *testing.T) {
 }
 
 func TestDrawWayArea(t *testing.T) {
-	r := New(mapper.New())
+	r := New(mapper.New(), 1)
 
 	m := model.Map{}
 	m.Init(3, 12, 6, 0)

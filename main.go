@@ -18,8 +18,11 @@ func init() {
 func printUsageAndExit() {
 	var Usage = fmt.Sprintf(`
 Usage: %s -conf <my_mapping_file.yaml> [-out <my.osm.tmx>] <my.osm.pbf>
-- conf: configuration file for tileset
-- out: output pathname, default to my.osm.tmx
+
+Options:
+-conf: configuration file for tileset
+-out: output pathname, default to my.osm.tmx
+-downscale: downscale factor (int): for example, -downscale 10 will reduce the map to 10 times its original size
 `, os.Args[0])
 	fmt.Println(Usage)
 	os.Exit(1)
@@ -29,6 +32,7 @@ func main() {
 	var helpFlag = flag.Bool("help", false, "display help")
 	var outputFlag = flag.String("out", "", "output pathname, default to my.osm.tmx")
 	// TODO: add mapping flag
+	var downscaleFlag = flag.Int("downscale", 1, "downscale factor (int): for example, -downscale 10 will reduce the map to 10 times its original size")
 
 	flag.Parse()
 
@@ -47,7 +51,7 @@ func main() {
 	log.Printf("will write output to %s", tmxFilename)
 
 	mp := mapper.New()
-	rst := raster.New(mp)
+	rst := raster.New(mp, *downscaleFlag)
 
 	rstMap, err := rst.Parse(osmFile)
 	if err != nil {
