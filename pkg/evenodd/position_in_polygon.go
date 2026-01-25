@@ -6,6 +6,53 @@ import (
 	"github.com/renomarx/osm2tmx/pkg/model"
 )
 
+func PositionInPolygon3(x, y int, poly []model.Point) (model.Position, bool) {
+	if !pointInPolygonOrEdge(x, y, poly) {
+		return model.Position{}, false
+	}
+
+	return model.Position{
+		X:      x,
+		Y:      y,
+		Top:    getTop(x, y, poly),
+		Bottom: getBottom(x, y, poly),
+		Left:   getLeft(x, y, poly),
+		Right:  getRight(x, y, poly),
+	}, true
+}
+
+func getTop(x, y int, poly []model.Point) int {
+	top := 0
+	for pointInPolygonOrEdge(x, y-top-1, poly) {
+		top--
+	}
+	return top
+}
+
+func getBottom(x, y int, poly []model.Point) int {
+	bottom := 0
+	for pointInPolygonOrEdge(x, y+bottom+1, poly) {
+		bottom++
+	}
+	return bottom
+}
+
+func getLeft(x, y int, poly []model.Point) int {
+	left := 0
+	for pointInPolygonOrEdge(x-left-1, y, poly) {
+		left--
+	}
+	return left
+}
+
+func getRight(x, y int, poly []model.Point) int {
+	right := 0
+	for pointInPolygonOrEdge(x+right+1, y, poly) {
+		right++
+	}
+	return right
+}
+
 func PositionInPolygon2(x, y int, poly []model.Point) (model.Position, bool) {
 	if !pointInPolygonOrEdge(x, y, poly) {
 		return model.Position{}, false

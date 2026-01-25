@@ -50,7 +50,7 @@ x,0,x,0,0,0,0,0,x,x,
 			{X: 1, Y: 1, Top: 0, Bottom: 2, Left: 0, Right: 4},
 		}
 		for _, position := range positions {
-			pos, inside := PositionInPolygon(position.X, position.Y, polygon.Vertices)
+			pos, inside := PositionInPolygon3(position.X, position.Y, polygon.Vertices)
 			assert.True(t, inside)
 			assert.Equal(t, position, pos)
 		}
@@ -58,7 +58,51 @@ x,0,x,0,0,0,0,0,x,x,
 			{X: 1, Y: 4},
 		}
 		for _, point := range outsidePoints {
-			_, inside := PositionInPolygon(point.X, point.Y, polygon.Vertices)
+			_, inside := PositionInPolygon3(point.X, point.Y, polygon.Vertices)
+			assert.False(t, inside)
+		}
+	})
+
+	t.Run("simple2", func(t *testing.T) {
+		polygon := model.NewPolygon()
+
+		polygon.AddVertex(model.Point{X: 1, Y: 1})
+		polygon.AddVertex(model.Point{X: 5, Y: 1})
+		polygon.AddVertex(model.Point{X: 10, Y: 2})
+		polygon.AddVertex(model.Point{X: 10, Y: 3})
+		polygon.AddVertex(model.Point{X: 8, Y: 4})
+		polygon.AddVertex(model.Point{X: 3, Y: 4})
+		polygon.AddVertex(model.Point{X: 1, Y: 3})
+		polygon.AddVertex(model.Point{X: 1, Y: 2})
+		polygon.AddVertex(model.Point{X: 1, Y: 1})
+
+		view := `
+x,0,0,0,x,0,0,0,0,0,
+x,0,0,0,0,0,0,0,0,x,
+x,0,0,0,0,0,0,0,0,x,
+0,0,x,0,0,0,0,x,0,0,
+`
+		require.Equal(t, view, "\n"+polygon.String())
+		require.Equal(t, 1, polygon.XMin.X)
+		require.Equal(t, 1, polygon.YMin.Y)
+		require.Equal(t, 10, polygon.XMax.X)
+		require.Equal(t, 4, polygon.YMax.Y)
+
+		positions := []model.Position{
+			// edge
+			{X: 6, Y: 1, Top: 0, Left: 6, Right: 0, Bottom: 3},
+			{X: 8, Y: 4, Top: 3, Left: 5, Right: 0, Bottom: 0},
+		}
+		for _, position := range positions {
+			pos, inside := PositionInPolygon3(position.X, position.Y, polygon.Vertices)
+			assert.True(t, inside)
+			assert.Equal(t, position, pos)
+		}
+		outsidePoints := []model.Point{
+			{X: 1, Y: 4},
+		}
+		for _, point := range outsidePoints {
+			_, inside := PositionInPolygon3(point.X, point.Y, polygon.Vertices)
 			assert.False(t, inside)
 		}
 	})
@@ -106,7 +150,7 @@ x,0,0,0,0,0,0,0,0,0,
 			{X: 4, Y: 5, Top: 4, Left: 2, Right: 5, Bottom: 3},
 		}
 		for _, position := range positions {
-			pos, inside := PositionInPolygon(position.X, position.Y, polygon.Vertices)
+			pos, inside := PositionInPolygon3(position.X, position.Y, polygon.Vertices)
 			assert.True(t, inside)
 			assert.Equal(t, position, pos)
 		}
