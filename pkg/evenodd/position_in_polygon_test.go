@@ -14,6 +14,7 @@ func TestPositionInPolygon(t *testing.T) {
 
 	t.Run("simple", func(t *testing.T) {
 		polygon := model.NewPolygon()
+		ps := NewPolygonScanner(polygon)
 
 		polygon.AddVertex(model.Point{X: 1, Y: 1})
 		polygon.AddVertex(model.Point{X: 5, Y: 1})
@@ -45,7 +46,7 @@ x,0,0,0,x,x,x,x,x,x,
 x,x,x,0,0,0,0,0,x,x,
 0,0,x,x,x,x,x,x,x,0,
 `
-		assert.Equal(t, segmentsView, "\n"+polygonSegmentsView(polygon))
+		assert.Equal(t, segmentsView, "\n"+polygonSegmentsView(ps))
 
 		filledView := `
 x,x,x,x,x,0,0,0,0,0,
@@ -53,7 +54,7 @@ x,x,x,x,x,x,x,x,x,x,
 x,x,x,x,x,x,x,x,x,x,
 0,0,x,x,x,x,x,x,x,0,
 `
-		assert.Equal(t, filledView, "\n"+polygonFilledView(polygon))
+		assert.Equal(t, filledView, "\n"+polygonFilledView(ps))
 
 		positions := []model.Position{
 			// edge
@@ -68,7 +69,7 @@ x,x,x,x,x,x,x,x,x,x,
 			{X: 1, Y: 1, Top: 0, Bottom: 2, Left: 0, Right: 4},
 		}
 		for _, position := range positions {
-			pos, inside := PositionInPolygon(position.X, position.Y, polygon.Vertices)
+			pos, inside := ps.PositionInPolygon(position.X, position.Y)
 			assert.True(t, inside)
 			assert.Equal(t, position, pos)
 		}
@@ -76,13 +77,14 @@ x,x,x,x,x,x,x,x,x,x,
 			{X: 1, Y: 4},
 		}
 		for _, point := range outsidePoints {
-			_, inside := PositionInPolygon(point.X, point.Y, polygon.Vertices)
+			_, inside := ps.PositionInPolygon(point.X, point.Y)
 			assert.False(t, inside)
 		}
 	})
 
 	t.Run("simple2", func(t *testing.T) {
 		polygon := model.NewPolygon()
+		ps := NewPolygonScanner(polygon)
 
 		polygon.AddVertex(model.Point{X: 1, Y: 1})
 		polygon.AddVertex(model.Point{X: 5, Y: 1})
@@ -112,7 +114,7 @@ x,x,x,x,x,x,x,x,x,x,
 x,x,x,x,x,x,x,x,x,x,
 0,0,x,x,x,x,x,x,0,0,
 `
-		assert.Equal(t, filledView, "\n"+polygonFilledView(polygon))
+		assert.Equal(t, filledView, "\n"+polygonFilledView(ps))
 
 		positions := []model.Position{
 			// edge
@@ -120,7 +122,7 @@ x,x,x,x,x,x,x,x,x,x,
 			{X: 8, Y: 4, Top: 2, Left: 5, Right: 0, Bottom: 0},
 		}
 		for _, position := range positions {
-			pos, inside := PositionInPolygon(position.X, position.Y, polygon.Vertices)
+			pos, inside := ps.PositionInPolygon(position.X, position.Y)
 			assert.True(t, inside)
 			assert.Equal(t, position, pos)
 		}
@@ -128,13 +130,14 @@ x,x,x,x,x,x,x,x,x,x,
 			{X: 1, Y: 4},
 		}
 		for _, point := range outsidePoints {
-			_, inside := PositionInPolygon(point.X, point.Y, polygon.Vertices)
+			_, inside := ps.PositionInPolygon(point.X, point.Y)
 			assert.False(t, inside)
 		}
 	})
 
 	t.Run("complex", func(t *testing.T) {
 		polygon := model.NewPolygon()
+		ps := NewPolygonScanner(polygon)
 
 		polygon.AddVertex(model.Point{X: 1, Y: 1})
 		polygon.AddVertex(model.Point{X: 5, Y: 1})
@@ -179,7 +182,7 @@ x,x,x,x,x,x,x,x,x,x,
 x,x,x,x,x,0,x,x,x,0,
 0,x,x,x,x,0,x,x,x,0,
 `
-		assert.Equal(t, filledView, "\n"+polygonFilledView(polygon))
+		assert.Equal(t, filledView, "\n"+polygonFilledView(ps))
 
 		positions := []model.Position{
 			// edge
@@ -188,7 +191,7 @@ x,x,x,x,x,0,x,x,x,0,
 			{X: 4, Y: 5, Top: 4, Left: 2, Right: 5, Bottom: 3},
 		}
 		for _, position := range positions {
-			pos, inside := PositionInPolygon(position.X, position.Y, polygon.Vertices)
+			pos, inside := ps.PositionInPolygon(position.X, position.Y)
 			assert.True(t, inside)
 			assert.Equal(t, position, pos)
 		}
@@ -196,12 +199,13 @@ x,x,x,x,x,0,x,x,x,0,
 
 }
 
-func polygonSegmentsView(p *model.Polygon) string {
+func polygonSegmentsView(ps *PolygonScanner) string {
+	p := ps.polygon
 	var line strings.Builder
 	for y := p.YMin.Y; y <= p.YMax.Y; y++ {
 		for x := p.XMin.X; x <= p.XMax.X; x++ {
 			char := "0"
-			if pointOnEdge(x, y, p.Vertices) {
+			if ps.pointOnEdge(x, y) {
 				char = "x"
 			}
 			line.WriteString(fmt.Sprintf("%s,", char))
@@ -211,12 +215,13 @@ func polygonSegmentsView(p *model.Polygon) string {
 	return line.String()
 }
 
-func polygonFilledView(p *model.Polygon) string {
+func polygonFilledView(ps *PolygonScanner) string {
+	p := ps.polygon
 	var line strings.Builder
 	for y := p.YMin.Y; y <= p.YMax.Y; y++ {
 		for x := p.XMin.X; x <= p.XMax.X; x++ {
 			char := "0"
-			if pointInPolygonOrEdge(x, y, p.Vertices) {
+			if ps.pointInPolygonOrEdge(x, y) {
 				char = "x"
 			}
 			line.WriteString(fmt.Sprintf("%s,", char))

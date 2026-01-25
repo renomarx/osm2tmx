@@ -1,57 +1,73 @@
 package evenodd
 
 import (
+	"sync"
+
 	"github.com/renomarx/osm2tmx/pkg/model"
 )
 
-func PositionInPolygon(x, y int, poly []model.Point) (model.Position, bool) {
-	if !pointInPolygonOrEdge(x, y, poly) {
+type PolygonScanner struct {
+	polygon        *model.Polygon
+	mu             sync.RWMutex
+	isInsideOrEdge map[model.Point]bool
+}
+
+func NewPolygonScanner(polygon *model.Polygon) *PolygonScanner {
+	return &PolygonScanner{
+		polygon:        polygon,
+		isInsideOrEdge: make(map[model.Point]bool),
+	}
+}
+
+func (ps *PolygonScanner) PositionInPolygon(x, y int) (model.Position, bool) {
+	if !ps.pointInPolygonOrEdge(x, y) {
 		return model.Position{}, false
 	}
 
 	return model.Position{
 		X:      x,
 		Y:      y,
-		Top:    getTop(x, y, poly),
-		Bottom: getBottom(x, y, poly),
-		Left:   getLeft(x, y, poly),
-		Right:  getRight(x, y, poly),
+		Top:    ps.getTop(x, y),
+		Bottom: ps.getBottom(x, y),
+		Left:   ps.getLeft(x, y),
+		Right:  ps.getRight(x, y),
 	}, true
 }
 
-func getTop(x, y int, poly []model.Point) int {
+func (ps *PolygonScanner) getTop(x, y int) int {
 	top := 0
-	for pointInPolygonOrEdge(x, y-top-1, poly) {
+	for ps.pointInPolygonOrEdge(x, y-top-1) {
 		top++
 	}
 	return top
 }
 
-func getBottom(x, y int, poly []model.Point) int {
+func (ps *PolygonScanner) getBottom(x, y int) int {
 	bottom := 0
-	for pointInPolygonOrEdge(x, y+bottom+1, poly) {
+	for ps.pointInPolygonOrEdge(x, y+bottom+1) {
 		bottom++
 	}
 	return bottom
 }
 
-func getLeft(x, y int, poly []model.Point) int {
+func (ps *PolygonScanner) getLeft(x, y int) int {
 	left := 0
-	for pointInPolygonOrEdge(x-left-1, y, poly) {
+	for ps.pointInPolygonOrEdge(x-left-1, y) {
 		left++
 	}
 	return left
 }
 
-func getRight(x, y int, poly []model.Point) int {
+func (ps *PolygonScanner) getRight(x, y int) int {
 	right := 0
-	for pointInPolygonOrEdge(x+right+1, y, poly) {
+	for ps.pointInPolygonOrEdge(x+right+1, y) {
 		right++
 	}
 	return right
 }
 
-func pointOnEdge(x, y int, poly []model.Point) bool {
+func (ps *PolygonScanner) pointOnEdge(x, y int) bool {
+	poly := ps.polygon.Vertices
 	for i, j := 0, len(poly)-1; i < len(poly); j, i = i, i+1 {
 		if onSegment(poly[j], poly[i], x, y) {
 			return true
@@ -60,10 +76,18 @@ func pointOnEdge(x, y int, poly []model.Point) bool {
 	return false
 }
 
-func pointInPolygonOrEdge(x, y int, poly []model.Point) bool {
-	inside := false
+func (ps *PolygonScanner) pointInPolygonOrEdge(x, y int) bool {
+	ps.mu.Lock()
+	defer ps.mu.Unlock()
+	inside, exists := ps.isInsideOrEdge[model.Point{X: x, Y: y}]
+	if exists {
+		return inside
+	}
+
+	poly := ps.polygon.Vertices
 	for i, j := 0, len(poly)-1; i < len(poly); j, i = i, i+1 {
 		if onSegment(poly[j], poly[i], x, y) {
+			ps.isInsideOrEdge[model.Point{X: x, Y: y}] = true
 			return true
 		}
 		a := poly[j]
@@ -73,6 +97,7 @@ func pointInPolygonOrEdge(x, y int, poly []model.Point) bool {
 			inside = !inside
 		}
 	}
+	ps.isInsideOrEdge[model.Point{X: x, Y: y}] = inside
 	return inside
 }
 
