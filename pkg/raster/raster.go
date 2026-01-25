@@ -143,7 +143,7 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 func (r *Raster) fillPolygon(m *model.Map, mapTileFunc mapper.MapTileFunc, polygon *model.Polygon) {
 	for y := polygon.YMin.Y; y <= polygon.YMax.Y; y++ {
 		for x := polygon.XMin.X; x <= polygon.XMax.X; x++ {
-			pos, inside := evenodd.PositionInPolygon3(x, y, polygon.Vertices)
+			pos, inside := evenodd.PositionInPolygon(x, y, polygon.Vertices)
 			if inside {
 				mapTile := mapTileFunc(&pos)
 				for z, tile := range mapTile.ByLayer {

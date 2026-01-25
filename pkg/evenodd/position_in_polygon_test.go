@@ -1,6 +1,8 @@
 package evenodd
 
 import (
+	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/renomarx/osm2tmx/pkg/model"
@@ -37,6 +39,22 @@ x,0,x,0,0,0,0,0,x,x,
 		require.Equal(t, 10, polygon.XMax.X)
 		require.Equal(t, 4, polygon.YMax.Y)
 
+		segmentsView := `
+x,x,x,x,x,0,0,0,0,0,
+x,0,0,0,x,x,x,x,x,x,
+x,x,x,0,0,0,0,0,x,x,
+0,0,x,x,x,x,x,x,x,0,
+`
+		assert.Equal(t, segmentsView, "\n"+polygonSegmentsView(polygon))
+
+		filledView := `
+x,x,x,x,x,0,0,0,0,0,
+x,x,x,x,x,x,x,x,x,x,
+x,x,x,x,x,x,x,x,x,x,
+0,0,x,x,x,x,x,x,x,0,
+`
+		assert.Equal(t, filledView, "\n"+polygonFilledView(polygon))
+
 		positions := []model.Position{
 			// edge
 			{X: 4, Y: 1, Top: 0, Left: 3, Right: 1, Bottom: 3},
@@ -50,7 +68,7 @@ x,0,x,0,0,0,0,0,x,x,
 			{X: 1, Y: 1, Top: 0, Bottom: 2, Left: 0, Right: 4},
 		}
 		for _, position := range positions {
-			pos, inside := PositionInPolygon3(position.X, position.Y, polygon.Vertices)
+			pos, inside := PositionInPolygon(position.X, position.Y, polygon.Vertices)
 			assert.True(t, inside)
 			assert.Equal(t, position, pos)
 		}
@@ -58,7 +76,7 @@ x,0,x,0,0,0,0,0,x,x,
 			{X: 1, Y: 4},
 		}
 		for _, point := range outsidePoints {
-			_, inside := PositionInPolygon3(point.X, point.Y, polygon.Vertices)
+			_, inside := PositionInPolygon(point.X, point.Y, polygon.Vertices)
 			assert.False(t, inside)
 		}
 	})
@@ -88,13 +106,21 @@ x,0,0,0,0,0,0,0,0,x,
 		require.Equal(t, 10, polygon.XMax.X)
 		require.Equal(t, 4, polygon.YMax.Y)
 
+		filledView := `
+x,x,x,x,x,0,0,0,0,0,
+x,x,x,x,x,x,x,x,x,x,
+x,x,x,x,x,x,x,x,x,x,
+0,0,x,x,x,x,x,x,0,0,
+`
+		assert.Equal(t, filledView, "\n"+polygonFilledView(polygon))
+
 		positions := []model.Position{
 			// edge
-			{X: 6, Y: 1, Top: 0, Left: 6, Right: 0, Bottom: 3},
-			{X: 8, Y: 4, Top: 3, Left: 5, Right: 0, Bottom: 0},
+			{X: 5, Y: 1, Top: 0, Left: 4, Right: 0, Bottom: 3},
+			{X: 8, Y: 4, Top: 2, Left: 5, Right: 0, Bottom: 0},
 		}
 		for _, position := range positions {
-			pos, inside := PositionInPolygon3(position.X, position.Y, polygon.Vertices)
+			pos, inside := PositionInPolygon(position.X, position.Y, polygon.Vertices)
 			assert.True(t, inside)
 			assert.Equal(t, position, pos)
 		}
@@ -102,7 +128,7 @@ x,0,0,0,0,0,0,0,0,x,
 			{X: 1, Y: 4},
 		}
 		for _, point := range outsidePoints {
-			_, inside := PositionInPolygon3(point.X, point.Y, polygon.Vertices)
+			_, inside := PositionInPolygon(point.X, point.Y, polygon.Vertices)
 			assert.False(t, inside)
 		}
 	})
@@ -143,6 +169,18 @@ x,0,0,0,0,0,0,0,0,0,
 		require.Equal(t, polygon.XMin, model.Point{X: 1, Y: 1})
 		require.Equal(t, polygon.YMin, model.Point{X: 1, Y: 1})
 
+		filledView := `
+x,x,x,x,x,0,0,0,0,0,
+x,x,x,x,x,x,x,x,x,x,
+x,x,x,x,x,x,x,x,x,x,
+0,x,x,x,x,x,x,x,x,0,
+0,x,x,x,x,x,x,x,x,0,
+0,x,x,x,x,0,x,x,x,0,
+x,x,x,x,x,0,x,x,x,0,
+0,x,x,x,x,0,x,x,x,0,
+`
+		assert.Equal(t, filledView, "\n"+polygonFilledView(polygon))
+
 		positions := []model.Position{
 			// edge
 			{X: 1, Y: 1, Top: 0, Left: 0, Right: 4, Bottom: 2},
@@ -150,10 +188,40 @@ x,0,0,0,0,0,0,0,0,0,
 			{X: 4, Y: 5, Top: 4, Left: 2, Right: 5, Bottom: 3},
 		}
 		for _, position := range positions {
-			pos, inside := PositionInPolygon3(position.X, position.Y, polygon.Vertices)
+			pos, inside := PositionInPolygon(position.X, position.Y, polygon.Vertices)
 			assert.True(t, inside)
 			assert.Equal(t, position, pos)
 		}
 	})
 
+}
+
+func polygonSegmentsView(p *model.Polygon) string {
+	var line strings.Builder
+	for y := p.YMin.Y; y <= p.YMax.Y; y++ {
+		for x := p.XMin.X; x <= p.XMax.X; x++ {
+			char := "0"
+			if pointOnEdge(x, y, p.Vertices) {
+				char = "x"
+			}
+			line.WriteString(fmt.Sprintf("%s,", char))
+		}
+		line.WriteString("\n")
+	}
+	return line.String()
+}
+
+func polygonFilledView(p *model.Polygon) string {
+	var line strings.Builder
+	for y := p.YMin.Y; y <= p.YMax.Y; y++ {
+		for x := p.XMin.X; x <= p.XMax.X; x++ {
+			char := "0"
+			if pointInPolygonOrEdge(x, y, p.Vertices) {
+				char = "x"
+			}
+			line.WriteString(fmt.Sprintf("%s,", char))
+		}
+		line.WriteString("\n")
+	}
+	return line.String()
 }
