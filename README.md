@@ -57,12 +57,27 @@ tags:
 
 - Explore a direct integration in 2d video games, without tilesets, using directional svg ?
 
+## Perfs
+
+```bash
+./osm2tmx -out example/example01/les_gets.osm.tmx data/les_gets.osm.pbf
+2026/01/25 15:43:39 main.go:47: will write output to example/example01/les_gets.osm.tmx
+2026/01/25 16:22:24 main.go:57: osm.Bounds{MinLat:46.144219999, MaxLat:46.167969999, MinLon:6.64407, MaxLon:6.69458}
+2026/01/25 16:22:24 main.go:58: Max: UTM: [east:745237.240000,north:5807307.510000]
+2026/01/25 16:22:24 main.go:59: Min: UTM: [east:739614.480000,north:5803490.770000]
+2026/01/25 16:22:24 main.go:60: Map size: (5623,3817) meters
+2026/01/25 16:22:24 main.go:62: Nodes: 40117
+2026/01/25 16:22:24 main.go:63: Ways: 5468
+2026/01/25 16:22:24 main.go:64: Relations: 86
+2026/01/25 16:22:24 main.go:66: Generated map: height: 3817, width: 5623
+2026/01/25 16:22:24 main.go:68: Number of points out of bounds: 9011
+```
+
 ## Resources
 
 Les valeurs de latitude sont mesurées par rapport à l'équateur et à une plage comprise entre -90° au pôle Sud et +90° au pôle Nord. Les valeurs de longitude sont mesurées par rapport au premier méridien. Elles sont comprises entre -180° en allant vers l'ouest et 180° vers l'est.
 
 - OpenStreetMap specifications:
-
   - https://planet.openstreetmap.org/
   - https://download.geofabrik.de/
   - https://wiki.openstreetmap.org/wiki/Map_features
@@ -72,13 +87,11 @@ Les valeurs de latitude sont mesurées par rapport à l'équateur et à une plag
   - https://wiki.openstreetmap.org/wiki/Altitude
 
 - UI:
-
   - https://github.com/hajimehoshi/ebiten/blob/main/examples/vector/main.go
   - https://github.com/systemed/tilemaker/tree/master
   - https://wiki.openstreetmap.org/wiki/Vector_tiles
 
 - Inspirations:
-
   - https://github.com/mapnik/mapnik/wiki/XMLConfigReference
   - https://github.com/mapnik/mapnik/wiki/OsmPlugin
   - https://github.com/maplibre/maplibre-gl-js?tab=readme-ov-file
