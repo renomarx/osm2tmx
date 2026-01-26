@@ -35,17 +35,17 @@ func TestRaster(t *testing.T) {
 				MinLon: 6.670234999000001,
 				MaxLon: 6.673915,
 			},
-			MapSizeX:    410,
-			MapSizeY:    352,
-			MaxEasting:  742936.82,
-			MaxNorthing: 5806340.56,
-			MinEasting:  742527.16,
-			MinNorthing: 5805989.38,
+			MapSizeX:         410,
+			MapSizeY:         352,
+			MaxEasting:       742936.82,
+			MaxNorthing:      5806340.56,
+			MinEasting:       742527.16,
+			MinNorthing:      5805989.38,
+			Nodes:            1694,
+			Ways:             306,
+			Relations:        26,
+			NodesOutOfBounds: 3322,
 		}, result.Meta)
-		assert.Equal(t, 1694, len(result.Nodes))
-		assert.Equal(t, 306, len(result.Ways))
-		assert.Equal(t, 26, len(result.Relations))
-		assert.Equal(t, 3322, len(result.NodesOutOfBounds))
 	})
 
 	t.Run("downscale_4", func(t *testing.T) {
@@ -67,17 +67,17 @@ func TestRaster(t *testing.T) {
 				MinLon: 6.670234999000001,
 				MaxLon: 6.673915,
 			},
-			MapSizeX:    102,
-			MapSizeY:    88,
-			MaxEasting:  742936.82,
-			MaxNorthing: 5806340.56,
-			MinEasting:  742527.16,
-			MinNorthing: 5805989.38,
+			MapSizeX:         102,
+			MapSizeY:         88,
+			MaxEasting:       742936.82,
+			MaxNorthing:      5806340.56,
+			MinEasting:       742527.16,
+			MinNorthing:      5805989.38,
+			Nodes:            1698,
+			Ways:             306,
+			Relations:        26,
+			NodesOutOfBounds: 3318,
 		}, result.Meta)
-		assert.Equal(t, 1698, len(result.Nodes))
-		assert.Equal(t, 306, len(result.Ways))
-		assert.Equal(t, 26, len(result.Relations))
-		assert.Equal(t, 3318, len(result.NodesOutOfBounds))
 	})
 
 	t.Run("downscale_2_with_bounds", func(t *testing.T) {
@@ -104,16 +104,16 @@ func TestRaster(t *testing.T) {
 				MinLon: 6.670234999000001,
 				MaxLon: 6.673915,
 			},
-			MapSizeX:    100,
-			MapSizeY:    95,
-			MaxEasting:  742936.82,
-			MaxNorthing: 5806340.56,
-			MinEasting:  742527.16,
-			MinNorthing: 5805989.38,
+			MapSizeX:         100,
+			MapSizeY:         95,
+			MaxEasting:       742936.82,
+			MaxNorthing:      5806340.56,
+			MinEasting:       742527.16,
+			MinNorthing:      5805989.38,
+			Nodes:            697,
+			Ways:             306,
+			Relations:        26,
+			NodesOutOfBounds: 4319,
 		}, result.Meta)
-		assert.Equal(t, 697, len(result.Nodes))
-		assert.Equal(t, 306, len(result.Ways))
-		assert.Equal(t, 26, len(result.Relations))
-		assert.Equal(t, 4319, len(result.NodesOutOfBounds))
 	})
 }

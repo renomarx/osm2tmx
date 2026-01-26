@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime"
 
 	"github.com/renomarx/osm2tmx/pkg/mapper"
 	"github.com/renomarx/osm2tmx/pkg/raster"
@@ -28,6 +29,7 @@ Options:
 -offset-y: offset y (after downscale if any)
 -limit-x: limit x (after downscale if any)
 -limit-y: limit y (after downscale if any)
+-workers: number of parallel workers; defaults to number of CPUs - 1
 `, os.Args[0])
 	fmt.Println(Usage)
 	os.Exit(1)
@@ -42,6 +44,7 @@ func main() {
 	var offsetYFlag = flag.Int("offset-y", 0, "offset y (after downscale if any)")
 	var limitXFlag = flag.Int("limit-x", 0, "limit x (after downscale if any)")
 	var limitYFlag = flag.Int("limit-y", 0, "limit y (after downscale if any)")
+	var workersFlag = flag.Int("workers", 0, "number of parallel workers; defaults to number of CPUs - 1")
 
 	flag.Parse()
 
@@ -53,6 +56,16 @@ func main() {
 	if len(args) != 1 {
 		printUsageAndExit()
 	}
+
+	workers := 1
+	cpusNumber := runtime.NumCPU()
+	if cpusNumber > 2 {
+		workers = cpusNumber - 1
+	}
+	if workersFlag != nil && *workersFlag != 0 {
+		workers = *workersFlag
+	}
+	fmt.Println("Number of CPUs:", runtime.NumCPU())
 
 	osmFile := args[0]
 
@@ -67,7 +80,7 @@ func main() {
 		LimitX:  *limitXFlag,
 		LimitY:  *limitYFlag,
 	}
-	rst := raster.New(mp, *downscaleFlag, bounds)
+	rst := raster.New(mp, *downscaleFlag, bounds).WithWorkers(workers)
 
 	rstMap, err := rst.Parse(osmFile)
 	if err != nil {
@@ -79,13 +92,13 @@ func main() {
 	log.Printf("Min: UTM: [east:%f,north:%f]\n", rstMap.Meta.MinEasting, rstMap.Meta.MinNorthing)
 	log.Printf("Map size: (%d,%d) meters\n", rstMap.Meta.MapSizeX, rstMap.Meta.MapSizeY)
 
-	log.Printf("Nodes: %d", len(rstMap.Nodes))
-	log.Printf("Ways: %d", len(rstMap.Ways))
-	log.Printf("Relations: %d", len(rstMap.Relations))
+	log.Printf("Nodes: %d", rstMap.Meta.Nodes)
+	log.Printf("Ways: %d", rstMap.Meta.Ways)
+	log.Printf("Relations: %d", rstMap.Meta.Relations)
 
 	log.Printf("Generated map: height: %d, width: %d", rstMap.Meta.MapSizeY, rstMap.Meta.MapSizeX)
 
-	log.Printf("Number of points out of bounds: %d", len(rstMap.NodesOutOfBounds))
+	log.Printf("Number of points out of bounds: %d", rstMap.Meta.NodesOutOfBounds)
 
 	writer := tmx.NewWriter("tileset/basechip_pipo.tsx", 16, 16) // TODO: get from conf
 	err = writer.Write(rstMap, tmxFilename)

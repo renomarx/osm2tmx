@@ -17,6 +17,7 @@ type Raster struct {
 	mapper    *mapper.Mapper
 	downscale int
 	bounds    Bounds
+	workers   int
 }
 
 type Bounds struct {
@@ -30,6 +31,11 @@ func New(mapper *mapper.Mapper, downscale int, bounds Bounds) *Raster {
 		downscale: downscale,
 		bounds:    bounds,
 	}
+}
+
+func (r *Raster) WithWorkers(workers int) *Raster {
+	r.workers = workers
+	return r
 }
 
 func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
@@ -137,18 +143,18 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 	return model.RasterMap{
 		Map: &m,
 		Meta: model.RasterMapMeta{
-			Bounds:      *header.Bounds,
-			MapSizeX:    mapSizeX,
-			MapSizeY:    mapSizeY,
-			MaxEasting:  maxEasting,
-			MaxNorthing: maxNorthing,
-			MinEasting:  minEasting,
-			MinNorthing: minNorthing,
+			Bounds:           *header.Bounds,
+			MapSizeX:         mapSizeX,
+			MapSizeY:         mapSizeY,
+			MaxEasting:       maxEasting,
+			MaxNorthing:      maxNorthing,
+			MinEasting:       minEasting,
+			MinNorthing:      minNorthing,
+			Nodes:            len(osmNodes),
+			Ways:             len(osmWays),
+			Relations:        len(osmRelations),
+			NodesOutOfBounds: len(osmNodesOutOfBounds),
 		},
-		Nodes:            osmNodes,
-		Ways:             osmWays,
-		Relations:        osmRelations,
-		NodesOutOfBounds: osmNodesOutOfBounds,
 	}, nil
 }
 
