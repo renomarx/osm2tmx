@@ -66,6 +66,7 @@ func main() {
 		workers = *workersFlag
 	}
 	fmt.Println("Number of CPUs:", runtime.NumCPU())
+	fmt.Println("Number of workers:", workers)
 
 	osmFile := args[0]
 
@@ -90,7 +91,7 @@ func main() {
 	log.Printf("%#v\n", rstMap.Meta.Bounds)
 	log.Printf("Max: UTM: [east:%f,north:%f]\n", rstMap.Meta.MaxEasting, rstMap.Meta.MaxNorthing)
 	log.Printf("Min: UTM: [east:%f,north:%f]\n", rstMap.Meta.MinEasting, rstMap.Meta.MinNorthing)
-	log.Printf("Map size: (%d,%d) meters\n", rstMap.Meta.MapSizeX, rstMap.Meta.MapSizeY)
+	log.Printf("Map size: (%d,%d) meters (%dx)\n", rstMap.Meta.MapSizeX, rstMap.Meta.MapSizeY, *downscaleFlag)
 
 	log.Printf("Nodes: %d", rstMap.Meta.Nodes)
 	log.Printf("Ways: %d", rstMap.Meta.Ways)
