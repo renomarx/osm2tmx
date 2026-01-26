@@ -119,7 +119,7 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 	}
 
 	wg := sync.WaitGroup{}
-	waysQueue := make(chan *osm.Way)
+	waysQueue := make(chan *osm.Way, len(osmWays))
 	for range r.workers {
 		wg.Add(1)
 		go func() {
@@ -134,7 +134,7 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 	wg.Wait()
 
 	wg = sync.WaitGroup{}
-	relationsQueue := make(chan *osm.Relation)
+	relationsQueue := make(chan *osm.Relation, len(osmRelations))
 	for range r.workers {
 		wg.Add(1)
 		go func() {
