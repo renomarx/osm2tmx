@@ -113,6 +113,11 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 		}
 	}
 
+	scanErr := scanner.Err()
+	if scanErr != nil {
+		return model.RasterMap{}, err
+	}
+
 	wg := sync.WaitGroup{}
 	waysQueue := make(chan *osm.Way)
 	for range r.workers {
@@ -141,11 +146,7 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 		relationsQueue <- &relation
 	}
 	close(relationsQueue)
-
-	scanErr := scanner.Err()
-	if scanErr != nil {
-		return model.RasterMap{}, err
-	}
+	wg.Wait()
 
 	return model.RasterMap{
 		Map: &m,
