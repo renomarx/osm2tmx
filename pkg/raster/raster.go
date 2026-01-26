@@ -82,6 +82,7 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 	osmWays := make(map[int64]*osm.Way)
 	osmRelations := []osm.Relation{}
 	osmNodesOutOfBounds := []osm.Node{}
+
 	for scanner.Scan() {
 		switch scanner.Object().(type) {
 		case *osm.Node:
@@ -105,39 +106,32 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 			way := scanner.Object().(*osm.Way)
 			osmWays[int64(way.ID)] = way
 		case *osm.Relation:
-			osmRelations = append(osmRelations, *scanner.Object().(*osm.Relation))
+			relation := scanner.Object().(*osm.Relation)
+			osmRelations = append(osmRelations, *relation)
 		}
 	}
+
+	waysQueue := make(chan *osm.Way)
+	for range r.workers {
+		go r.workerWay(waysQueue, &m, pointsByNodeID)
+	}
+	for _, way := range osmWays {
+		waysQueue <- way
+	}
+	close(waysQueue)
+
+	relationsQueue := make(chan *osm.Relation)
+	for range r.workers {
+		go r.workerRelation(relationsQueue, &m, osmWays, pointsByNodeID)
+	}
+	for _, relation := range osmRelations {
+		relationsQueue <- &relation
+	}
+	close(relationsQueue)
 
 	scanErr := scanner.Err()
 	if scanErr != nil {
 		return model.RasterMap{}, err
-	}
-
-	for _, way := range osmWays {
-		mapTileFunc := r.mapper.GetMapTileFunc(way.Tags)
-		if r.isPolygon(way) {
-			if !r.mapper.IsTileDefault(mapTileFunc(nil)) {
-				r.drawWayArea(&m, way, pointsByNodeID, mapTileFunc)
-			}
-		} else {
-			r.drawWayLine(&m, way, pointsByNodeID, mapTileFunc)
-		}
-	}
-
-	for _, relation := range osmRelations {
-		// relations of type multipolygon are made of members of type node or way,
-		// representing boundaries of the way
-		// used to represent rivers, for example
-		if !r.isMultipolygon(&relation) {
-			continue
-		}
-		mapTileFunc := r.mapper.GetMapTileFunc(relation.Tags)
-		tile := mapTileFunc(nil)
-		if r.mapper.IsTileDefault(tile) {
-			continue
-		}
-		r.drawRelationArea(&m, &relation, osmWays, pointsByNodeID, mapTileFunc)
 	}
 
 	return model.RasterMap{
@@ -156,6 +150,37 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 			NodesOutOfBounds: len(osmNodesOutOfBounds),
 		},
 	}, nil
+}
+
+func (r *Raster) workerWay(waysQueue chan *osm.Way, m *model.Map, pointsByNodeID map[int64]model.Point) {
+	for way := range waysQueue {
+		mapTileFunc := r.mapper.GetMapTileFunc(way.Tags)
+		if r.isPolygon(way) {
+			if !r.mapper.IsTileDefault(mapTileFunc(nil)) {
+				r.drawWayArea(m, way, pointsByNodeID, mapTileFunc)
+			}
+		} else {
+			r.drawWayLine(m, way, pointsByNodeID, mapTileFunc)
+		}
+	}
+
+}
+
+func (r *Raster) workerRelation(relationsQueue chan *osm.Relation, m *model.Map, osmWays map[int64]*osm.Way, pointsByNodeID map[int64]model.Point) {
+	for relation := range relationsQueue {
+		// relations of type multipolygon are made of members of type node or way,
+		// representing boundaries of the way
+		// used to represent rivers, for example
+		if !r.isMultipolygon(relation) {
+			continue
+		}
+		mapTileFunc := r.mapper.GetMapTileFunc(relation.Tags)
+		tile := mapTileFunc(nil)
+		if r.mapper.IsTileDefault(tile) {
+			continue
+		}
+		r.drawRelationArea(m, relation, osmWays, pointsByNodeID, mapTileFunc)
+	}
 }
 
 func (r *Raster) fillPolygon(m *model.Map, mapTileFunc mapper.MapTileFunc, polygon *model.Polygon) {
