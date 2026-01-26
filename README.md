@@ -46,11 +46,10 @@ tags:
 - How to handle z-index and level lines ?
   - Not included in OSM data, we'll have to find another way
 - Conf & handle the mapping.yaml file
-- Optimisation
-  - Goroutines & workers to handle ways & areas
-  - See simd/archisimd in go1.26
 - More examples with other tilesets
 - Generate a tileset like OSM stylesheets to have a pretty map in tmx :)
+- Optimisation
+  - See simd/archisimd in go1.26
 
 - Explore a direct integration in 2d video games, without tilesets, using directional svg ?
 
