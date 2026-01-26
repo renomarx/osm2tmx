@@ -4,6 +4,7 @@ import (
 	"context"
 	"math"
 	"os"
+	"sync"
 
 	"github.com/paulmach/osm"
 	"github.com/paulmach/osm/osmpbf"
@@ -112,18 +113,29 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 		}
 	}
 
+	wg := sync.WaitGroup{}
 	waysQueue := make(chan *osm.Way)
 	for range r.workers {
-		go r.workerWay(waysQueue, &m, pointsByNodeID)
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			r.workerWay(waysQueue, &m, pointsByNodeID)
+		}()
 	}
 	for _, way := range osmWays {
 		waysQueue <- way
 	}
 	close(waysQueue)
+	wg.Wait()
 
+	wg = sync.WaitGroup{}
 	relationsQueue := make(chan *osm.Relation)
 	for range r.workers {
-		go r.workerRelation(relationsQueue, &m, osmWays, pointsByNodeID)
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			r.workerRelation(relationsQueue, &m, osmWays, pointsByNodeID)
+		}()
 	}
 	for _, relation := range osmRelations {
 		relationsQueue <- &relation
