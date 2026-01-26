@@ -20,7 +20,7 @@ func TestRaster(t *testing.T) {
 
 		begin := time.Now()
 		result, err := raster.Parse(osmfilename)
-		totalDuration := time.Now().Sub(begin)
+		totalDuration := time.Since(begin)
 		t.Logf("duration: %d ms", totalDuration/time.Millisecond)
 		assert.NoError(t, err)
 		assert.Equal(t, 3, len(result.Map.Layers))

@@ -7,19 +7,31 @@ import (
 )
 
 type PolygonScanner struct {
+	threadSafe     bool
 	polygon        *model.Polygon
 	mu             sync.RWMutex
 	isInsideOrEdge map[model.Point]bool
+	index          map[model.Point]model.Position
 }
 
 func NewPolygonScanner(polygon *model.Polygon) *PolygonScanner {
 	return &PolygonScanner{
 		polygon:        polygon,
 		isInsideOrEdge: make(map[model.Point]bool),
+		index:          make(map[model.Point]model.Position),
 	}
 }
 
+func (ps *PolygonScanner) WithThreadSafe() *PolygonScanner {
+	ps.threadSafe = true
+	return ps
+}
+
 func (ps *PolygonScanner) PositionInPolygon(x, y int) (model.Position, bool) {
+	if ps.threadSafe {
+		ps.mu.Lock()
+		defer ps.mu.Unlock()
+	}
 	if !ps.pointInPolygonOrEdge(x, y) {
 		return model.Position{}, false
 	}
@@ -30,19 +42,25 @@ func (ps *PolygonScanner) PositionInPolygon(x, y int) (model.Position, bool) {
 	left := ps.getLeft(x, y)
 	top := ps.getTop(x, y)
 
-	return model.Position{
+	pos := model.Position{
 		X:      x,
 		Y:      y,
 		Top:    top,
 		Bottom: bottom,
 		Left:   left,
 		Right:  right,
-	}, true
+	}
+	ps.index[model.Point{X: x, Y: y}] = pos
+	return pos, true
 }
 
 func (ps *PolygonScanner) getTop(x, y int) int {
 	top := 0
 	for ps.pointInPolygonOrEdge(x, y-top-1) && y-top >= ps.polygon.YMin.Y {
+		pos, exists := ps.index[model.Point{X: x, Y: y - top - 1}]
+		if exists {
+			return pos.Top + top + 1
+		}
 		top++
 	}
 	return top
@@ -51,6 +69,10 @@ func (ps *PolygonScanner) getTop(x, y int) int {
 func (ps *PolygonScanner) getBottom(x, y int) int {
 	bottom := 0
 	for ps.pointInPolygonOrEdge(x, y+bottom+1) && y+bottom <= ps.polygon.YMax.Y {
+		pos, exists := ps.index[model.Point{X: x, Y: y + bottom + 1}]
+		if exists {
+			return pos.Bottom + bottom + 1
+		}
 		bottom++
 	}
 	return bottom
@@ -59,6 +81,10 @@ func (ps *PolygonScanner) getBottom(x, y int) int {
 func (ps *PolygonScanner) getLeft(x, y int) int {
 	left := 0
 	for ps.pointInPolygonOrEdge(x-left-1, y) && x-left >= ps.polygon.XMin.X {
+		pos, exists := ps.index[model.Point{X: x - left - 1, Y: y}]
+		if exists {
+			return pos.Left + left + 1
+		}
 		left++
 	}
 	return left
@@ -67,6 +93,10 @@ func (ps *PolygonScanner) getLeft(x, y int) int {
 func (ps *PolygonScanner) getRight(x, y int) int {
 	right := 0
 	for ps.pointInPolygonOrEdge(x+right+1, y) && x+right <= ps.polygon.XMax.X {
+		pos, exists := ps.index[model.Point{X: x + right + 1, Y: y}]
+		if exists {
+			return pos.Right + right + 1
+		}
 		right++
 	}
 	return right
@@ -83,8 +113,6 @@ func (ps *PolygonScanner) pointOnEdge(x, y int) bool {
 }
 
 func (ps *PolygonScanner) pointInPolygonOrEdge(x, y int) bool {
-	ps.mu.Lock()
-	defer ps.mu.Unlock()
 	inside, exists := ps.isInsideOrEdge[model.Point{X: x, Y: y}]
 	if exists {
 		return inside
