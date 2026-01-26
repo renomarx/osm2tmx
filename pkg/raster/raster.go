@@ -30,6 +30,7 @@ func New(mapper *mapper.Mapper, downscale int, bounds Bounds) *Raster {
 		mapper:    mapper,
 		downscale: downscale,
 		bounds:    bounds,
+		workers:   1,
 	}
 }
 
