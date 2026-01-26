@@ -2,6 +2,7 @@ package raster
 
 import (
 	"testing"
+	"time"
 
 	"github.com/paulmach/osm"
 	"github.com/renomarx/osm2tmx/pkg/mapper"
@@ -17,7 +18,10 @@ func TestRaster(t *testing.T) {
 
 		raster := New(mapper, 1, Bounds{})
 
+		begin := time.Now()
 		result, err := raster.Parse(osmfilename)
+		totalDuration := time.Now().Sub(begin)
+		t.Logf("duration: %d ms", totalDuration/time.Millisecond)
 		assert.NoError(t, err)
 		assert.Equal(t, 3, len(result.Map.Layers))
 		assert.Equal(t, 352, result.Map.Layers[0].SizeY())
