@@ -13,6 +13,9 @@ import (
 type UI struct {
 	background  *ebiten.Image
 	pressedKeys []ebiten.Key
+	tx, ty      float64
+	zoom        float64
+	speed       float64
 }
 
 func (ui *UI) loadTmx(tmxFile string) error {
@@ -61,7 +64,7 @@ const (
 )
 
 func (ui *UI) getAction() action {
-	if len(ui.pressedKeys) < 2 {
+	if len(ui.pressedKeys) == 0 {
 		return ""
 	}
 	isCtrlPressed := false
@@ -102,24 +105,23 @@ func (ui *UI) getAction() action {
 }
 
 func (ui *UI) Draw(screen *ebiten.Image) {
-
 	op := &ebiten.DrawImageOptions{}
 	switch ui.getAction() {
 	case zoomDown:
-		op.GeoM.Scale(0.5, 0.5)
+		ui.zoom = ui.zoom / 1.1
 	case zoomUp:
-		op.GeoM.Scale(2, 2)
+		ui.zoom = ui.zoom * 1.1
 	case goLeft:
-		op.GeoM.Translate(-200, 0)
+		ui.tx += ui.speed / ui.zoom
 	case goRight:
-		op.GeoM.Translate(200, 0)
+		ui.tx -= ui.speed / ui.zoom
 	case goUp:
-		op.GeoM.Translate(0, 200)
+		ui.ty += ui.speed / ui.zoom
 	case goDown:
-		op.GeoM.Translate(0, -200)
-	default:
-		op.GeoM.Translate(-200, -200)
+		ui.ty -= ui.speed / ui.zoom
 	}
+	op.GeoM.Translate(ui.tx, ui.ty)
+	op.GeoM.Scale(ui.zoom, ui.zoom)
 	screen.DrawImage(ui.background, op)
 }
 
@@ -132,7 +134,12 @@ func Draw(tmxFilename string) error {
 	basename := path.Base(tmxFilename)
 	ebiten.SetWindowTitle(basename)
 
-	ui := UI{}
+	ui := UI{
+		speed: 2,
+		zoom:  1,
+		tx:    -200,
+		ty:    -200,
+	}
 	if err := ui.loadTmx(tmxFilename); err != nil {
 		return err
 	}
