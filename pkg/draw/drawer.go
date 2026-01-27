@@ -5,12 +5,14 @@ import (
 	"path"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/lafriks/go-tiled"
 	"github.com/lafriks/go-tiled/render"
 )
 
 type UI struct {
-	background *ebiten.Image
+	background  *ebiten.Image
+	pressedKeys []ebiten.Key
 }
 
 func (ui *UI) loadTmx(tmxFile string) error {
@@ -43,14 +45,81 @@ func (ui *UI) loadTmx(tmxFile string) error {
 }
 
 func (ui *UI) Update() error {
+	ui.pressedKeys = inpututil.AppendPressedKeys(ui.pressedKeys[:0])
 	return nil
+}
+
+type action string
+
+const (
+	zoomUp   action = "zoomUp"
+	zoomDown action = "zoomDown"
+	goLeft   action = "goLeft"
+	goDown   action = "goDown"
+	goUp     action = "goUp"
+	goRight  action = "goRight"
+)
+
+func (ui *UI) getAction() action {
+	if len(ui.pressedKeys) < 2 {
+		return ""
+	}
+	isCtrlPressed := false
+	isKeyUpPressed := false
+	isKeyLeftPressed := false
+	isKeyDownPressed := false
+	isKeyRightPressed := false
+	for _, key := range ui.pressedKeys {
+		switch key {
+		case ebiten.KeyControl:
+			isCtrlPressed = true
+		case ebiten.KeyArrowUp:
+			isKeyUpPressed = true
+		case ebiten.KeyArrowLeft:
+			isKeyLeftPressed = true
+		case ebiten.KeyArrowDown:
+			isKeyDownPressed = true
+		case ebiten.KeyArrowRight:
+			isKeyRightPressed = true
+		}
+	}
+	switch {
+	case isCtrlPressed && isKeyUpPressed:
+		return zoomUp
+	case isCtrlPressed && isKeyDownPressed:
+		return zoomDown
+	case isKeyUpPressed:
+		return goUp
+	case isKeyLeftPressed:
+		return goLeft
+	case isKeyDownPressed:
+		return goDown
+	case isKeyRightPressed:
+		return goRight
+	}
+
+	return ""
 }
 
 func (ui *UI) Draw(screen *ebiten.Image) {
 
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(-200, -200)
-	//op.GeoM.Scale(0.5, 0.5)
+	switch ui.getAction() {
+	case zoomDown:
+		op.GeoM.Scale(0.5, 0.5)
+	case zoomUp:
+		op.GeoM.Scale(2, 2)
+	case goLeft:
+		op.GeoM.Translate(-200, 0)
+	case goRight:
+		op.GeoM.Translate(200, 0)
+	case goUp:
+		op.GeoM.Translate(0, 200)
+	case goDown:
+		op.GeoM.Translate(0, -200)
+	default:
+		op.GeoM.Translate(-200, -200)
+	}
 	screen.DrawImage(ui.background, op)
 }
 
