@@ -7,14 +7,11 @@ import (
 	"os"
 	"runtime"
 
+	"github.com/renomarx/osm2tmx/pkg/draw"
 	"github.com/renomarx/osm2tmx/pkg/mapper"
 	"github.com/renomarx/osm2tmx/pkg/raster"
 	"github.com/renomarx/osm2tmx/pkg/tmx"
 )
-
-func init() {
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
-}
 
 func printUsageAndExit() {
 	var Usage = fmt.Sprintf(`
@@ -30,6 +27,7 @@ Options:
 -limit-x: limit x (after downscale if any)
 -limit-y: limit y (after downscale if any)
 -workers: number of parallel workers; defaults to number of CPUs - 1
+-draw: display generated tmx as a game UI
 `, os.Args[0])
 	fmt.Println(Usage)
 	os.Exit(1)
@@ -45,6 +43,7 @@ func main() {
 	var limitXFlag = flag.Int("limit-x", 0, "limit x (after downscale if any)")
 	var limitYFlag = flag.Int("limit-y", 0, "limit y (after downscale if any)")
 	var workersFlag = flag.Int("workers", 0, "number of parallel workers; defaults to number of CPUs - 1")
+	var drawFlag = flag.Bool("draw", false, "display generated tmx as a game UI")
 
 	flag.Parse()
 
@@ -85,7 +84,7 @@ func main() {
 
 	rstMap, err := rst.Parse(osmFile)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	log.Printf("%#v\n", rstMap.Meta.Bounds)
@@ -102,9 +101,14 @@ func main() {
 	log.Printf("Number of points out of bounds: %d", rstMap.Meta.NodesOutOfBounds)
 
 	writer := tmx.NewWriter("tileset/basechip_pipo.tsx", 16, 16) // TODO: get from conf
-	err = writer.Write(rstMap, tmxFilename)
-	if err != nil {
-		panic(err)
+	if err := writer.Write(rstMap, tmxFilename); err != nil {
+		log.Fatal(err)
+	}
+
+	if drawFlag != nil && *drawFlag {
+		if err := draw.Draw(tmxFilename); err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
