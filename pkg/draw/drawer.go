@@ -2,9 +2,11 @@ package draw
 
 import (
 	"fmt"
+	"math"
 	"path"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/lafriks/go-tiled"
 	"github.com/lafriks/go-tiled/render"
@@ -123,10 +125,11 @@ func (ui *UI) Draw(screen *ebiten.Image) {
 	op.GeoM.Translate(ui.tx, ui.ty)
 	op.GeoM.Scale(ui.zoom, ui.zoom)
 	screen.DrawImage(ui.background, op)
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Zoom: %d%%", int(math.Round(ui.zoom*100))), 16, 16)
 }
 
 func (ui *UI) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return 320, 240
+	return 800, 600
 }
 
 func Draw(tmxFilename string) error {
@@ -135,7 +138,7 @@ func Draw(tmxFilename string) error {
 	ebiten.SetWindowTitle(basename)
 
 	ui := UI{
-		speed: 2,
+		speed: 6,
 		zoom:  1,
 		tx:    -200,
 		ty:    -200,
