@@ -41,8 +41,6 @@ tags:
 
 ## TODO
 
-- POC drawer 2d (ebiten, draw2d ?)
-
 - How to handle z-index and level lines ?
   - Not included in OSM data, we'll have to find another way
 - Conf & handle the mapping.yaml file
