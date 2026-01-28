@@ -8,6 +8,7 @@ require (
 )
 
 require (
+	github.com/chai2010/tiff v0.0.0-20211005095045-4ec2aa243943
 	github.com/google/uuid v1.6.0
 	github.com/hajimehoshi/ebiten/v2 v2.9.7
 	github.com/lafriks/go-tiled v0.14.0
