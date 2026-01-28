@@ -2,6 +2,7 @@ package draw
 
 import (
 	"fmt"
+	"log"
 	"math"
 	"path"
 
@@ -129,7 +130,7 @@ func (ui *UI) Draw(screen *ebiten.Image) {
 }
 
 func (ui *UI) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return 800, 600
+	return outsideWidth, outsideHeight
 }
 
 func Draw(tmxFilename string) error {
@@ -140,12 +141,18 @@ func Draw(tmxFilename string) error {
 	ui := UI{
 		speed: 6,
 		zoom:  1,
-		tx:    -200,
-		ty:    -200,
 	}
 	if err := ui.loadTmx(tmxFilename); err != nil {
 		return err
 	}
+
+	// Set the camera at the center of the image by default
+	bounds := ui.background.Bounds()
+	centerX := (bounds.Dx() - 800) / 2
+	centerY := (bounds.Dy() - 600) / 2
+	ui.tx = -1 * float64(centerX)
+	ui.ty = -1 * float64(centerY)
+	log.Printf("Image:(%d,%d), camera translation:(%d,%d)\n", bounds.Dx(), bounds.Dy(), int(ui.tx), int(ui.ty))
 
 	if err := ebiten.RunGame(&ui); err != nil {
 		return err
