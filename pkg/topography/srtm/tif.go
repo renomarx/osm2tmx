@@ -24,9 +24,14 @@ func NewTifParser() *TifParser {
 	}
 }
 
-func (tp *TifParser) LoadDirectory(dirpath string, recursive bool) error {
+func (tp *TifParser) AddDirectory(dirpath string, recursive bool) error {
 	// TODO: for each .tif in dirpath (recursively),
-	// add tif to tp.tifs[basename] = pathname
+	// add tif to tp.tifs[basename] = filepath
+	return nil
+}
+
+func (tp *TifParser) AddTif(filepath string) error {
+	// TODO: add tif to tp.tifs[basename] = filepath
 	return nil
 }
 
@@ -43,14 +48,14 @@ func (tp *TifParser) GetAltitude(lat, lon float64) (model.Altitude, error) {
 	return model.Altitude(0), nil
 }
 
-func ParseTif(filename string, precision int, topo *model.Topography) error {
-	input, err := os.Open(filename)
+func ParseTif(filepath string, precision int, topo *model.Topography) error {
+	input, err := os.Open(filepath)
 	if err != nil {
 		return err
 	}
 
 	// Expected format for filename: N26W080.tif
-	north, west, err := parseTifFilename(filename)
+	north, west, err := parseTifFilepath(filepath)
 	if err != nil {
 		return err
 	}
@@ -90,9 +95,9 @@ func ParseTif(filename string, precision int, topo *model.Topography) error {
 	return nil
 }
 
-func parseTifFilename(filename string) (int, int, error) {
+func parseTifFilepath(filepath string) (int, int, error) {
 	errMsg := "bad tif filename: expected NxxWyy, got %s"
-	basename := path.Base(filename)
+	basename := path.Base(filepath)
 	basename = strings.TrimSuffix(basename, ".tif")
 	if len(basename) == 0 {
 		return 0, 0, fmt.Errorf(errMsg, basename)
