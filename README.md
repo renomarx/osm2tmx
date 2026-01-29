@@ -41,8 +41,8 @@ tags:
 
 ## TODO
 
-- How to handle z-index and level lines ?
-  - Not included in OSM data, we'll have to find another way
+- Handle  altitudes with SRTM data files
+- Trace "primary" roads with 5 meters diameter
 - Conf & handle the mapping.yaml file
 - More examples with other tilesets
 - Generate a tileset like OSM stylesheets to have a pretty map in tmx :)
