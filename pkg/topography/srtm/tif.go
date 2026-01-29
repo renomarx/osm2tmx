@@ -15,7 +15,8 @@ import (
 )
 
 type TifParser struct {
-	tifs map[string]string
+	tifs       map[string]string
+	Topography *model.Topography
 }
 
 func NewTifParser() *TifParser {
@@ -31,7 +32,10 @@ func (tp *TifParser) AddDirectory(dirpath string, recursive bool) error {
 }
 
 func (tp *TifParser) AddTif(filepath string) error {
-	// TODO: add tif to tp.tifs[basename] = filepath
+	basename := path.Base(filepath)
+	basename = strings.TrimSuffix(basename, ".tif")
+	// TODO: add some controls on basename format
+	tp.tifs[basename] = filepath
 	return nil
 }
 
@@ -41,10 +45,56 @@ func (tp *TifParser) Preload(minlat, maxlat, minlon, maxlon float64) error {
 	return nil
 }
 
-func (tp *TifParser) GetAltitude(lat, lon float64) (model.Altitude, error) {
-	// TODO: get altitude from topography already loaded
-	// if not found, search for corresponding tif and parse it
+func (tp *TifParser) GetAltitude(lat, lon float64, precision int) (model.Altitude, error) {
+	// Get altitude from topography if already loaded
+	mult := math.Pow(10, float64(precision))
+	roundedLat := math.Round(lat*mult) / mult
+	roundedLon := math.Round(lon*mult) / mult
+	geopoint := model.GeoPoint{Lat: roundedLat, Lon: roundedLon}
+	alt, exists := tp.Topography.Altitudes[geopoint]
+	if exists {
+		return alt, nil
+	}
+	// Altitude not found, search for corresponding tif and parse it
 	// then return the corresponding altitude from topography
+	basename := ""
+	switch {
+	case lat > 60:
+		return 0, nil //TODO: ErrNotSupported ?
+	case lat < -57:
+		return 0, nil //TODO: ErrNotSupported ?
+	case lat >= 0:
+		north := int(math.Floor(lat))
+		basename = fmt.Sprintf("N%03d", north)
+	case lat < 0:
+		south := int(math.Floor(lat))
+		basename = fmt.Sprintf("S%03d", south)
+	}
+	switch {
+	case lon >= 0:
+		east := int(math.Floor(lon))
+		basename += fmt.Sprintf("E%03d", east)
+	case lon < 0:
+		west := int(math.Floor(lon))
+		basename += fmt.Sprintf("W%03d", west)
+	}
+
+	filepath, exists := tp.tifs[basename]
+	if !exists {
+		return 0, nil //TODO: ErrNotFound ?
+	}
+
+	ParseTif(filepath, precision, tp.Topography)
+
+	alt, exists = tp.Topography.Altitudes[geopoint]
+	if exists {
+		return alt, nil
+	}
+
+	// If still not found, we can definitively consider that we do not have the
+	// altitude for this geopoint, and set it to 0
+	tp.Topography.Altitudes[geopoint] = 0
+
 	return model.Altitude(0), nil
 }
 
