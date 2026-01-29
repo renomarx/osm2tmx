@@ -1,5 +1,5 @@
 package model
 
 type Point struct {
-	X, Y int
+	X, Y, Z int
 }
