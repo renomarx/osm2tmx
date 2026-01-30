@@ -74,8 +74,8 @@ func (tp *TifParser) AddTif(filepath string) error {
 func (tp *TifParser) Preload(minlat, maxlat, minlon, maxlon float64, precision int) error {
 	if len(tp.tifs) > int(math.Ceil((maxlat-minlat)*(maxlon-minlon))) {
 		// Preloading by lat,lon range
-		for lat := minlat; lat < maxlat; lat += 1 {
-			for lon := minlon; lon < maxlon; lon += 1 {
+		for lat := minlat; lat <= maxlat; lat += 1 {
+			for lon := minlon; lon <= maxlon; lon += 1 {
 				filepath, exists := tp.tifs[tifID{Lat: int(lat), Lon: int(lon)}]
 				if !exists {
 					continue
