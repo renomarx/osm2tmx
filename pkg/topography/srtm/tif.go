@@ -4,9 +4,11 @@ import (
 	"bufio"
 	"fmt"
 	"image/color"
+	"io/fs"
 	"math"
 	"os"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -20,8 +22,12 @@ var (
 )
 
 type TifParser struct {
-	tifs       map[string]string
+	tifs       map[tifID]string
 	Topography *model.Topography
+}
+
+type tifID struct {
+	Lat, Lon int
 }
 
 func NewTifParser(topography *model.Topography) *TifParser {
@@ -29,30 +35,66 @@ func NewTifParser(topography *model.Topography) *TifParser {
 		topography.Altitudes = make(map[model.GeoPoint]model.Altitude)
 	}
 	return &TifParser{
-		tifs:       make(map[string]string),
+		tifs:       make(map[tifID]string),
 		Topography: topography,
 	}
 }
 
 // AddDirectory: for each .tif in dirpath (recursively),
 // add tif filepath to TifParser (for future loading)
-func (tp *TifParser) AddDirectory(dirpath string, recursive bool) error {
-	// TODO
+func (tp *TifParser) AddDirectory(dirpath string) error {
+	return filepath.WalkDir(dirpath, tp.walkDirectory)
+}
+
+func (tp *TifParser) walkDirectory(s string, d fs.DirEntry, err error) error {
+	if err != nil {
+		return err
+	}
+	if d.IsDir() {
+		return nil
+	}
+
+	// Voluntarly ignore errors because we want to skip unsupported files
+	_ = tp.AddTif(s)
+
 	return nil
 }
 
 func (tp *TifParser) AddTif(filepath string) error {
-	basename := path.Base(filepath)
-	basename = strings.TrimSuffix(basename, ".tif")
-	// TODO: add some controls on basename format
-	tp.tifs[basename] = filepath
+	tifID, err := parseTifFilepath(filepath)
+	if err != nil {
+		return err
+	}
+	tp.tifs[tifID] = filepath
 	return nil
 }
 
 // Preload parse all tifs corresponding to the range between minlat and maxlat, minlon and maxlon
 // return a custom error if missing tifs, but preload the others anyway
-func (tp *TifParser) Preload(minlat, maxlat, minlon, maxlon float64) error {
-	// TODO
+func (tp *TifParser) Preload(minlat, maxlat, minlon, maxlon float64, precision int) error {
+	if len(tp.tifs) > int(math.Ceil((maxlat-minlat)*(maxlon-minlon))) {
+		// Preloading by lat,lon range
+		for lat := minlat; lat < maxlat; lat += 1 {
+			for lon := minlon; lon < maxlon; lon += 1 {
+				filepath, exists := tp.tifs[tifID{Lat: int(lat), Lon: int(lon)}]
+				if !exists {
+					continue
+				}
+				tp.parseTif(filepath, precision)
+			}
+		}
+		return nil
+	}
+
+	// Preloading by tifs added
+	for tifID, filepath := range tp.tifs {
+		// Parse correspoding tif if included withmin min,max range
+		if tifID.Lat >= int(minlat) && tifID.Lat <= int(maxlat) &&
+			tifID.Lon >= int(minlon) && tifID.Lon <= int(maxlon) {
+			tp.parseTif(filepath, precision)
+		}
+	}
+
 	return nil
 }
 
@@ -68,31 +110,11 @@ func (tp *TifParser) GetAltitude(lat, lon float64, precision int) (model.Altitud
 	}
 	// Altitude not found, search for corresponding tif and parse it
 	// then return the corresponding altitude from topography
-	basename := ""
-	switch {
-	case lat > 60:
-		return 0, fmt.Errorf("%w: lat %f", ErrNotSupported, lat)
-	case lat < -57:
-		return 0, fmt.Errorf("%w: lon %f", ErrNotSupported, lat)
-	case lat >= 0:
-		north := int(math.Floor(lat))
-		basename = fmt.Sprintf("N%02d", north)
-	case lat < 0:
-		south := int(math.Floor(lat))
-		basename = fmt.Sprintf("S%02d", south)
-	}
-	switch {
-	case lon >= 0:
-		east := int(math.Floor(lon))
-		basename += fmt.Sprintf("E%03d", east)
-	case lon < 0:
-		west := int(math.Floor(-1 * lon))
-		basename += fmt.Sprintf("W%03d", west)
-	}
 
-	filepath, exists := tp.tifs[basename]
+	id := tifID{Lat: int(lat), Lon: int(lon)}
+	filepath, exists := tp.tifs[id]
 	if !exists {
-		return 0, fmt.Errorf("%w: %s", ErrTifNotFound, basename)
+		return 0, fmt.Errorf("%w: %+v", ErrTifNotFound, id)
 	}
 
 	tp.parseTif(filepath, precision)
@@ -116,12 +138,12 @@ func (tp *TifParser) parseTif(filepath string, precision int) error {
 	}
 
 	// Expected format for filename: N26W080.tif
-	north, east, err := parseTifFilepath(filepath)
+	id, err := parseTifFilepath(filepath)
 	if err != nil {
 		return err
 	}
-	latOffset := float64(north)
-	lngOffset := float64(east)
+	latOffset := float64(id.Lat)
+	lngOffset := float64(id.Lon)
 
 	img, err := tiff.Decode(bufio.NewReader(input))
 	if err != nil {
@@ -160,45 +182,45 @@ func (tp *TifParser) parseTif(filepath string, precision int) error {
 	return nil
 }
 
-func parseTifFilepath(filepath string) (int, int, error) {
-	errMsg := "bad tif filename: expected matching '[N|S][0-6][0-9][E|W][0-1][0-8][0-9]', got %s"
+func parseTifFilepath(filepath string) (tifID, error) {
+	errMsg := "bad tif filename: expected matching '[N|S]dd[E|W]ddd', got %s"
 	basename := path.Base(filepath)
 	basename = strings.TrimSuffix(basename, ".tif")
 
 	if len(basename) != 7 {
-		return 0, 0, fmt.Errorf(errMsg, basename)
+		return tifID{}, fmt.Errorf(errMsg, basename)
 	}
 
-	northFactor := 1
+	latFactor := 1
 	switch basename[0] {
 	case 'N':
-		northFactor = 1
+		latFactor = 1
 	case 'S':
-		northFactor = -1
+		latFactor = -1
 	default:
-		return 0, 0, fmt.Errorf(errMsg, basename)
+		return tifID{}, fmt.Errorf(errMsg, basename)
 	}
 
-	eastFactor := 1
+	lonFactor := 1
 	switch basename[3] {
 	case 'E':
-		eastFactor = 1
+		lonFactor = 1
 	case 'W':
-		eastFactor = -1
+		lonFactor = -1
 	default:
-		return 0, 0, fmt.Errorf(errMsg, basename)
+		return tifID{}, fmt.Errorf(errMsg, basename)
 	}
 
-	northStr := basename[1:3]
-	eastStr := basename[4:]
-	north, err := strconv.Atoi(northStr)
+	latStr := basename[1:3]
+	lonStr := basename[4:]
+	latAbs, err := strconv.Atoi(latStr)
 	if err != nil {
-		return 0, 0, fmt.Errorf(errMsg+": %w", basename, err)
+		return tifID{}, fmt.Errorf(errMsg+": %w", basename, err)
 	}
-	east, err := strconv.Atoi(eastStr)
+	lonAbs, err := strconv.Atoi(lonStr)
 	if err != nil {
-		return 0, 0, fmt.Errorf(errMsg+": %w", basename, err)
+		return tifID{}, fmt.Errorf(errMsg+": %w", basename, err)
 	}
 
-	return north * northFactor, east * eastFactor, nil
+	return tifID{Lat: latAbs * latFactor, Lon: lonAbs * lonFactor}, nil
 }
