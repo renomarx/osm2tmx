@@ -23,7 +23,7 @@ type MapTile struct {
 func New() *Mapper {
 	return &Mapper{
 		defaultTile: 2,
-		layers:      3,
+		layers:      2,
 	}
 }
 
@@ -57,9 +57,6 @@ func (m *Mapper) mapToTiles(tags osm.Tags, pos *model.Position) MapTile {
 	// TODO: handle pos
 	byLayer := make(map[int]model.Tile)
 	byLayer[0] = m.defaultTile
-	if pos != nil && pos.Z > model.Altitude(0) {
-		byLayer[0] = 1378
-	}
 	dynamic := false
 	for _, tag := range tags {
 		// TODO: use atlas-index instead of hard-coded switch
@@ -155,9 +152,6 @@ func (m *Mapper) mapToTiles(tags osm.Tags, pos *model.Position) MapTile {
 			case "wood":
 				r := rand.Intn(100)
 				byLayer[0] = 4
-				if pos != nil && pos.Z > model.Altitude(0) {
-					byLayer[0] = 1378
-				}
 				switch {
 				case r >= 80 && r < 85:
 					byLayer[1] = 41
@@ -188,9 +182,6 @@ func (m *Mapper) mapToTiles(tags osm.Tags, pos *model.Position) MapTile {
 			case "forest":
 				r := rand.Intn(100)
 				byLayer[0] = 4
-				if pos != nil && pos.Z > model.Altitude(0) {
-					byLayer[0] = 1378
-				}
 				switch {
 				case r >= 80 && r < 85:
 					byLayer[1] = 41
@@ -210,6 +201,10 @@ func (m *Mapper) mapToTiles(tags osm.Tags, pos *model.Position) MapTile {
 				byLayer[0] = 1
 			}
 		}
+	}
+	if pos != nil && pos.Z > model.Altitude(500) {
+		byLayer[0] = 1378
+		byLayer[1] = 1378
 	}
 
 	return MapTile{ByLayer: byLayer, dynamic: dynamic}

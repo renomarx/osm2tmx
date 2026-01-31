@@ -2,6 +2,7 @@ package raster
 
 import (
 	"context"
+	"log"
 	"math"
 	"os"
 	"sync"
@@ -22,11 +23,14 @@ type Raster struct {
 	osmWays             map[int64]*osm.Way
 	osmRelations        []osm.Relation
 	osmNodesOutOfBounds []osm.Node
+	minHeight           model.Altitude
 	maxHeight           model.Altitude
 	downscale           int
 	bounds              Bounds
 	workers             int
 	topography          *topography
+	minX                int
+	maxY                int
 }
 
 type Bounds struct {
@@ -88,8 +92,8 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 	minNorthing := math.Floor(mercator.Lat2y(header.Bounds.MinLat)*100) / 100
 	minEasting := math.Floor(mercator.Lon2x(header.Bounds.MinLon)*100) / 100
 
-	maxY := (int(math.Ceil(maxNorthing)) / r.downscale) - r.bounds.OffsetY
-	minX := (int(math.Floor(minEasting)) / r.downscale) + r.bounds.OffsetX
+	r.maxY = (int(math.Ceil(maxNorthing)) / r.downscale) - r.bounds.OffsetY
+	r.minX = (int(math.Floor(minEasting)) / r.downscale) + r.bounds.OffsetX
 	mapSizeY := int(math.Ceil(maxNorthing-minNorthing)) / r.downscale
 	mapSizeX := int(math.Ceil(maxEasting-minEasting)) / r.downscale
 
@@ -111,28 +115,18 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 		switch scanner.Object().(type) {
 		case *osm.Node:
 			node := *scanner.Object().(*osm.Node)
-			north := mercator.Lat2y(node.Lat)
-			east := mercator.Lon2x(node.Lon)
-			height := model.Altitude(0)
-			if r.topography != nil {
-				height, err = r.topography.parser.GetAltitude(node.Lat, node.Lon, r.topography.precision)
-				if height > r.maxHeight {
-					r.maxHeight = height
-				}
-			}
-			// we want to have point 0,0 at minEasting,maxNorthing
-			x := (int(math.Floor(east)) / r.downscale) - minX
-			y := maxY - (int(math.Floor(north)) / r.downscale)
+			x, y := r.ToXY(node.Lat, node.Lon)
 			if x >= mapSizeX || x < 0 || y < 0 || y >= mapSizeY {
 				r.osmNodesOutOfBounds = append(r.osmNodesOutOfBounds, node)
 				continue
 			}
+			height := r.getAltitude(x, y)
 			mapTile := r.mapper.GetMapTileFunc(node.Tags)(&model.Position{X: x, Y: y, Z: height})
 			for z, tile := range mapTile.ByLayer {
 				m.Layers[z].SetTile(x, y, tile)
 			}
 			r.osmNodes = append(r.osmNodes, node)
-			r.pointsByNodeID[int64(node.ID)] = model.Point{X: x, Y: y, Z: height}
+			r.pointsByNodeID[int64(node.ID)] = model.Point{X: x, Y: y}
 		case *osm.Way:
 			way := scanner.Object().(*osm.Way)
 			r.osmWays[int64(way.ID)] = way
@@ -192,6 +186,7 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 			Relations:        len(r.osmRelations),
 			NodesOutOfBounds: len(r.osmNodesOutOfBounds),
 			MaxHeight:        r.maxHeight,
+			MinHeight:        r.minHeight,
 		},
 	}, nil
 }
@@ -240,4 +235,43 @@ func (r *Raster) fillPolygon(m *model.Map, mapTileFunc mapper.MapTileFunc, polyg
 			}
 		}
 	}
+}
+
+func (r *Raster) ToXY(lat, lon float64) (int, int) {
+	north := mercator.Lat2y(lat)
+	east := mercator.Lon2x(lon)
+	// we want to have point 0,0 at minEasting,maxNorthing
+	x := (int(math.Floor(east)) / r.downscale) - r.minX
+	y := r.maxY - (int(math.Floor(north)) / r.downscale)
+	return x, y
+}
+
+func (r *Raster) ToLatLon(x, y int) (float64, float64) {
+	trueX := (x + r.minX) * r.downscale
+	trueY := -1 * (y - r.maxY) * r.downscale
+	lat := mercator.Y2lat(float64(trueY))
+	lon := mercator.X2lon(float64(trueX))
+	return lat, lon
+}
+
+func (r *Raster) getAltitude(x, y int) model.Altitude {
+	if r.topography == nil {
+		return model.Altitude(0)
+	}
+	lat, lon := r.ToLatLon(x, y)
+
+	height, err := r.topography.parser.GetAltitude(lat, lon, r.topography.precision)
+	if err != nil {
+		log.Printf("error getting altitude of (x:%d,y:%d): %s", x, y, err.Error())
+		return model.Altitude(0)
+	}
+
+	if height > r.maxHeight {
+		r.maxHeight = height
+	}
+	if height != 0 && (r.minHeight == 0 || height < r.minHeight) {
+		r.minHeight = height
+	}
+
+	return height
 }

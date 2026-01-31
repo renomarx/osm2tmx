@@ -20,7 +20,7 @@ func Lat2y(lat float64) float64 {
 	return R * math.Log(math.Tan(math.Pi/4+Radians(lat)/2))
 }
 
-func X2lat(x float64) float64 {
+func X2lon(x float64) float64 {
 	return Degrees(x / R)
 }
 

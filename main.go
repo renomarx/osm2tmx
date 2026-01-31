@@ -117,6 +117,7 @@ func main() {
 	log.Printf("Max: UTM: [east:%f,north:%f]\n", rstMap.Meta.MaxEasting, rstMap.Meta.MaxNorthing)
 	log.Printf("Min: UTM: [east:%f,north:%f]\n", rstMap.Meta.MinEasting, rstMap.Meta.MinNorthing)
 	log.Printf("Map size: (%d,%d) meters (%dx)\n", rstMap.Meta.MapSizeX, rstMap.Meta.MapSizeY, *downscaleFlag)
+	log.Printf("Height: %d -> %d", rstMap.Meta.MinHeight, rstMap.Meta.MaxHeight)
 
 	log.Printf("Nodes: %d", rstMap.Meta.Nodes)
 	log.Printf("Ways: %d", rstMap.Meta.Ways)
