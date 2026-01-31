@@ -244,16 +244,16 @@ func (r *Raster) toXY(lat, lon float64) (int, int) {
 	north := mercator.Lat2y(lat)
 	east := mercator.Lon2x(lon)
 	// we want to have point 0,0 at minEasting,maxNorthing
-	x := (int(math.Floor(east)) / r.downscale) - r.minX
-	y := r.maxY - (int(math.Floor(north)) / r.downscale)
+	x := (int(math.Round(east)) / r.downscale) - r.minX
+	y := r.maxY - (int(math.Round(north)) / r.downscale)
 	return x, y
 }
 
 func (r *Raster) toLatLon(x, y int) (float64, float64) {
-	trueX := (x + r.minX) * r.downscale
-	trueY := -1 * (y - r.maxY) * r.downscale
-	lat := mercator.Y2lat(float64(trueY))
-	lon := mercator.X2lon(float64(trueX))
+	east := (x + r.minX) * r.downscale
+	north := (r.maxY - y) * r.downscale
+	lat := mercator.Y2lat(float64(north))
+	lon := mercator.X2lon(float64(east))
 	return lat, lon
 }
 

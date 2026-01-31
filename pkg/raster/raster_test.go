@@ -49,8 +49,18 @@ func TestRaster(t *testing.T) {
 		}, result.Meta)
 
 		lat, lon := raster.toLatLon(92, 42)
-		assert.Equal(t, 46.1617, math.Round(lat*10000)/10000) // TODO: fix
-		assert.Equal(t, 6.6711, math.Round(lon*10000)/10000)  // TODO: fix
+		assert.Equal(t, 46.16170, math.Round(lat*100000)/100000)
+		assert.Equal(t, 6.67106, math.Round(lon*100000)/100000)
+		x, y := raster.toXY(lat, lon)
+		assert.Equal(t, 92, x)
+		assert.Equal(t, 42, y)
+
+		lat, lon = raster.toLatLon(410, 352)
+		assert.Equal(t, 46.15977, math.Round(lat*100000)/100000)
+		assert.Equal(t, 6.67392, math.Round(lon*100000)/100000)
+		x, y = raster.toXY(lat, lon)
+		assert.Equal(t, 410, x)
+		assert.Equal(t, 352, y)
 	})
 
 	t.Run("downscale_4", func(t *testing.T) {
@@ -84,9 +94,12 @@ func TestRaster(t *testing.T) {
 			NodesOutOfBounds: 3318,
 		}, result.Meta)
 
-		lat, lon := raster.toLatLon(92, 42)
-		assert.Equal(t, 46.1609, math.Round(lat*10000)/10000) // TODO: fix
-		assert.Equal(t, 6.6735, math.Round(lon*10000)/10000)  // TODO: fix
+		lat, lon := raster.toLatLon(102, 88)
+		assert.Equal(t, 46.160, math.Round(lat*1000)/1000)
+		assert.Equal(t, 6.674, math.Round(lon*1000)/1000)
+		x, y := raster.toXY(lat, lon)
+		assert.Equal(t, 102, x)
+		assert.Equal(t, 88, y)
 	})
 
 	t.Run("downscale_2_with_bounds", func(t *testing.T) {
@@ -119,10 +132,10 @@ func TestRaster(t *testing.T) {
 			MaxNorthing:      5806340.56,
 			MinEasting:       742527.16,
 			MinNorthing:      5805989.38,
-			Nodes:            697,
+			Nodes:            695,
 			Ways:             306,
 			Relations:        26,
-			NodesOutOfBounds: 4319,
+			NodesOutOfBounds: 4321,
 		}, result.Meta)
 	})
 }
