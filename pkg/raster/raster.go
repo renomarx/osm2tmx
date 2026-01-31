@@ -23,8 +23,8 @@ type Raster struct {
 	osmWays             map[int64]*osm.Way
 	osmRelations        []osm.Relation
 	osmNodesOutOfBounds []osm.Node
-	minHeight           model.Altitude
-	maxHeight           model.Altitude
+	minAltitude         model.Altitude
+	maxAltitude         model.Altitude
 	downscale           int
 	bounds              Bounds
 	workers             int
@@ -50,7 +50,7 @@ func New(mapper *mapper.Mapper, downscale int, bounds Bounds) *Raster {
 		osmWays:             make(map[int64]*osm.Way),
 		osmRelations:        []osm.Relation{},
 		osmNodesOutOfBounds: []osm.Node{},
-		maxHeight:           model.Altitude(0),
+		maxAltitude:         model.Altitude(0),
 		mapper:              mapper,
 		downscale:           downscale,
 		bounds:              bounds,
@@ -63,7 +63,9 @@ func (r *Raster) WithWorkers(workers int) *Raster {
 	return r
 }
 
-func (r *Raster) WithTopography(parser *srtm.TifParser, precision int) *Raster {
+func (r *Raster) WithTopography(parser *srtm.TifParser) *Raster {
+	// 1 precision degree = x10 meters
+	precision := int(math.Round(4 - float64(r.downscale-1)*0.1))
 	r.topography = &topography{
 		parser:    parser,
 		precision: precision,
@@ -107,15 +109,14 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 
 	// init map
 	m := model.Map{}
-	m.Init(r.mapper.Layers(), mapSizeX, mapSizeY, r.mapper.GetDefaultTile())
-
 	// fill map first layer with Tile values
+	m.Init(r.mapper.Layers(), mapSizeX, mapSizeY, r.getDefaultTile)
 
 	for scanner.Scan() {
 		switch scanner.Object().(type) {
 		case *osm.Node:
 			node := *scanner.Object().(*osm.Node)
-			x, y := r.ToXY(node.Lat, node.Lon)
+			x, y := r.toXY(node.Lat, node.Lon)
 			if x >= mapSizeX || x < 0 || y < 0 || y >= mapSizeY {
 				r.osmNodesOutOfBounds = append(r.osmNodesOutOfBounds, node)
 				continue
@@ -185,8 +186,8 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 			Ways:             len(r.osmWays),
 			Relations:        len(r.osmRelations),
 			NodesOutOfBounds: len(r.osmNodesOutOfBounds),
-			MaxHeight:        r.maxHeight,
-			MinHeight:        r.minHeight,
+			MaxHeight:        r.maxAltitude,
+			MinHeight:        r.minAltitude,
 		},
 	}, nil
 }
@@ -228,6 +229,8 @@ func (r *Raster) fillPolygon(m *model.Map, mapTileFunc mapper.MapTileFunc, polyg
 		for x := polygon.XMin.X; x <= polygon.XMax.X; x++ {
 			pos, inside := ps.PositionInPolygon(x, y)
 			if inside {
+				height := r.getAltitude(x, y)
+				pos.Z = height
 				mapTile := mapTileFunc(&pos)
 				for z, tile := range mapTile.ByLayer {
 					m.Layers[z].SetTile(x, y, tile)
@@ -237,7 +240,7 @@ func (r *Raster) fillPolygon(m *model.Map, mapTileFunc mapper.MapTileFunc, polyg
 	}
 }
 
-func (r *Raster) ToXY(lat, lon float64) (int, int) {
+func (r *Raster) toXY(lat, lon float64) (int, int) {
 	north := mercator.Lat2y(lat)
 	east := mercator.Lon2x(lon)
 	// we want to have point 0,0 at minEasting,maxNorthing
@@ -246,7 +249,7 @@ func (r *Raster) ToXY(lat, lon float64) (int, int) {
 	return x, y
 }
 
-func (r *Raster) ToLatLon(x, y int) (float64, float64) {
+func (r *Raster) toLatLon(x, y int) (float64, float64) {
 	trueX := (x + r.minX) * r.downscale
 	trueY := -1 * (y - r.maxY) * r.downscale
 	lat := mercator.Y2lat(float64(trueY))
@@ -254,11 +257,22 @@ func (r *Raster) ToLatLon(x, y int) (float64, float64) {
 	return lat, lon
 }
 
+func (r *Raster) getDefaultTile(x, y int) model.Tile {
+	height := r.getAltitude(x, y)
+	pos := model.Position{
+		X: x,
+		Y: y,
+		Z: height,
+	}
+
+	return r.mapper.GetDefaultTile(&pos)
+}
+
 func (r *Raster) getAltitude(x, y int) model.Altitude {
 	if r.topography == nil {
 		return model.Altitude(0)
 	}
-	lat, lon := r.ToLatLon(x, y)
+	lat, lon := r.toLatLon(x, y)
 
 	height, err := r.topography.parser.GetAltitude(lat, lon, r.topography.precision)
 	if err != nil {
@@ -266,11 +280,11 @@ func (r *Raster) getAltitude(x, y int) model.Altitude {
 		return model.Altitude(0)
 	}
 
-	if height > r.maxHeight {
-		r.maxHeight = height
+	if height > r.maxAltitude {
+		r.maxAltitude = height
 	}
-	if height != 0 && (r.minHeight == 0 || height < r.minHeight) {
-		r.minHeight = height
+	if height != 0 && (r.minAltitude == 0 || height < r.minAltitude) {
+		r.minAltitude = height
 	}
 
 	return height

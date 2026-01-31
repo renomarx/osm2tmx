@@ -32,7 +32,6 @@ Options:
 -draw: display generated tmx as a game UI
 -srtm-tif: add tif files (can be used multiple lines for multiple files)
 -srtm-dir: add tifs directory to be walked recursively for tif files
--srtm-precision: number of decimals to get the altitude from lat,lon. 1 to 4, defaults to 4
 `, os.Args[0])
 	fmt.Println(Usage)
 	os.Exit(1)
@@ -52,7 +51,6 @@ func main() {
 	tifFiles := stringsSlice{}
 	flag.Var(&tifFiles, "srtm-tif", "add tif files (can be used multiple lines for multiple files)")
 	var tifDirFlag = flag.String("srtm-dir", "", "add tifs directory to be walked recursively for tif files")
-	var srtmPrecisionFlag = flag.Int("srtm-precision", 4, "number of decimals to get the altitude from lat,lon. 1 to 4, defaults to 4")
 
 	flag.Parse()
 
@@ -103,9 +101,8 @@ func main() {
 			log.Fatal(err)
 		}
 	}
-	srtmPrecision := *srtmPrecisionFlag
 	if srtmParser.HasTifFiles() {
-		rst = rst.WithTopography(srtmParser, srtmPrecision)
+		rst = rst.WithTopography(srtmParser)
 	}
 
 	rstMap, err := rst.Parse(osmFile)
@@ -117,7 +114,7 @@ func main() {
 	log.Printf("Max: UTM: [east:%f,north:%f]\n", rstMap.Meta.MaxEasting, rstMap.Meta.MaxNorthing)
 	log.Printf("Min: UTM: [east:%f,north:%f]\n", rstMap.Meta.MinEasting, rstMap.Meta.MinNorthing)
 	log.Printf("Map size: (%d,%d) meters (%dx)\n", rstMap.Meta.MapSizeX, rstMap.Meta.MapSizeY, *downscaleFlag)
-	log.Printf("Height: %d -> %d", rstMap.Meta.MinHeight, rstMap.Meta.MaxHeight)
+	log.Printf("Altitude: %d -> %d", rstMap.Meta.MinHeight, rstMap.Meta.MaxHeight)
 
 	log.Printf("Nodes: %d", rstMap.Meta.Nodes)
 	log.Printf("Ways: %d", rstMap.Meta.Ways)

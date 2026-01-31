@@ -29,6 +29,8 @@ func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, mapTileFunc mapper.MapT
 	// and select corresponding tile to fill the map
 	for _, point := range line.Points {
 		pos := line.GetPosition(point)
+		height := r.getAltitude(point.X, point.Y)
+		pos.Z = height
 		mapTile := mapTileFunc(&pos)
 		for z, tile := range mapTile.ByLayer {
 			m.Layers[z].SetTile(point.X, point.Y, tile)

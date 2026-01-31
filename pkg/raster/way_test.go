@@ -13,7 +13,7 @@ func TestDrawWayLine(t *testing.T) {
 	r := New(mapper.New(), 1, Bounds{})
 
 	m := model.Map{}
-	m.Init(3, 12, 6, 0)
+	m.Init(3, 12, 6, func(x, y int) model.Tile { return 0 })
 
 	way := osm.Way{
 		Nodes: osm.WayNodes{
@@ -63,7 +63,7 @@ func TestDrawWayArea(t *testing.T) {
 	r := New(mapper.New(), 1, Bounds{})
 
 	m := model.Map{}
-	m.Init(3, 12, 6, 0)
+	m.Init(3, 12, 6, func(x, y int) model.Tile { return 0 })
 
 	way := osm.Way{
 		Nodes: osm.WayNodes{

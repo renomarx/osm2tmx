@@ -45,7 +45,7 @@ func generateLayerTest(t *testing.T) *model.Layer {
 	sizeY := 6
 	sizeX := 12
 	layer := model.Layer{}
-	layer.Init(sizeX, sizeY, 0)
+	layer.Init(sizeX, sizeY, func(x, y int) model.Tile { return 0 })
 	for y := range sizeY {
 		for x := range sizeX {
 			tile := model.Tile(0)

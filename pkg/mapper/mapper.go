@@ -41,7 +41,13 @@ func (m *Mapper) GetMapTileFunc(tags osm.Tags) MapTileFunc {
 	}
 }
 
-func (m *Mapper) GetDefaultTile() model.Tile {
+func (m *Mapper) GetDefaultTile(pos *model.Position) model.Tile {
+	if pos == nil {
+		return m.defaultTile
+	}
+	if pos.Z > model.Altitude(470) {
+		return 1378
+	}
 	return m.defaultTile
 }
 
