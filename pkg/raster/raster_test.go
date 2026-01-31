@@ -1,6 +1,7 @@
 package raster
 
 import (
+	"math"
 	"testing"
 	"time"
 
@@ -46,6 +47,10 @@ func TestRaster(t *testing.T) {
 			Relations:        26,
 			NodesOutOfBounds: 3322,
 		}, result.Meta)
+
+		lat, lon := raster.toLatLon(92, 42)
+		assert.Equal(t, 46.1617, math.Round(lat*10000)/10000) // TODO: fix
+		assert.Equal(t, 6.6711, math.Round(lon*10000)/10000)  // TODO: fix
 	})
 
 	t.Run("downscale_4", func(t *testing.T) {
@@ -78,6 +83,10 @@ func TestRaster(t *testing.T) {
 			Relations:        26,
 			NodesOutOfBounds: 3318,
 		}, result.Meta)
+
+		lat, lon := raster.toLatLon(92, 42)
+		assert.Equal(t, 46.1609, math.Round(lat*10000)/10000) // TODO: fix
+		assert.Equal(t, 6.6735, math.Round(lon*10000)/10000)  // TODO: fix
 	})
 
 	t.Run("downscale_2_with_bounds", func(t *testing.T) {

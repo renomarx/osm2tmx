@@ -210,7 +210,6 @@ func (m *Mapper) mapToTiles(tags osm.Tags, pos *model.Position) MapTile {
 	}
 	if pos != nil && pos.Z > model.Altitude(500) {
 		byLayer[0] = 1378
-		byLayer[1] = 1378
 	}
 
 	return MapTile{ByLayer: byLayer, dynamic: dynamic}
