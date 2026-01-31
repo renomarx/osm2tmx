@@ -21,4 +21,5 @@ type RasterMapMeta struct {
 	Ways             int
 	Relations        int
 	NodesOutOfBounds int
+	MaxHeight        Altitude
 }

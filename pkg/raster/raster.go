@@ -16,11 +16,17 @@ import (
 )
 
 type Raster struct {
-	mapper     *mapper.Mapper
-	downscale  int
-	bounds     Bounds
-	workers    int
-	topography *topography
+	mapper              *mapper.Mapper
+	pointsByNodeID      map[int64]model.Point
+	osmNodes            []osm.Node
+	osmWays             map[int64]*osm.Way
+	osmRelations        []osm.Relation
+	osmNodesOutOfBounds []osm.Node
+	maxHeight           model.Altitude
+	downscale           int
+	bounds              Bounds
+	workers             int
+	topography          *topography
 }
 
 type Bounds struct {
@@ -35,10 +41,16 @@ type topography struct {
 
 func New(mapper *mapper.Mapper, downscale int, bounds Bounds) *Raster {
 	return &Raster{
-		mapper:    mapper,
-		downscale: downscale,
-		bounds:    bounds,
-		workers:   1,
+		pointsByNodeID:      make(map[int64]model.Point),
+		osmNodes:            []osm.Node{},
+		osmWays:             make(map[int64]*osm.Way),
+		osmRelations:        []osm.Relation{},
+		osmNodesOutOfBounds: []osm.Node{},
+		maxHeight:           model.Altitude(0),
+		mapper:              mapper,
+		downscale:           downscale,
+		bounds:              bounds,
+		workers:             1,
 	}
 }
 
@@ -94,11 +106,6 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 	m.Init(r.mapper.Layers(), mapSizeX, mapSizeY, r.mapper.GetDefaultTile())
 
 	// fill map first layer with Tile values
-	osmNodes := []osm.Node{}
-	pointsByNodeID := make(map[int64]model.Point)
-	osmWays := make(map[int64]*osm.Way)
-	osmRelations := []osm.Relation{}
-	osmNodesOutOfBounds := []osm.Node{}
 
 	for scanner.Scan() {
 		switch scanner.Object().(type) {
@@ -109,26 +116,29 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 			height := model.Altitude(0)
 			if r.topography != nil {
 				height, err = r.topography.parser.GetAltitude(node.Lat, node.Lon, r.topography.precision)
+				if height > r.maxHeight {
+					r.maxHeight = height
+				}
 			}
 			// we want to have point 0,0 at minEasting,maxNorthing
 			x := (int(math.Floor(east)) / r.downscale) - minX
 			y := maxY - (int(math.Floor(north)) / r.downscale)
 			if x >= mapSizeX || x < 0 || y < 0 || y >= mapSizeY {
-				osmNodesOutOfBounds = append(osmNodesOutOfBounds, node)
+				r.osmNodesOutOfBounds = append(r.osmNodesOutOfBounds, node)
 				continue
 			}
 			mapTile := r.mapper.GetMapTileFunc(node.Tags)(&model.Position{X: x, Y: y, Z: height})
 			for z, tile := range mapTile.ByLayer {
 				m.Layers[z].SetTile(x, y, tile)
 			}
-			osmNodes = append(osmNodes, node)
-			pointsByNodeID[int64(node.ID)] = model.Point{X: x, Y: y, Z: height}
+			r.osmNodes = append(r.osmNodes, node)
+			r.pointsByNodeID[int64(node.ID)] = model.Point{X: x, Y: y, Z: height}
 		case *osm.Way:
 			way := scanner.Object().(*osm.Way)
-			osmWays[int64(way.ID)] = way
+			r.osmWays[int64(way.ID)] = way
 		case *osm.Relation:
 			relation := scanner.Object().(*osm.Relation)
-			osmRelations = append(osmRelations, *relation)
+			r.osmRelations = append(r.osmRelations, *relation)
 		}
 	}
 
@@ -138,30 +148,30 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 	}
 
 	wg := sync.WaitGroup{}
-	waysQueue := make(chan *osm.Way, len(osmWays))
+	waysQueue := make(chan *osm.Way, len(r.osmWays))
 	for range r.workers {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			r.workerWay(waysQueue, &m, pointsByNodeID)
+			r.workerWay(waysQueue, &m)
 		}()
 	}
-	for _, way := range osmWays {
+	for _, way := range r.osmWays {
 		waysQueue <- way
 	}
 	close(waysQueue)
 	wg.Wait()
 
 	wg = sync.WaitGroup{}
-	relationsQueue := make(chan *osm.Relation, len(osmRelations))
+	relationsQueue := make(chan *osm.Relation, len(r.osmRelations))
 	for range r.workers {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			r.workerRelation(relationsQueue, &m, osmWays, pointsByNodeID)
+			r.workerRelation(relationsQueue, &m)
 		}()
 	}
-	for _, relation := range osmRelations {
+	for _, relation := range r.osmRelations {
 		relationsQueue <- &relation
 	}
 	close(relationsQueue)
@@ -177,29 +187,30 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 			MaxNorthing:      maxNorthing,
 			MinEasting:       minEasting,
 			MinNorthing:      minNorthing,
-			Nodes:            len(osmNodes),
-			Ways:             len(osmWays),
-			Relations:        len(osmRelations),
-			NodesOutOfBounds: len(osmNodesOutOfBounds),
+			Nodes:            len(r.osmNodes),
+			Ways:             len(r.osmWays),
+			Relations:        len(r.osmRelations),
+			NodesOutOfBounds: len(r.osmNodesOutOfBounds),
+			MaxHeight:        r.maxHeight,
 		},
 	}, nil
 }
 
-func (r *Raster) workerWay(waysQueue chan *osm.Way, m *model.Map, pointsByNodeID map[int64]model.Point) {
+func (r *Raster) workerWay(waysQueue chan *osm.Way, m *model.Map) {
 	for way := range waysQueue {
 		mapTileFunc := r.mapper.GetMapTileFunc(way.Tags)
 		if r.isPolygon(way) {
 			if !r.mapper.IsTileDefault(mapTileFunc(nil)) {
-				r.drawWayArea(m, way, pointsByNodeID, mapTileFunc)
+				r.drawWayArea(m, way, mapTileFunc)
 			}
 		} else {
-			r.drawWayLine(m, way, pointsByNodeID, mapTileFunc)
+			r.drawWayLine(m, way, mapTileFunc)
 		}
 	}
 
 }
 
-func (r *Raster) workerRelation(relationsQueue chan *osm.Relation, m *model.Map, osmWays map[int64]*osm.Way, pointsByNodeID map[int64]model.Point) {
+func (r *Raster) workerRelation(relationsQueue chan *osm.Relation, m *model.Map) {
 	for relation := range relationsQueue {
 		// relations of type multipolygon are made of members of type node or way,
 		// representing boundaries of the way
@@ -212,7 +223,7 @@ func (r *Raster) workerRelation(relationsQueue chan *osm.Relation, m *model.Map,
 		if r.mapper.IsTileDefault(tile) {
 			continue
 		}
-		r.drawRelationArea(m, relation, osmWays, pointsByNodeID, mapTileFunc)
+		r.drawRelationArea(m, relation, mapTileFunc)
 	}
 }
 

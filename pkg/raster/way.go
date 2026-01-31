@@ -7,11 +7,11 @@ import (
 	"github.com/renomarx/osm2tmx/pkg/model"
 )
 
-func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, pointsByNodeID map[int64]model.Point, mapTileFunc mapper.MapTileFunc) {
+func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, mapTileFunc mapper.MapTileFunc) {
 	var lastPoint *model.Point
 	line := model.NewLine()
 	for _, nd := range way.Nodes {
-		nodePoint, exists := pointsByNodeID[int64(nd.ID)]
+		nodePoint, exists := r.pointsByNodeID[int64(nd.ID)]
 		if !exists {
 			continue
 		}
@@ -43,14 +43,14 @@ func (r *Raster) isPolygon(way *osm.Way) bool {
 	return way.Nodes[0] == way.Nodes[len(way.Nodes)-1]
 }
 
-func (r *Raster) drawWayArea(m *model.Map, way *osm.Way, pointsByNodeID map[int64]model.Point, mapTileFunc mapper.MapTileFunc) {
+func (r *Raster) drawWayArea(m *model.Map, way *osm.Way, mapTileFunc mapper.MapTileFunc) {
 	polygon := model.NewPolygon()
 	// Follow the Scan Line Algorithm
 
 	// 1. Get the polygon vertices as an array of points,
 	//	and find the yMin & yMax points to apply the scanline algorithm
 	for _, nd := range way.Nodes {
-		point, exists := pointsByNodeID[int64(nd.ID)]
+		point, exists := r.pointsByNodeID[int64(nd.ID)]
 		if !exists {
 			continue
 		}
