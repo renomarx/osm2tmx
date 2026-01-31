@@ -9,8 +9,10 @@ import (
 
 	"github.com/renomarx/osm2tmx/pkg/draw"
 	"github.com/renomarx/osm2tmx/pkg/mapper"
+	"github.com/renomarx/osm2tmx/pkg/model"
 	"github.com/renomarx/osm2tmx/pkg/raster"
 	"github.com/renomarx/osm2tmx/pkg/tmx"
+	"github.com/renomarx/osm2tmx/pkg/topography/srtm"
 )
 
 func printUsageAndExit() {
@@ -28,6 +30,9 @@ Options:
 -limit-y: limit y (after downscale if any)
 -workers: number of parallel workers; defaults to number of CPUs - 1
 -draw: display generated tmx as a game UI
+-srtm-tif: add tif files (can be used multiple lines for multiple files)
+-srtm-dir: add tifs directory to be walked recursively for tif files
+-srtm-precision: number of decimals to get the altitude from lat,lon. 1 to 4, defaults to 4
 `, os.Args[0])
 	fmt.Println(Usage)
 	os.Exit(1)
@@ -44,6 +49,10 @@ func main() {
 	var limitYFlag = flag.Int("limit-y", 0, "limit y (after downscale if any)")
 	var workersFlag = flag.Int("workers", 0, "number of parallel workers; defaults to number of CPUs - 1")
 	var drawFlag = flag.Bool("draw", false, "display generated tmx as a game UI")
+	tifFiles := stringsSlice{}
+	flag.Var(&tifFiles, "srtm-tif", "add tif files (can be used multiple lines for multiple files)")
+	var tifDirFlag = flag.String("srtm-dir", "", "add tifs directory to be walked recursively for tif files")
+	var srtmPrecisionFlag = flag.Int("srtm-precision", 4, "number of decimals to get the altitude from lat,lon. 1 to 4, defaults to 4")
 
 	flag.Parse()
 
@@ -81,6 +90,23 @@ func main() {
 		LimitY:  *limitYFlag,
 	}
 	rst := raster.New(mp, *downscaleFlag, bounds).WithWorkers(workers)
+
+	topography := model.Topography{}
+	srtmParser := srtm.NewTifParser(&topography)
+	for _, tifFile := range tifFiles {
+		if err := srtmParser.AddTif(tifFile); err != nil {
+			log.Fatal(err)
+		}
+	}
+	if tifDirFlag != nil && *tifDirFlag != "" {
+		if err := srtmParser.AddDirectory(*tifDirFlag); err != nil {
+			log.Fatal(err)
+		}
+	}
+	srtmPrecision := *srtmPrecisionFlag
+	if srtmParser.HasTifFiles() {
+		rst = rst.WithTopography(srtmParser, srtmPrecision)
+	}
 
 	rstMap, err := rst.Parse(osmFile)
 	if err != nil {
@@ -123,4 +149,17 @@ func setTmxFilename(outputFlag *string, osmFile string) string {
 	}
 	return osmFile[:len(osmFile)-4] + ".tmx"
 
+}
+
+type stringsSlice []string
+
+// String is an implementation of the flag.Value interface
+func (i *stringsSlice) String() string {
+	return fmt.Sprintf("%v", *i)
+}
+
+// Set is an implementation of the flag.Value interface
+func (i *stringsSlice) Set(value string) error {
+	*i = append(*i, value)
+	return nil
 }

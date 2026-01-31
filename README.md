@@ -11,6 +11,23 @@ Util to convert osm.pbf files to tmx files, using a tileset and a conf file to d
 - out: default to my.osm.tmx
 ```
 
+## Examples
+
+- Simple
+```bash
+./osm2tmx -out example/example01/centre_les_gets.osm.tmx data/centre_les_gets.osm.pbf
+```
+
+- With downscale 4 and drawing
+```bash
+./osm2tmx -downscale 4 -draw -out example/example01/centre_les_gets.osm.tmx data/centre_les_gets.osm.pbf
+```
+
+- With downscale 4, srtm file and drawing
+```bash
+./osm2tmx -downscale 4 -srtm-tif data/N46E006.tif -draw -out example/example01/centre_les_gets.osm.tmx data/centre_les_gets.osm.pbf
+```
+
 ### Conf file format: YAML
 
 Example:

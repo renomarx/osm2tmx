@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"image/color"
 	"io/fs"
+	"log"
 	"math"
 	"os"
 	"path"
@@ -23,6 +24,7 @@ var (
 
 type TifParser struct {
 	tifs       map[tifID]string
+	loaded     map[tifID]bool
 	Topography *model.Topography
 }
 
@@ -36,8 +38,14 @@ func NewTifParser(topography *model.Topography) *TifParser {
 	}
 	return &TifParser{
 		tifs:       make(map[tifID]string),
+		loaded:     make(map[tifID]bool),
 		Topography: topography,
 	}
+}
+
+// HasTifFiles usefull to know if there is any need to use the parser
+func (tp *TifParser) HasTifFiles() bool {
+	return len(tp.tifs) > 0
 }
 
 // AddDirectory: for each .tif in dirpath (recursively),
@@ -76,11 +84,12 @@ func (tp *TifParser) Preload(minlat, maxlat, minlon, maxlon float64, precision i
 		// Preloading by lat,lon range
 		for lat := minlat; lat <= maxlat; lat += 1 {
 			for lon := minlon; lon <= maxlon; lon += 1 {
-				filepath, exists := tp.tifs[tifID{Lat: int(lat), Lon: int(lon)}]
+				id := tifID{Lat: int(lat), Lon: int(lon)}
+				filepath, exists := tp.tifs[id]
 				if !exists {
 					continue
 				}
-				tp.parseTif(filepath, precision)
+				tp.parseTif(id, filepath, precision)
 			}
 		}
 		return nil
@@ -91,7 +100,7 @@ func (tp *TifParser) Preload(minlat, maxlat, minlon, maxlon float64, precision i
 		// Parse correspoding tif if included withmin min,max range
 		if tifID.Lat >= int(minlat) && tifID.Lat <= int(maxlat) &&
 			tifID.Lon >= int(minlon) && tifID.Lon <= int(maxlon) {
-			tp.parseTif(filepath, precision)
+			tp.parseTif(tifID, filepath, precision)
 		}
 	}
 
@@ -108,16 +117,16 @@ func (tp *TifParser) GetAltitude(lat, lon float64, precision int) (model.Altitud
 	if exists {
 		return alt, nil
 	}
-	// Altitude not found, search for corresponding tif and parse it
-	// then return the corresponding altitude from topography
 
+	// search for corresponding tif and parse it
+	// then return the corresponding altitude from topography
 	id := tifID{Lat: int(lat), Lon: int(lon)}
 	filepath, exists := tp.tifs[id]
 	if !exists {
 		return 0, fmt.Errorf("%w: %+v", ErrTifNotFound, id)
 	}
 
-	tp.parseTif(filepath, precision)
+	tp.parseTif(id, filepath, precision)
 
 	alt, exists = tp.Topography.Altitudes[geopoint]
 	if exists {
@@ -131,17 +140,18 @@ func (tp *TifParser) GetAltitude(lat, lon float64, precision int) (model.Altitud
 	return model.Altitude(0), nil
 }
 
-func (tp *TifParser) parseTif(filepath string, precision int) error {
+func (tp *TifParser) parseTif(id tifID, filepath string, precision int) error {
+	_, exists := tp.loaded[id]
+	if exists {
+		// Tif already loaded, no need to parse it again
+		return nil
+	}
+	log.Printf("loading SRTM tif file %s with precision %d ...", filepath, precision)
 	input, err := os.Open(filepath)
 	if err != nil {
 		return err
 	}
 
-	// Expected format for filename: N26W080.tif
-	id, err := parseTifFilepath(filepath)
-	if err != nil {
-		return err
-	}
 	latOffset := float64(id.Lat)
 	lngOffset := float64(id.Lon)
 
@@ -178,6 +188,8 @@ func (tp *TifParser) parseTif(filepath string, precision int) error {
 			tp.Topography.Altitudes[model.GeoPoint{Lat: roundedLat, Lon: roundedLon}] = model.Altitude(height.Y)
 		}
 	}
+	tp.loaded[id] = true
+	log.Printf("finished loading SRTM file %s", filepath)
 
 	return nil
 }

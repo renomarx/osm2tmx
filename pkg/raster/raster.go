@@ -12,18 +12,25 @@ import (
 	"github.com/renomarx/osm2tmx/pkg/mapper"
 	"github.com/renomarx/osm2tmx/pkg/mercator"
 	"github.com/renomarx/osm2tmx/pkg/model"
+	"github.com/renomarx/osm2tmx/pkg/topography/srtm"
 )
 
 type Raster struct {
-	mapper    *mapper.Mapper
-	downscale int
-	bounds    Bounds
-	workers   int
+	mapper     *mapper.Mapper
+	downscale  int
+	bounds     Bounds
+	workers    int
+	topography *topography
 }
 
 type Bounds struct {
 	OffsetX, OffsetY int
 	LimitX, LimitY   int
+}
+
+type topography struct {
+	parser    *srtm.TifParser
+	precision int
 }
 
 func New(mapper *mapper.Mapper, downscale int, bounds Bounds) *Raster {
@@ -37,6 +44,14 @@ func New(mapper *mapper.Mapper, downscale int, bounds Bounds) *Raster {
 
 func (r *Raster) WithWorkers(workers int) *Raster {
 	r.workers = workers
+	return r
+}
+
+func (r *Raster) WithTopography(parser *srtm.TifParser, precision int) *Raster {
+	r.topography = &topography{
+		parser:    parser,
+		precision: precision,
+	}
 	return r
 }
 
@@ -91,6 +106,10 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 			node := *scanner.Object().(*osm.Node)
 			north := mercator.Lat2y(node.Lat)
 			east := mercator.Lon2x(node.Lon)
+			height := model.Altitude(0)
+			if r.topography != nil {
+				height, err = r.topography.parser.GetAltitude(node.Lat, node.Lon, r.topography.precision)
+			}
 			// we want to have point 0,0 at minEasting,maxNorthing
 			x := (int(math.Floor(east)) / r.downscale) - minX
 			y := maxY - (int(math.Floor(north)) / r.downscale)
@@ -98,12 +117,12 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 				osmNodesOutOfBounds = append(osmNodesOutOfBounds, node)
 				continue
 			}
-			mapTile := r.mapper.GetMapTileFunc(node.Tags)(&model.Position{X: x, Y: y})
+			mapTile := r.mapper.GetMapTileFunc(node.Tags)(&model.Position{X: x, Y: y, Z: height})
 			for z, tile := range mapTile.ByLayer {
 				m.Layers[z].SetTile(x, y, tile)
 			}
 			osmNodes = append(osmNodes, node)
-			pointsByNodeID[int64(node.ID)] = model.Point{X: x, Y: y}
+			pointsByNodeID[int64(node.ID)] = model.Point{X: x, Y: y, Z: height}
 		case *osm.Way:
 			way := scanner.Object().(*osm.Way)
 			osmWays[int64(way.ID)] = way

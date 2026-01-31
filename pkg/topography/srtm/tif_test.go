@@ -41,8 +41,17 @@ func TestTifParser(t *testing.T) {
 		alt, err = tp.GetAltitude(-56.115745, 158.687832, 4)
 		assert.NoError(t, err)
 		assert.Equal(t, model.Altitude(5), alt)
-		t.Log(topo.Altitudes)
 		assert.Equal(t, 54, len(topo.Altitudes))
+
+		// Non-existing altitude in tifs
+		alt, err = tp.GetAltitude(-56.100000, 158.687832, 4)
+		assert.NoError(t, err)
+		assert.Equal(t, model.Altitude(0), alt)
+		assert.Equal(t, 55, len(topo.Altitudes))
+
+		// Non-existing tif for altitude
+		alt, err = tp.GetAltitude(1.115745, 2.687832, 4)
+		assert.Error(t, err)
 	})
 
 	t.Run("directory_with_preload_ranging_over_tifs", func(t *testing.T) {
@@ -62,6 +71,16 @@ func TestTifParser(t *testing.T) {
 		alt, err = tp.GetAltitude(-56.115745, 158.687832, 4)
 		assert.NoError(t, err)
 		assert.Equal(t, model.Altitude(5), alt)
+
+		// Non-existing altitude in tifs
+		alt, err = tp.GetAltitude(-56.100000, 158.687832, 4)
+		assert.NoError(t, err)
+		assert.Equal(t, model.Altitude(0), alt)
+		assert.Equal(t, 55, len(topo.Altitudes))
+
+		// Non-existing tif for altitude
+		alt, err = tp.GetAltitude(1.115745, 2.687832, 4)
+		assert.Error(t, err)
 	})
 
 	t.Run("directory_with_preload_ranging_over_lat_lon", func(t *testing.T) {
@@ -77,5 +96,15 @@ func TestTifParser(t *testing.T) {
 		alt, err := tp.GetAltitude(-56.115745, 158.687832, 4)
 		assert.NoError(t, err)
 		assert.Equal(t, model.Altitude(5), alt)
+
+		// Non-existing altitude in tifs
+		alt, err = tp.GetAltitude(-56.100000, 158.687832, 4)
+		assert.NoError(t, err)
+		assert.Equal(t, model.Altitude(0), alt)
+		assert.Equal(t, 38, len(topo.Altitudes))
+
+		// Non-existing tif for altitude
+		alt, err = tp.GetAltitude(1.115745, 2.687832, 4)
+		assert.Error(t, err)
 	})
 }

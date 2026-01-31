@@ -1,5 +1,6 @@
 package model
 
 type Point struct {
-	X, Y, Z int
+	X, Y int
+	Z    Altitude
 }

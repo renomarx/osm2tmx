@@ -4,6 +4,7 @@ package model
 // with top, left, right and bottom nearest boundary of the polygon
 type Position struct {
 	X, Y                     int
+	Z                        Altitude
 	Top, Left, Right, Bottom int
 }
 
