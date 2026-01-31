@@ -45,7 +45,7 @@ func (m *Mapper) GetDefaultTile(pos *model.Position) model.Tile {
 	if pos == nil {
 		return m.defaultTile
 	}
-	if pos.Z > model.Altitude(470) {
+	if pos.Z > model.Altitude(1400) {
 		return 1378
 	}
 	return m.defaultTile
@@ -208,7 +208,7 @@ func (m *Mapper) mapToTiles(tags osm.Tags, pos *model.Position) MapTile {
 			}
 		}
 	}
-	if pos != nil && pos.Z > model.Altitude(500) {
+	if pos != nil && pos.Z > model.Altitude(1400) {
 		byLayer[0] = 1378
 	}
 

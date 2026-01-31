@@ -14,7 +14,7 @@ func TestTifParser(t *testing.T) {
 		tp := NewTifParser(&topo)
 		err := tp.AddTif("test/N26W080.tif")
 		assert.NoError(t, err)
-		alt, err := tp.GetAltitude(26.769445, -80.276432, 4)
+		alt, err := tp.GetAltitude(26.230632, -80.2764363, 4)
 		assert.NoError(t, err)
 		assert.Equal(t, model.Altitude(8), alt)
 		assert.Equal(t, 17, len(topo.Altitudes))
@@ -33,14 +33,14 @@ func TestTifParser(t *testing.T) {
 		err := tp.AddDirectory("test")
 		assert.NoError(t, err)
 
-		alt, err := tp.GetAltitude(26.769445, -80.276432, 4)
+		alt, err := tp.GetAltitude(26.230632, -80.2764363, 4)
 		assert.NoError(t, err)
 		assert.Equal(t, model.Altitude(8), alt)
 		assert.Equal(t, 17, len(topo.Altitudes))
 
-		alt, err = tp.GetAltitude(-56.115745, 158.687832, 4)
+		alt, err = tp.GetAltitude(-56.886845, 158.689432, 4)
 		assert.NoError(t, err)
-		assert.Equal(t, model.Altitude(5), alt)
+		assert.Equal(t, model.Altitude(18), alt)
 		assert.Equal(t, 54, len(topo.Altitudes))
 
 		// Non-existing altitude in tifs
@@ -64,13 +64,13 @@ func TestTifParser(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, 54, len(topo.Altitudes))
 
-		alt, err := tp.GetAltitude(26.769445, -80.276432, 4)
+		alt, err := tp.GetAltitude(26.230632, -80.2764363, 4)
 		assert.NoError(t, err)
 		assert.Equal(t, model.Altitude(8), alt)
 
-		alt, err = tp.GetAltitude(-56.115745, 158.687832, 4)
+		alt, err = tp.GetAltitude(-56.886845, 158.689432, 4)
 		assert.NoError(t, err)
-		assert.Equal(t, model.Altitude(5), alt)
+		assert.Equal(t, model.Altitude(18), alt)
 
 		// Non-existing altitude in tifs
 		alt, err = tp.GetAltitude(-56.100000, 158.687832, 4)
@@ -93,9 +93,9 @@ func TestTifParser(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, 37, len(topo.Altitudes))
 
-		alt, err := tp.GetAltitude(-56.115745, 158.687832, 4)
+		alt, err := tp.GetAltitude(-56.886845, 158.689432, 4)
 		assert.NoError(t, err)
-		assert.Equal(t, model.Altitude(5), alt)
+		assert.Equal(t, model.Altitude(18), alt)
 
 		// Non-existing altitude in tifs
 		alt, err = tp.GetAltitude(-56.100000, 158.687832, 4)

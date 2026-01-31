@@ -160,12 +160,13 @@ func (tp *TifParser) parseTif(id tifID, filepath string, precision int) error {
 		return err
 	}
 
+	var maxAlt uint16
 	bounds := img.Bounds()
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			// Normalize X and Y to a 0 to 1 space based on the size of the image.
 			// Add the offsets to get coordinates.
-			latAbs := math.Abs(latOffset) + (float64(y) / float64(bounds.Max.Y))
+			latAbs := math.Abs(latOffset) + (float64(bounds.Max.Y-y) / float64(bounds.Max.Y))
 			lngAbs := math.Abs(lngOffset) + (float64(x) / float64(bounds.Max.X))
 
 			height := img.At(x, y).(color.Gray16)
@@ -186,10 +187,13 @@ func (tp *TifParser) parseTif(id tifID, filepath string, precision int) error {
 			roundedLon := math.Round(lngAbs*float64(lngFactor)*mult) / mult
 
 			tp.Topography.Altitudes[model.GeoPoint{Lat: roundedLat, Lon: roundedLon}] = model.Altitude(height.Y)
+			if height.Y > maxAlt {
+				maxAlt = height.Y
+			}
 		}
 	}
 	tp.loaded[id] = true
-	log.Printf("finished loading SRTM file %s", filepath)
+	log.Printf("finished loading SRTM file %s, max alt: %d", filepath, maxAlt)
 
 	return nil
 }
