@@ -58,7 +58,6 @@ tags:
 
 ## TODO
 
-- Handle  altitudes with SRTM data files
 - Trace "primary" roads with 5 meters diameter
 - Conf & handle the mapping.yaml file
 - More examples with other tilesets
