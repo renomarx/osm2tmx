@@ -30,7 +30,7 @@ In addition, you can add SRTM files to the program, to be able to handle differe
 - With downscale 4, srtm file and drawing
 
 ```bash
-./osm2tmx -downscale 4 -srtm-tif data/N46E006.tif -draw -out example/example01/centre_les_gets.osm.tmx data/centre_les_gets.osm.pbf
+./osm2tmx -downscale 10 -srtm-tif data/N46E006.tif -draw -out example/example01/les_gets.osm.tmx data/les_gets.osm.pbf
 ```
 
 ### Get OSM files
@@ -99,8 +99,6 @@ tags:
 
 ## TODO
 
-- Trace borders & corners in a second step (to draw the border of snow fields, for example)
-  - Optimisation: positionInPolygon not needed, totally replaced by this second step ?
 - Conf & handle the mapping.yaml file
 - More examples with other tilesets
 - Generate a tileset like OSM stylesheets to have a pretty map in tmx :)

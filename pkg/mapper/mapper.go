@@ -108,12 +108,24 @@ func (m *Mapper) mapToTiles(tags osm.Tags, pos model.Position) MapTile {
 				switch {
 				case r >= 80 && r < 85:
 					byLayer[1] = 41
+					if pos.Z > model.Altitude(1400) {
+						byLayer[1] = 1351
+					}
 				case r >= 85 && r < 90:
 					byLayer[1] = 42
+					if pos.Z > model.Altitude(1400) {
+						byLayer[1] = 1351
+					}
 				case r >= 90 && r < 95:
 					byLayer[1] = 43
+					if pos.Z > model.Altitude(1400) {
+						byLayer[1] = 1351
+					}
 				case r >= 95 && r < 100:
 					byLayer[1] = 44
+					if pos.Z > model.Altitude(1400) {
+						byLayer[1] = 1351
+					}
 				}
 			case "heath":
 				byLayer[0] = 6
@@ -137,12 +149,24 @@ func (m *Mapper) mapToTiles(tags osm.Tags, pos model.Position) MapTile {
 				switch {
 				case r >= 80 && r < 85:
 					byLayer[1] = 41
+					if pos.Z > model.Altitude(1400) {
+						byLayer[1] = 1351
+					}
 				case r >= 85 && r < 90:
 					byLayer[1] = 42
+					if pos.Z > model.Altitude(1400) {
+						byLayer[1] = 1351
+					}
 				case r >= 90 && r < 95:
 					byLayer[1] = 43
+					if pos.Z > model.Altitude(1400) {
+						byLayer[1] = 1351
+					}
 				case r >= 95 && r < 100:
 					byLayer[1] = 44
+					if pos.Z > model.Altitude(1400) {
+						byLayer[1] = 1351
+					}
 				}
 			case "industrial", "residential", "construction":
 				byLayer[0] = 8
@@ -165,6 +189,39 @@ func (m *Mapper) GetCustomTile(pos model.Position) MapTile {
 	for layer := range m.m.Layers {
 		tile := m.m.Layers[layer].GetCell(pos.X, pos.Y).Tile
 		switch tile {
+		case 1378:
+			switch {
+			case m.isStandalone(layer, pos, tile):
+				tile = 1376
+			case m.isCornerTopLeft(layer, pos, tile):
+				tile = 1369
+			case m.isCornerTopRight(layer, pos, tile):
+				tile = 1371
+			case m.isCornerBottomLeft(layer, pos, tile):
+				tile = 1385
+			case m.isCornerBottomRight(layer, pos, tile):
+				tile = 1387
+			case m.isBorderTop(layer, pos, tile):
+				tile = 1370
+			case m.isBorderBottom(layer, pos, tile):
+				tile = 1386
+			case m.isBorderLeft(layer, pos, tile):
+				tile = 1377
+			case m.isBorderRight(layer, pos, tile):
+				tile = 1379
+			case m.isBorderLeftAndRight(layer, pos, tile):
+				tile = 1399
+			case m.isBorderTopAndBottom(layer, pos, tile):
+				tile = 1405
+			case m.isEndWayRight(layer, pos, tile):
+				tile = 1406
+			case m.isEndWayLeft(layer, pos, tile):
+				tile = 1404
+			case m.isEndWayBottom(layer, pos, tile):
+				tile = 1407
+			case m.isEndWayTop(layer, pos, tile):
+				tile = 1391
+			}
 		case 465:
 			switch {
 			case m.isWall(4, 1, layer, pos, tile):
@@ -184,35 +241,35 @@ func (m *Mapper) GetCustomTile(pos model.Position) MapTile {
 			}
 		case 120:
 			switch {
-			case m.isStandalone(layer, pos, 120):
+			case m.isStandalone(layer, pos, tile):
 				tile = 128
-			case m.isCornerTopLeft(layer, pos, 120):
+			case m.isCornerTopLeft(layer, pos, tile):
 				tile = 113
-			case m.isCornerTopRight(layer, pos, 120):
+			case m.isCornerTopRight(layer, pos, tile):
 				tile = 115
-			case m.isCornerBottomLeft(layer, pos, 120):
+			case m.isCornerBottomLeft(layer, pos, tile):
 				tile = 129
-			case m.isCornerBottomRight(layer, pos, 120):
+			case m.isCornerBottomRight(layer, pos, tile):
 				tile = 131
-			case m.isBorderTop(layer, pos, 120):
+			case m.isBorderTop(layer, pos, tile):
 				tile = 114
-			case m.isBorderBottom(layer, pos, 120):
+			case m.isBorderBottom(layer, pos, tile):
 				tile = 130
-			case m.isBorderLeft(layer, pos, 120):
+			case m.isBorderLeft(layer, pos, tile):
 				tile = 121
-			case m.isBorderRight(layer, pos, 120):
+			case m.isBorderRight(layer, pos, tile):
 				tile = 123
-			case m.isBorderLeftAndRight(layer, pos, 120):
+			case m.isBorderLeftAndRight(layer, pos, tile):
 				tile = 144
-			case m.isBorderTopAndBottom(layer, pos, 120):
+			case m.isBorderTopAndBottom(layer, pos, tile):
 				tile = 149
-			case m.isEndWayRight(layer, pos, 120):
+			case m.isEndWayRight(layer, pos, tile):
 				tile = 150
-			case m.isEndWayLeft(layer, pos, 120):
+			case m.isEndWayLeft(layer, pos, tile):
 				tile = 148
-			case m.isEndWayBottom(layer, pos, 120):
+			case m.isEndWayBottom(layer, pos, tile):
 				tile = 152
-			case m.isEndWayTop(layer, pos, 120):
+			case m.isEndWayTop(layer, pos, tile):
 				tile = 135
 			}
 		}
