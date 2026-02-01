@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/paulmach/osm"
-	"github.com/renomarx/osm2tmx/pkg/mapper"
 	"github.com/renomarx/osm2tmx/pkg/model"
 	"github.com/stretchr/testify/assert"
 )
@@ -15,9 +14,7 @@ func TestRaster(t *testing.T) {
 	osmfilename := "test.osm.pbf"
 
 	t.Run("original_size", func(t *testing.T) {
-		mapper := mapper.New()
-
-		raster := New(mapper, 1, Bounds{})
+		raster := New(1, Bounds{})
 
 		begin := time.Now()
 		result, err := raster.Parse(osmfilename)
@@ -64,9 +61,7 @@ func TestRaster(t *testing.T) {
 	})
 
 	t.Run("downscale_4", func(t *testing.T) {
-		mapper := mapper.New()
-
-		raster := New(mapper, 4, Bounds{})
+		raster := New(4, Bounds{})
 
 		result, err := raster.Parse(osmfilename)
 		assert.NoError(t, err)
@@ -103,9 +98,7 @@ func TestRaster(t *testing.T) {
 	})
 
 	t.Run("downscale_2_with_bounds", func(t *testing.T) {
-		mapper := mapper.New()
-
-		raster := New(mapper, 2, Bounds{
+		raster := New(2, Bounds{
 			OffsetX: 50,
 			OffsetY: 40,
 			LimitX:  100,

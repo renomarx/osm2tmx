@@ -4,17 +4,14 @@ import (
 	"testing"
 
 	"github.com/paulmach/osm"
-	"github.com/renomarx/osm2tmx/pkg/mapper"
 	"github.com/renomarx/osm2tmx/pkg/model"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestDrawWayLine(t *testing.T) {
 	t.Run("normal", func(t *testing.T) {
-		r := New(mapper.New(), 1, Bounds{})
-
-		m := model.Map{}
-		m.Init(3, 12, 6, func(x, y int) model.Tile { return 0 })
+		r := New(1, Bounds{})
+		r.m.Init(3, 12, 6, func(x, y int) model.Tile { return 0 })
 
 		way := osm.Way{
 			Nodes: osm.WayNodes{
@@ -47,9 +44,21 @@ func TestDrawWayLine(t *testing.T) {
 		pointsByNodeID[9] = model.Point{X: 1, Y: 1}
 		r.pointsByNodeID = pointsByNodeID
 
-		r.drawWayLine(&m, &way, r.mapper.GetMapTileFunc(way.Tags))
+		r.drawWayLine(&way, r.mapper.GetMapTileFunc(way.Tags))
 
 		expectedFilledLayerView := `
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,120,120,120,120,120,120,120,0,0,0,0,
+0,120,0,0,0,0,0,120,120,120,120,0,
+0,120,120,0,0,0,0,0,0,120,120,0,
+0,0,120,120,120,120,120,120,120,120,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+`
+		assert.Equal(t, expectedFilledLayerView, r.m.Layers[1].String())
+
+		r.drawCustomTiles()
+
+		expectedFilledLayerView = `
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,113,149,149,149,149,149,115,0,0,0,0,
 0,144,0,0,0,0,0,129,149,114,115,0,
@@ -57,14 +66,12 @@ func TestDrawWayLine(t *testing.T) {
 0,0,129,149,149,149,149,149,149,131,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
 `
-		assert.Equal(t, expectedFilledLayerView, m.Layers[1].String())
+		assert.Equal(t, expectedFilledLayerView, r.m.Layers[1].String())
 	})
 
 	t.Run("highway_primary", func(t *testing.T) {
-		r := New(mapper.New(), 1, Bounds{})
-
-		m := model.Map{}
-		m.Init(3, 12, 6, func(x, y int) model.Tile { return 0 })
+		r := New(1, Bounds{})
+		r.m.Init(3, 12, 6, func(x, y int) model.Tile { return 0 })
 
 		way := osm.Way{
 			Nodes: osm.WayNodes{
@@ -97,24 +104,34 @@ func TestDrawWayLine(t *testing.T) {
 		pointsByNodeID[9] = model.Point{X: 1, Y: 1}
 		r.pointsByNodeID = pointsByNodeID
 
-		r.drawWayLine(&m, &way, r.mapper.GetMapTileFunc(way.Tags))
+		r.drawWayLine(&way, r.mapper.GetMapTileFunc(way.Tags))
 
 		expectedFilledLayerView := `
-0,121,120,120,120,120,120,120,114,114,115,0,
-114,120,120,120,120,120,120,120,120,120,123,0,
-120,120,120,120,120,120,120,120,120,120,120,114,
+0,120,120,120,120,120,120,120,120,120,120,0,
+120,120,120,120,120,120,120,120,120,120,120,0,
 120,120,120,120,120,120,120,120,120,120,120,120,
-129,120,120,120,120,120,120,120,120,120,120,131,
-0,129,120,120,120,120,120,120,120,120,131,0,
+120,120,120,120,120,120,120,120,120,120,120,120,
+120,120,120,120,120,120,120,120,120,120,120,120,
+0,120,120,120,120,120,120,120,120,120,120,0,
 `
-		assert.Equal(t, expectedFilledLayerView, m.Layers[1].String())
+		assert.Equal(t, expectedFilledLayerView, r.m.Layers[1].String())
+
+		r.drawCustomTiles()
+
+		expectedFilledLayerView = `
+0,113,114,114,114,114,114,114,114,114,115,0,
+113,120,120,120,120,120,120,120,120,120,123,0,
+121,120,120,120,120,120,120,120,120,120,120,115,
+121,120,120,120,120,120,120,120,120,120,120,123,
+129,120,120,120,120,120,120,120,120,120,120,131,
+0,129,130,130,130,130,130,130,130,130,131,0,
+`
+		assert.Equal(t, expectedFilledLayerView, r.m.Layers[1].String())
 	})
 
 	t.Run("highway_secondary_2_lanes", func(t *testing.T) {
-		r := New(mapper.New(), 1, Bounds{})
-
-		m := model.Map{}
-		m.Init(3, 12, 6, func(x, y int) model.Tile { return 0 })
+		r := New(1, Bounds{})
+		r.m.Init(3, 12, 6, func(x, y int) model.Tile { return 0 })
 
 		way := osm.Way{
 			Nodes: osm.WayNodes{
@@ -147,25 +164,35 @@ func TestDrawWayLine(t *testing.T) {
 		pointsByNodeID[9] = model.Point{X: 1, Y: 1}
 		r.pointsByNodeID = pointsByNodeID
 
-		r.drawWayLine(&m, &way, r.mapper.GetMapTileFunc(way.Tags))
+		r.drawWayLine(&way, r.mapper.GetMapTileFunc(way.Tags))
 
 		expectedFilledLayerView := `
-0,121,120,120,120,120,120,120,114,114,115,0,
-114,120,120,120,120,120,120,120,120,120,123,0,
-120,120,120,120,120,120,120,120,120,120,120,114,
+0,120,120,120,120,120,120,120,120,120,120,0,
+120,120,120,120,120,120,120,120,120,120,120,0,
 120,120,120,120,120,120,120,120,120,120,120,120,
-129,120,120,120,120,120,120,120,120,120,120,131,
-0,129,120,120,120,120,120,120,120,120,131,0,
+120,120,120,120,120,120,120,120,120,120,120,120,
+120,120,120,120,120,120,120,120,120,120,120,120,
+0,120,120,120,120,120,120,120,120,120,120,0,
 `
-		assert.Equal(t, expectedFilledLayerView, m.Layers[1].String())
+		assert.Equal(t, expectedFilledLayerView, r.m.Layers[1].String())
+
+		r.drawCustomTiles()
+
+		expectedFilledLayerView = `
+0,113,114,114,114,114,114,114,114,114,115,0,
+113,120,120,120,120,120,120,120,120,120,123,0,
+121,120,120,120,120,120,120,120,120,120,120,115,
+121,120,120,120,120,120,120,120,120,120,120,123,
+129,120,120,120,120,120,120,120,120,120,120,131,
+0,129,130,130,130,130,130,130,130,130,131,0,
+`
+		assert.Equal(t, expectedFilledLayerView, r.m.Layers[1].String())
 	})
 }
 
 func TestDrawWayArea(t *testing.T) {
-	r := New(mapper.New(), 1, Bounds{})
-
-	m := model.Map{}
-	m.Init(3, 12, 6, func(x, y int) model.Tile { return 0 })
+	r := New(1, Bounds{})
+	r.m.Init(3, 12, 6, func(x, y int) model.Tile { return 0 })
 
 	way := osm.Way{
 		Nodes: osm.WayNodes{
@@ -198,15 +225,27 @@ func TestDrawWayArea(t *testing.T) {
 	pointsByNodeID[9] = model.Point{X: 1, Y: 1}
 	r.pointsByNodeID = pointsByNodeID
 
-	r.drawWayArea(&m, &way, r.mapper.GetMapTileFunc(way.Tags))
+	r.drawWayArea(&way, r.mapper.GetMapTileFunc(way.Tags))
 
 	expectedFilledLayerView := `
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,465,465,465,465,465,0,0,0,0,0,0,
-0,419,419,473,473,473,465,465,465,465,465,0,
-0,419,419,481,481,481,419,419,419,419,419,0,
-0,0,0,489,489,489,419,419,419,0,0,0,
+0,465,465,465,465,465,465,465,465,465,465,0,
+0,465,465,465,465,465,465,465,465,465,465,0,
+0,0,0,465,0,0,0,0,465,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
 `
-	assert.Equal(t, expectedFilledLayerView, m.Layers[1].String())
+	assert.Equal(t, expectedFilledLayerView, r.m.Layers[1].String())
+
+	r.drawCustomTiles()
+
+	expectedFilledLayerView = `
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,473,473,465,473,473,0,0,0,0,0,0,
+0,481,481,473,481,481,465,465,465,465,465,0,
+0,489,489,481,489,489,419,419,419,419,419,0,
+0,0,0,489,0,0,0,0,419,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+`
+	assert.Equal(t, expectedFilledLayerView, r.m.Layers[1].String())
 }

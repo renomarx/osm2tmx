@@ -45,6 +45,20 @@ func (l *Layer) Init(mapSizeX, mapSizeY int, getTile func(x, y int) Tile) {
 	}
 }
 
+func (m *Map) SizeY() int {
+	if len(m.Layers) == 0 {
+		return 0
+	}
+	return m.Layers[0].SizeY()
+}
+
+func (m *Map) SizeX() int {
+	if len(m.Layers) == 0 {
+		return 0
+	}
+	return m.Layers[0].SizeX()
+}
+
 func (l *Layer) SizeY() int {
 	return len(l.m)
 }
@@ -61,6 +75,12 @@ func (l *Layer) Row(y int) []Cell {
 }
 
 func (l *Layer) GetCell(x, y int) Cell {
+	if y < 0 || y >= len(l.m) {
+		return Cell{X: x, Y: y}
+	}
+	if x < 0 || x >= len(l.m[y]) {
+		return Cell{X: x, Y: y}
+	}
 	return l.m[y][x]
 }
 

@@ -8,7 +8,6 @@ import (
 	"runtime"
 
 	"github.com/renomarx/osm2tmx/pkg/draw"
-	"github.com/renomarx/osm2tmx/pkg/mapper"
 	"github.com/renomarx/osm2tmx/pkg/model"
 	"github.com/renomarx/osm2tmx/pkg/raster"
 	"github.com/renomarx/osm2tmx/pkg/tmx"
@@ -79,15 +78,13 @@ func main() {
 	tmxFilename := setTmxFilename(outputFlag, osmFile)
 	log.Printf("will write output to %s", tmxFilename)
 
-	mp := mapper.New()
-
 	bounds := raster.Bounds{
 		OffsetX: *offsetXFlag,
 		OffsetY: *offsetYFlag,
 		LimitX:  *limitXFlag,
 		LimitY:  *limitYFlag,
 	}
-	rst := raster.New(mp, *downscaleFlag, bounds).WithWorkers(workers)
+	rst := raster.New(*downscaleFlag, bounds).WithWorkers(workers)
 
 	topography := model.Topography{}
 	srtmParser := srtm.NewTifParser(&topography)

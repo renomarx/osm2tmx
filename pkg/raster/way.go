@@ -10,7 +10,7 @@ import (
 	"github.com/renomarx/osm2tmx/pkg/model"
 )
 
-func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, mapTileFunc mapper.MapTileFunc) {
+func (r *Raster) drawWayLine(way *osm.Way, mapTileFunc mapper.MapTileFunc) {
 	var lastPoint *model.Point
 	line := model.NewLine()
 	width, lanes := r.getWayWidthAndLanes(way)
@@ -39,12 +39,12 @@ func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, mapTileFunc mapper.MapT
 	// range over line to get the relative position of each point of the line,
 	// and select corresponding tile to fill the map
 	for _, point := range line.Points {
-		pos := line.GetPosition(point)
+		pos := model.Position{X: point.X, Y: point.Y}
 		height := r.getAltitude(point.X, point.Y)
 		pos.Z = height
 		mapTile := mapTileFunc(pos)
 		for z, tile := range mapTile.ByLayer {
-			m.Layers[z].SetTile(point.X, point.Y, tile)
+			r.m.Layers[z].SetTile(point.X, point.Y, tile)
 		}
 	}
 }
@@ -87,7 +87,7 @@ func (r *Raster) isPolygon(way *osm.Way) bool {
 	return way.Nodes[0] == way.Nodes[len(way.Nodes)-1]
 }
 
-func (r *Raster) drawWayArea(m *model.Map, way *osm.Way, mapTileFunc mapper.MapTileFunc) {
+func (r *Raster) drawWayArea(way *osm.Way, mapTileFunc mapper.MapTileFunc) {
 	polygon := model.NewPolygon()
 	// Follow the Scan Line Algorithm
 
@@ -102,5 +102,5 @@ func (r *Raster) drawWayArea(m *model.Map, way *osm.Way, mapTileFunc mapper.MapT
 	}
 
 	// 2. Apply the scanline + even-odd algorithm
-	r.fillPolygon(m, mapTileFunc, polygon)
+	r.fillPolygon(mapTileFunc, polygon)
 }

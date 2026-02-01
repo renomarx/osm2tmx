@@ -17,6 +17,7 @@ import (
 )
 
 type Raster struct {
+	m                   *model.Map
 	mapper              *mapper.Mapper
 	pointsByNodeID      map[int64]model.Point
 	osmNodes            []osm.Node
@@ -43,8 +44,11 @@ type topography struct {
 	precision int
 }
 
-func New(mapper *mapper.Mapper, downscale int, bounds Bounds) *Raster {
+func New(downscale int, bounds Bounds) *Raster {
+	m := model.Map{}
+	mapper := mapper.New(&m)
 	return &Raster{
+		m:                   &m,
 		pointsByNodeID:      make(map[int64]model.Point),
 		osmNodes:            []osm.Node{},
 		osmWays:             make(map[int64]*osm.Way),
@@ -107,11 +111,11 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 		mapSizeX = min(r.bounds.LimitX, mapSizeX)
 	}
 
-	// init map
-	m := model.Map{}
 	// fill map first layer with Tile values
-	m.Init(r.mapper.Layers(), mapSizeX, mapSizeY, r.getDefaultTile)
+	r.m.Init(r.mapper.Layers(), mapSizeX, mapSizeY, r.getDefaultTile)
 
+	// Scan the OSM file, filling map tiles for nodes, saving nodes in map,
+	// and getting ways & relations for next steps
 	for scanner.Scan() {
 		switch scanner.Object().(type) {
 		case *osm.Node:
@@ -124,7 +128,7 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 			height := r.getAltitude(x, y)
 			mapTile := r.mapper.GetMapTileFunc(node.Tags)(model.Position{X: x, Y: y, Z: height})
 			for z, tile := range mapTile.ByLayer {
-				m.Layers[z].SetTile(x, y, tile)
+				r.m.Layers[z].SetTile(x, y, tile)
 			}
 			r.osmNodes = append(r.osmNodes, node)
 			r.pointsByNodeID[int64(node.ID)] = model.Point{X: x, Y: y}
@@ -136,19 +140,19 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 			r.osmRelations = append(r.osmRelations, *relation)
 		}
 	}
-
 	scanErr := scanner.Err()
 	if scanErr != nil {
 		return model.RasterMap{}, err
 	}
 
+	// handling ways in parralel
 	wg := sync.WaitGroup{}
 	waysQueue := make(chan *osm.Way, len(r.osmWays))
 	for range r.workers {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			r.workerWay(waysQueue, &m)
+			r.workerWay(waysQueue)
 		}()
 	}
 	for _, way := range r.osmWays {
@@ -157,13 +161,14 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 	close(waysQueue)
 	wg.Wait()
 
+	// handling relations in parralel
 	wg = sync.WaitGroup{}
 	relationsQueue := make(chan *osm.Relation, len(r.osmRelations))
 	for range r.workers {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			r.workerRelation(relationsQueue, &m)
+			r.workerRelation(relationsQueue)
 		}()
 	}
 	for _, relation := range r.osmRelations {
@@ -172,8 +177,12 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 	close(relationsQueue)
 	wg.Wait()
 
+	// Now that the map is filled with basic tiles,
+	// we can re-draw the map with custom tiles (based on basic tiles & positions)
+	r.drawCustomTiles()
+
 	return model.RasterMap{
-		Map: &m,
+		Map: r.m,
 		Meta: model.RasterMapMeta{
 			Bounds:           *header.Bounds,
 			MapSizeX:         mapSizeX,
@@ -192,19 +201,34 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 	}, nil
 }
 
-func (r *Raster) workerWay(waysQueue chan *osm.Way, m *model.Map) {
+// Draw custom tiles, depending on position, like corners, borders, walls...
+func (r *Raster) drawCustomTiles() {
+	newMap := model.Map{}
+	newMap.Init(len(r.m.Layers), r.m.SizeX(), r.m.SizeY(), r.getDefaultTile)
+	for y := 0; y < r.m.SizeY(); y++ {
+		for x := 0; x < r.m.SizeX(); x++ {
+			height := r.getAltitude(x, y)
+			mapTile := r.mapper.GetCustomTile(model.Position{X: x, Y: y, Z: height})
+			for z, tile := range mapTile.ByLayer {
+				newMap.Layers[z].SetTile(x, y, tile)
+			}
+		}
+	}
+	r.m = &newMap
+}
+
+func (r *Raster) workerWay(waysQueue chan *osm.Way) {
 	for way := range waysQueue {
 		mapTileFunc := r.mapper.GetMapTileFunc(way.Tags)
 		if r.isPolygon(way) {
-			r.drawWayArea(m, way, mapTileFunc)
+			r.drawWayArea(way, mapTileFunc)
 		} else {
-			r.drawWayLine(m, way, mapTileFunc)
+			r.drawWayLine(way, mapTileFunc)
 		}
 	}
-
 }
 
-func (r *Raster) workerRelation(relationsQueue chan *osm.Relation, m *model.Map) {
+func (r *Raster) workerRelation(relationsQueue chan *osm.Relation) {
 	for relation := range relationsQueue {
 		// relations of type multipolygon are made of members of type node or way,
 		// representing boundaries of the way
@@ -213,21 +237,19 @@ func (r *Raster) workerRelation(relationsQueue chan *osm.Relation, m *model.Map)
 			continue
 		}
 		mapTileFunc := r.mapper.GetMapTileFunc(relation.Tags)
-		r.drawRelationArea(m, relation, mapTileFunc)
+		r.drawRelationArea(relation, mapTileFunc)
 	}
 }
 
-func (r *Raster) fillPolygon(m *model.Map, mapTileFunc mapper.MapTileFunc, polygon *model.Polygon) {
-	ps := evenodd.NewPolygonScanner(polygon)
+func (r *Raster) fillPolygon(mapTileFunc mapper.MapTileFunc, polygon *model.Polygon) {
 	for y := polygon.YMin.Y; y <= polygon.YMax.Y; y++ {
 		for x := polygon.XMin.X; x <= polygon.XMax.X; x++ {
-			pos, inside := ps.PositionInPolygon(x, y)
-			if inside {
+			if evenodd.IsInsidePolygon(x, y, polygon.Vertices) {
 				height := r.getAltitude(x, y)
-				pos.Z = height
+				pos := model.Position{X: x, Y: y, Z: height}
 				mapTile := mapTileFunc(pos)
 				for z, tile := range mapTile.ByLayer {
-					m.Layers[z].SetTile(x, y, tile)
+					r.m.Layers[z].SetTile(x, y, tile)
 				}
 			}
 		}

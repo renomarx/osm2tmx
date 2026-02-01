@@ -9,6 +9,7 @@ import (
 
 type Mapper struct {
 	// TODO add conf
+	m           *model.Map
 	defaultTile model.Tile
 	layers      int
 }
@@ -19,8 +20,9 @@ type MapTile struct {
 	ByLayer map[int]model.Tile
 }
 
-func New() *Mapper {
+func New(m *model.Map) *Mapper {
 	return &Mapper{
+		m:           m,
 		defaultTile: 2,
 		layers:      2,
 	}
@@ -58,7 +60,6 @@ func (m *Mapper) Layers() int {
 }
 
 func (m *Mapper) mapToTiles(tags osm.Tags, pos model.Position) MapTile {
-	// TODO: handle pos
 	byLayer := make(map[int]model.Tile)
 	byLayer[0] = m.defaultTile
 	for _, tag := range tags {
@@ -76,22 +77,7 @@ func (m *Mapper) mapToTiles(tags osm.Tags, pos model.Position) MapTile {
 			case "detached", "house":
 			case "hotel", "residential":
 			case "religious", "cathedral", "chapel", "church":
-				switch {
-				case pos.Bottom == 0 && pos.Top >= 3:
-					byLayer[1] = 489
-				case pos.Bottom == 1 && pos.Top >= 2:
-					byLayer[1] = 481
-				case pos.Bottom == 2 && pos.Top >= 1:
-					byLayer[1] = 473
-				case pos.Bottom == 0 && pos.Top < 3:
-					byLayer[1] = 419
-				case pos.Bottom == 1 && pos.Top > 0 && pos.Top < 2:
-					byLayer[1] = 419
-				case pos.IsStandalone():
-					byLayer[1] = 431
-				default:
-					byLayer[1] = 465
-				}
+				byLayer[1] = 465
 			case "commercial", "industrial", "kiosk", "office", "retail", "supermarket", "warehouse":
 			case "hospital":
 			case "museum":
@@ -104,38 +90,6 @@ func (m *Mapper) mapToTiles(tags osm.Tags, pos model.Position) MapTile {
 			// apartments
 		case "highway":
 			byLayer[1] = 120
-			switch {
-			case pos.IsStandalone():
-				byLayer[1] = 128
-			case pos.IsCornerTopLeft():
-				byLayer[1] = 113
-			case pos.IsCornerTopRight():
-				byLayer[1] = 115
-			case pos.IsCornerBottomLeft():
-				byLayer[1] = 129
-			case pos.IsCornerBottomRight():
-				byLayer[1] = 131
-			case pos.IsBorderTop():
-				byLayer[1] = 114
-			case pos.IsBorderBottom():
-				byLayer[1] = 130
-			case pos.IsBorderLeft():
-				byLayer[1] = 121
-			case pos.IsBorderRight():
-				byLayer[1] = 123
-			case pos.IsBorderLeftAndRight():
-				byLayer[1] = 144
-			case pos.IsBorderTopAndBottom():
-				byLayer[1] = 149
-			case pos.IsEndWayRight():
-				byLayer[1] = 150
-			case pos.IsEndWayLeft():
-				byLayer[1] = 148
-			case pos.IsEndWayBottom():
-				byLayer[1] = 152
-			case pos.IsEndWayTop():
-				byLayer[1] = 135
-			}
 			switch tag.Value {
 			case "motorway", "trunk", "primary", "secondary", "tertiary", "road":
 			case "steps":
@@ -204,4 +158,188 @@ func (m *Mapper) mapToTiles(tags osm.Tags, pos model.Position) MapTile {
 	}
 
 	return MapTile{ByLayer: byLayer}
+}
+
+func (m *Mapper) GetCustomTile(pos model.Position) MapTile {
+	byLayer := make(map[int]model.Tile)
+	for layer := range m.m.Layers {
+		tile := m.m.Layers[layer].GetCell(pos.X, pos.Y).Tile
+		switch tile {
+		case 465:
+			switch {
+			case m.isWall(4, 1, layer, pos, tile):
+				tile = 489
+			case m.isWall(4, 2, layer, pos, tile):
+				tile = 481
+			case m.isWall(4, 3, layer, pos, tile):
+				tile = 473
+			case m.isWall(3, 1, layer, pos, tile):
+				tile = 419
+			case m.isWall(3, 2, layer, pos, tile):
+				tile = 419
+			case m.isWall(2, 1, layer, pos, tile):
+				tile = 419
+			case m.isStandalone(layer, pos, tile):
+				tile = 431
+			}
+		case 120:
+			switch {
+			case m.isStandalone(layer, pos, 120):
+				tile = 128
+			case m.isCornerTopLeft(layer, pos, 120):
+				tile = 113
+			case m.isCornerTopRight(layer, pos, 120):
+				tile = 115
+			case m.isCornerBottomLeft(layer, pos, 120):
+				tile = 129
+			case m.isCornerBottomRight(layer, pos, 120):
+				tile = 131
+			case m.isBorderTop(layer, pos, 120):
+				tile = 114
+			case m.isBorderBottom(layer, pos, 120):
+				tile = 130
+			case m.isBorderLeft(layer, pos, 120):
+				tile = 121
+			case m.isBorderRight(layer, pos, 120):
+				tile = 123
+			case m.isBorderLeftAndRight(layer, pos, 120):
+				tile = 144
+			case m.isBorderTopAndBottom(layer, pos, 120):
+				tile = 149
+			case m.isEndWayRight(layer, pos, 120):
+				tile = 150
+			case m.isEndWayLeft(layer, pos, 120):
+				tile = 148
+			case m.isEndWayBottom(layer, pos, 120):
+				tile = 152
+			case m.isEndWayTop(layer, pos, 120):
+				tile = 135
+			}
+		}
+		byLayer[layer] = tile
+	}
+
+	return MapTile{ByLayer: byLayer}
+}
+
+func (m *Mapper) isWall(height, wallPos int, layer int, pos model.Position, tile model.Tile) bool {
+	if m.m.Layers[layer].GetCell(pos.X, pos.Y+wallPos).Tile == tile {
+		return false
+	}
+	for y, j := pos.Y, 0; y > 0 && j <= height-wallPos; y, j = y-1, j+1 {
+		if m.m.Layers[layer].GetCell(pos.X, y).Tile != tile {
+			return false
+		}
+	}
+	for y, j := pos.Y, 0; y < m.m.Layers[layer].SizeY() && j < wallPos; y, j = y+1, j+1 {
+		if m.m.Layers[layer].GetCell(pos.X, y).Tile != tile {
+			return false
+		}
+	}
+	return true
+}
+
+func (m *Mapper) isStandalone(layer int, pos model.Position, tile model.Tile) bool {
+	return m.m.Layers[layer].GetCell(pos.X-1, pos.Y).Tile != tile &&
+		m.m.Layers[layer].GetCell(pos.X+1, pos.Y).Tile != tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y-1).Tile != tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y+1).Tile != tile
+}
+
+func (m *Mapper) isCornerTopLeft(layer int, pos model.Position, tile model.Tile) bool {
+	return m.m.Layers[layer].GetCell(pos.X-1, pos.Y).Tile != tile &&
+		m.m.Layers[layer].GetCell(pos.X+1, pos.Y).Tile == tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y-1).Tile != tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y+1).Tile == tile
+}
+
+func (m *Mapper) isCornerTopRight(layer int, pos model.Position, tile model.Tile) bool {
+	return m.m.Layers[layer].GetCell(pos.X-1, pos.Y).Tile == tile &&
+		m.m.Layers[layer].GetCell(pos.X+1, pos.Y).Tile != tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y-1).Tile != tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y+1).Tile == tile
+}
+
+func (m *Mapper) isCornerBottomLeft(layer int, pos model.Position, tile model.Tile) bool {
+	return m.m.Layers[layer].GetCell(pos.X-1, pos.Y).Tile != tile &&
+		m.m.Layers[layer].GetCell(pos.X+1, pos.Y).Tile == tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y-1).Tile == tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y+1).Tile != tile
+}
+
+func (m *Mapper) isCornerBottomRight(layer int, pos model.Position, tile model.Tile) bool {
+	return m.m.Layers[layer].GetCell(pos.X-1, pos.Y).Tile == tile &&
+		m.m.Layers[layer].GetCell(pos.X+1, pos.Y).Tile != tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y-1).Tile == tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y+1).Tile != tile
+}
+
+func (m *Mapper) isBorderTop(layer int, pos model.Position, tile model.Tile) bool {
+	return m.m.Layers[layer].GetCell(pos.X-1, pos.Y).Tile == tile &&
+		m.m.Layers[layer].GetCell(pos.X+1, pos.Y).Tile == tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y-1).Tile != tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y+1).Tile == tile
+}
+
+func (m *Mapper) isBorderBottom(layer int, pos model.Position, tile model.Tile) bool {
+	return m.m.Layers[layer].GetCell(pos.X-1, pos.Y).Tile == tile &&
+		m.m.Layers[layer].GetCell(pos.X+1, pos.Y).Tile == tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y-1).Tile == tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y+1).Tile != tile
+}
+
+func (m *Mapper) isBorderLeft(layer int, pos model.Position, tile model.Tile) bool {
+	return m.m.Layers[layer].GetCell(pos.X-1, pos.Y).Tile != tile &&
+		m.m.Layers[layer].GetCell(pos.X+1, pos.Y).Tile == tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y-1).Tile == tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y+1).Tile == tile
+}
+
+func (m *Mapper) isBorderRight(layer int, pos model.Position, tile model.Tile) bool {
+	return m.m.Layers[layer].GetCell(pos.X-1, pos.Y).Tile == tile &&
+		m.m.Layers[layer].GetCell(pos.X+1, pos.Y).Tile != tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y-1).Tile == tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y+1).Tile == tile
+}
+
+func (m *Mapper) isBorderLeftAndRight(layer int, pos model.Position, tile model.Tile) bool {
+	return m.m.Layers[layer].GetCell(pos.X-1, pos.Y).Tile != tile &&
+		m.m.Layers[layer].GetCell(pos.X+1, pos.Y).Tile != tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y-1).Tile == tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y+1).Tile == tile
+}
+
+func (m *Mapper) isBorderTopAndBottom(layer int, pos model.Position, tile model.Tile) bool {
+	return m.m.Layers[layer].GetCell(pos.X-1, pos.Y).Tile == tile &&
+		m.m.Layers[layer].GetCell(pos.X+1, pos.Y).Tile == tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y-1).Tile != tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y+1).Tile != tile
+}
+
+func (m *Mapper) isEndWayRight(layer int, pos model.Position, tile model.Tile) bool {
+	return m.m.Layers[layer].GetCell(pos.X-1, pos.Y).Tile == tile &&
+		m.m.Layers[layer].GetCell(pos.X+1, pos.Y).Tile != tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y-1).Tile != tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y+1).Tile != tile
+}
+
+func (m *Mapper) isEndWayLeft(layer int, pos model.Position, tile model.Tile) bool {
+	return m.m.Layers[layer].GetCell(pos.X-1, pos.Y).Tile != tile &&
+		m.m.Layers[layer].GetCell(pos.X+1, pos.Y).Tile == tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y-1).Tile != tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y+1).Tile != tile
+}
+
+func (m *Mapper) isEndWayBottom(layer int, pos model.Position, tile model.Tile) bool {
+	return m.m.Layers[layer].GetCell(pos.X-1, pos.Y).Tile != tile &&
+		m.m.Layers[layer].GetCell(pos.X+1, pos.Y).Tile != tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y-1).Tile == tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y+1).Tile != tile
+}
+
+func (m *Mapper) isEndWayTop(layer int, pos model.Position, tile model.Tile) bool {
+	return m.m.Layers[layer].GetCell(pos.X-1, pos.Y).Tile != tile &&
+		m.m.Layers[layer].GetCell(pos.X+1, pos.Y).Tile != tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y-1).Tile != tile &&
+		m.m.Layers[layer].GetCell(pos.X, pos.Y+1).Tile == tile
 }

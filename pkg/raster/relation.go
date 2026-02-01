@@ -15,7 +15,7 @@ func (r *Raster) isMultipolygon(relation *osm.Relation) bool {
 	return false
 }
 
-func (r *Raster) drawRelationArea(m *model.Map, relation *osm.Relation, mapTileFunc mapper.MapTileFunc) {
+func (r *Raster) drawRelationArea(relation *osm.Relation, mapTileFunc mapper.MapTileFunc) {
 	polygon := model.NewPolygon()
 	// Follow the Scan Line Algorithm
 
@@ -46,5 +46,5 @@ func (r *Raster) drawRelationArea(m *model.Map, relation *osm.Relation, mapTileF
 	}
 
 	// 2. Apply the scanline + even-odd algorithm
-	r.fillPolygon(m, mapTileFunc, polygon)
+	r.fillPolygon(mapTileFunc, polygon)
 }

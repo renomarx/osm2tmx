@@ -113,18 +113,19 @@ tags:
 
 ```bash
 ./osm2tmx -downscale 4 -out example/example01/les_gets_div4.osm.tmx data/les_gets.osm.pbf
-Number of CPUs: 8
-Number of workers: 7
-2026/01/26 18:42:26 main.go:74: will write output to example/example01/les_gets_div4.osm.tmx
-2026/01/26 18:42:35 main.go:91: osm.Bounds{MinLat:46.144219999, MaxLat:46.167969999, MinLon:6.64407, MaxLon:6.69458}
-2026/01/26 18:42:35 main.go:92: Max: UTM: [east:745237.240000,north:5807307.510000]
-2026/01/26 18:42:35 main.go:93: Min: UTM: [east:739614.480000,north:5803490.770000]
-2026/01/26 18:42:35 main.go:94: Map size: (1405,954) meters (4x)
-2026/01/26 18:42:35 main.go:96: Nodes: 40085
-2026/01/26 18:42:35 main.go:97: Ways: 5468
-2026/01/26 18:42:35 main.go:98: Relations: 86
-2026/01/26 18:42:35 main.go:100: Generated map: height: 954, width: 1405
-2026/01/26 18:42:35 main.go:102: Number of points out of bounds: 9043
+Number of CPUs: 12
+Number of workers: 11
+2026/02/01 15:27:21 will write output to example/example01/les_gets_div4.osm.tmx
+2026/02/01 15:27:22 osm.Bounds{MinLat:46.144219999, MaxLat:46.167969999, MinLon:6.64407, MaxLon:6.69458}
+2026/02/01 15:27:22 Max: UTM: [east:745237.240000,north:5807307.510000]
+2026/02/01 15:27:22 Min: UTM: [east:739614.480000,north:5803490.770000]
+2026/02/01 15:27:22 Map size: (1405,954) meters (4x)
+2026/02/01 15:27:22 Altitude: 0 -> 0
+2026/02/01 15:27:22 Nodes: 40081
+2026/02/01 15:27:22 Ways: 5468
+2026/02/01 15:27:22 Relations: 86
+2026/02/01 15:27:22 Generated map: height: 954, width: 1405
+2026/02/01 15:27:22 Number of points out of bounds: 9047
 ```
 
 ## Resources
