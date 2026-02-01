@@ -122,7 +122,7 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 				continue
 			}
 			height := r.getAltitude(x, y)
-			mapTile := r.mapper.GetMapTileFunc(node.Tags)(&model.Position{X: x, Y: y, Z: height})
+			mapTile := r.mapper.GetMapTileFunc(node.Tags)(model.Position{X: x, Y: y, Z: height})
 			for z, tile := range mapTile.ByLayer {
 				m.Layers[z].SetTile(x, y, tile)
 			}
@@ -196,9 +196,7 @@ func (r *Raster) workerWay(waysQueue chan *osm.Way, m *model.Map) {
 	for way := range waysQueue {
 		mapTileFunc := r.mapper.GetMapTileFunc(way.Tags)
 		if r.isPolygon(way) {
-			if !r.mapper.IsTileDefault(mapTileFunc(nil)) {
-				r.drawWayArea(m, way, mapTileFunc)
-			}
+			r.drawWayArea(m, way, mapTileFunc)
 		} else {
 			r.drawWayLine(m, way, mapTileFunc)
 		}
@@ -215,10 +213,6 @@ func (r *Raster) workerRelation(relationsQueue chan *osm.Relation, m *model.Map)
 			continue
 		}
 		mapTileFunc := r.mapper.GetMapTileFunc(relation.Tags)
-		tile := mapTileFunc(nil)
-		if r.mapper.IsTileDefault(tile) {
-			continue
-		}
 		r.drawRelationArea(m, relation, mapTileFunc)
 	}
 }
@@ -231,7 +225,7 @@ func (r *Raster) fillPolygon(m *model.Map, mapTileFunc mapper.MapTileFunc, polyg
 			if inside {
 				height := r.getAltitude(x, y)
 				pos.Z = height
-				mapTile := mapTileFunc(&pos)
+				mapTile := mapTileFunc(pos)
 				for z, tile := range mapTile.ByLayer {
 					m.Layers[z].SetTile(x, y, tile)
 				}

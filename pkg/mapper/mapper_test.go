@@ -25,9 +25,8 @@ func TestMapper(t *testing.T) {
 			},
 		}
 
-		mapTile := mapper.GetMapTileFunc(tags)(nil)
+		mapTile := mapper.GetMapTileFunc(tags)(model.Position{Top: 1, Left: 1, Right: 1, Bottom: 1})
 		assert.Equal(t, model.Tile(120), mapTile.ByLayer[1])
-		assert.False(t, mapper.IsTileDefault(mapTile))
 	})
 
 	t.Run("correctly default to defaultTile", func(t *testing.T) {
@@ -40,9 +39,8 @@ func TestMapper(t *testing.T) {
 			},
 		}
 
-		mapTile := mapper.GetMapTileFunc(tags)(nil)
+		mapTile := mapper.GetMapTileFunc(tags)(model.Position{})
 		assert.Equal(t, model.Tile(2), mapTile.ByLayer[0])
-		assert.True(t, mapper.IsTileDefault(mapTile))
 	})
 
 	t.Run("correctly map all tiles for multiple tags", func(t *testing.T) {
@@ -63,10 +61,9 @@ func TestMapper(t *testing.T) {
 			},
 		}
 
-		mapTile := mapper.GetMapTileFunc(tags)(nil)
+		mapTile := mapper.GetMapTileFunc(tags)(model.Position{})
 		assert.Equal(t, model.Tile(8), mapTile.ByLayer[0])
 		assert.Equal(t, model.Tile(417), mapTile.ByLayer[1])
-		assert.False(t, mapper.IsTileDefault(mapTile))
 	})
 
 	t.Run("correctly map with pos", func(t *testing.T) {
@@ -85,8 +82,8 @@ func TestMapper(t *testing.T) {
 		}
 
 		mapTileFunc := mapper.GetMapTileFunc(tags)
-		assert.Equal(t, model.Tile(120), mapTileFunc(nil).ByLayer[1])
-		assert.Equal(t, model.Tile(128), mapTileFunc(&model.Position{Top: 0, Bottom: 0, Left: 0, Right: 0}).ByLayer[1])
-		assert.Equal(t, model.Tile(113), mapTileFunc(&model.Position{Top: 0, Bottom: 1, Left: 0, Right: 1}).ByLayer[1])
+		assert.Equal(t, model.Tile(120), mapTileFunc(model.Position{Top: 1, Left: 1, Right: 1, Bottom: 1}).ByLayer[1])
+		assert.Equal(t, model.Tile(128), mapTileFunc(model.Position{Top: 0, Bottom: 0, Left: 0, Right: 0}).ByLayer[1])
+		assert.Equal(t, model.Tile(113), mapTileFunc(model.Position{Top: 0, Bottom: 1, Left: 0, Right: 1}).ByLayer[1])
 	})
 }

@@ -14,10 +14,9 @@ type Mapper struct {
 }
 
 // MapTileFunc is a function that maps a position to a MapTile
-type MapTileFunc func(pos *model.Position) MapTile
+type MapTileFunc func(pos model.Position) MapTile
 type MapTile struct {
 	ByLayer map[int]model.Tile
-	dynamic bool
 }
 
 func New() *Mapper {
@@ -30,14 +29,17 @@ func New() *Mapper {
 // GetMapTileFunc returns a function that returns the mapTile mapped to the tags
 // The interest of using this function is to cache non-dynamic tile (will always return the same tile for the same tags)
 func (m *Mapper) GetMapTileFunc(tags osm.Tags) MapTileFunc {
-	mapTile := m.mapToTiles(tags, nil)
-	if mapTile.dynamic {
-		return func(pos *model.Position) MapTile {
-			return m.mapToTiles(tags, pos)
-		}
-	}
-	return func(pos *model.Position) MapTile {
-		return mapTile
+	// mapTile := m.mapToTiles(tags, nil)
+	// if mapTile.dynamic {
+	// 	return func(pos *model.Position) MapTile {
+	// 		return m.mapToTiles(tags, pos)
+	// 	}
+	// }
+	// return func(pos *model.Position) MapTile {
+	// 	return mapTile
+	// }
+	return func(pos model.Position) MapTile {
+		return m.mapToTiles(tags, pos)
 	}
 }
 
@@ -55,15 +57,10 @@ func (m *Mapper) Layers() int {
 	return m.layers
 }
 
-func (m *Mapper) IsTileDefault(mapTile MapTile) bool {
-	return len(mapTile.ByLayer) == 0 || (len(mapTile.ByLayer) == 1 && mapTile.ByLayer[0] == m.defaultTile)
-}
-
-func (m *Mapper) mapToTiles(tags osm.Tags, pos *model.Position) MapTile {
+func (m *Mapper) mapToTiles(tags osm.Tags, pos model.Position) MapTile {
 	// TODO: handle pos
 	byLayer := make(map[int]model.Tile)
 	byLayer[0] = m.defaultTile
-	dynamic := false
 	for _, tag := range tags {
 		// TODO: use atlas-index instead of hard-coded switch
 		// Get the tile ID from tiled editor, +1
@@ -74,14 +71,12 @@ func (m *Mapper) mapToTiles(tags osm.Tags, pos *model.Position) MapTile {
 			byLayer[1] = 847
 		case "building":
 			byLayer[1] = 417
-			dynamic = true
 			switch tag.Value {
 			case "apartments":
 			case "detached", "house":
 			case "hotel", "residential":
 			case "religious", "cathedral", "chapel", "church":
 				switch {
-				case pos == nil:
 				case pos.Bottom == 0 && pos.Top >= 3:
 					byLayer[1] = 489
 				case pos.Bottom == 1 && pos.Top >= 2:
@@ -109,9 +104,7 @@ func (m *Mapper) mapToTiles(tags osm.Tags, pos *model.Position) MapTile {
 			// apartments
 		case "highway":
 			byLayer[1] = 120
-			dynamic = true
 			switch {
-			case pos == nil:
 			case pos.IsStandalone():
 				byLayer[1] = 128
 			case pos.IsCornerTopLeft():
@@ -168,7 +161,6 @@ func (m *Mapper) mapToTiles(tags osm.Tags, pos *model.Position) MapTile {
 				case r >= 95 && r < 100:
 					byLayer[1] = 44
 				}
-				dynamic = true
 			case "heath":
 				byLayer[0] = 6
 			case "mash":
@@ -198,7 +190,6 @@ func (m *Mapper) mapToTiles(tags osm.Tags, pos *model.Position) MapTile {
 				case r >= 95 && r < 100:
 					byLayer[1] = 44
 				}
-				dynamic = true
 			case "industrial", "residential", "construction":
 				byLayer[0] = 8
 			case "cemetery":
@@ -208,9 +199,9 @@ func (m *Mapper) mapToTiles(tags osm.Tags, pos *model.Position) MapTile {
 			}
 		}
 	}
-	if pos != nil && pos.Z > model.Altitude(1400) {
+	if pos.Z > model.Altitude(1400) {
 		byLayer[0] = 1378
 	}
 
-	return MapTile{ByLayer: byLayer, dynamic: dynamic}
+	return MapTile{ByLayer: byLayer}
 }
