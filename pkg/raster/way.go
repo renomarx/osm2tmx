@@ -1,6 +1,9 @@
 package raster
 
 import (
+	"math"
+	"strconv"
+
 	"github.com/paulmach/osm"
 	"github.com/renomarx/osm2tmx/pkg/bresenham"
 	"github.com/renomarx/osm2tmx/pkg/mapper"
@@ -10,6 +13,8 @@ import (
 func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, mapTileFunc mapper.MapTileFunc) {
 	var lastPoint *model.Point
 	line := model.NewLine()
+	width, lanes := r.getWayWidthAndLanes(way)
+	borderWidth := int(math.Ceil(float64(width*lanes) / float64(r.downscale)))
 	for _, nd := range way.Nodes {
 		nodePoint, exists := r.pointsByNodeID[int64(nd.ID)]
 		if !exists {
@@ -20,6 +25,12 @@ func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, mapTileFunc mapper.MapT
 			points := bresenham.Bresenham(lastPoint.X, lastPoint.Y, nodePoint.X, nodePoint.Y, true)
 			for _, point := range points {
 				line.AddPoint(point)
+				for i := 1; i < borderWidth; i++ {
+					line.AddPoint(model.Point{X: point.X, Y: point.Y + i})
+					line.AddPoint(model.Point{X: point.X, Y: point.Y - i})
+					line.AddPoint(model.Point{X: point.X + i, Y: point.Y})
+					line.AddPoint(model.Point{X: point.X - i, Y: point.Y})
+				}
 			}
 		}
 		lastPoint = &nodePoint
@@ -36,6 +47,37 @@ func (r *Raster) drawWayLine(m *model.Map, way *osm.Way, mapTileFunc mapper.MapT
 			m.Layers[z].SetTile(point.X, point.Y, tile)
 		}
 	}
+}
+
+func (r *Raster) getWayWidthAndLanes(way *osm.Way) (int, int) {
+	width := 1
+	lanes := 1
+	for _, tag := range way.Tags {
+		switch tag.Key {
+		case "highway":
+			switch tag.Value {
+			case "motorway", "trunk", "primary":
+				width = 3
+			case "secondary":
+				width = 2
+			}
+		case "width":
+			// only width in meters are supported for now
+			parsedWidth, err := strconv.Atoi(tag.Value)
+			if err != nil {
+				continue
+			}
+			width = parsedWidth
+		case "lanes":
+			parsedLanes, err := strconv.Atoi(tag.Value)
+			if err != nil {
+				continue
+			}
+			lanes = parsedLanes
+		}
+	}
+
+	return width, lanes
 }
 
 func (r *Raster) isPolygon(way *osm.Way) bool {

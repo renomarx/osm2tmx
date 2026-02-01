@@ -65,6 +65,12 @@ func (l *Layer) GetCell(x, y int) Cell {
 }
 
 func (l *Layer) SetTile(x, y int, tile Tile) {
+	if y < 0 || y >= len(l.m) {
+		return
+	}
+	if x < 0 || x >= len(l.m[y]) {
+		return
+	}
 	l.m[y][x] = Cell{
 		X:    x,
 		Y:    y,

@@ -99,7 +99,6 @@ tags:
 
 ## TODO
 
-- Trace "primary" roads with 5 meters diameter
 - Trace borders & corners in a second step (to draw the border of snow fields, for example)
   - Optimisation: positionInPolygon not needed, totally replaced by this second step ?
 - Conf & handle the mapping.yaml file
