@@ -74,6 +74,7 @@ To get your SRTM files, we can go for instance visit: https://portal.opentopogra
 Example:
 
 ```yaml
+# TODO: replace with real example
 tileset:
   source: "tileset/basechip_pipo.png"
   tile_width: 16
@@ -83,18 +84,18 @@ layers: 3
 
 tags:
   default:
-    layer: 0
-    tile: 2
+    0:
+      tile: 2
   building:
-    layer: 1
-    tile: 38
-    # values:
-    #   roof:
-    #     layer: 2
-    #     tile: 21
+    1:
+      tile: 38
+      values:
+        roof:
+          2:
+            tile: 21
   highway:
-    layer: 1
-    tile: 42
+    1:
+      tile: 42
 ```
 
 ## TODO
