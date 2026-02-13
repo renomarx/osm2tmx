@@ -1,11 +1,10 @@
 package mapper
 
 type Conf struct {
-	Tileset     Tileset                `yaml:"tileset"`
-	Layers      int                    `yaml:"layers"`
-	Default     TileValue              `yaml:"default"`
-	Tags        map[string]TagsByLayer `yaml:"tags"`
-	CustomTiles map[int]CustomTile     `yaml:"custom_tiles,omitempty"`
+	Tileset     Tileset            `yaml:"tileset"`
+	Default     TileValue          `yaml:"default"`
+	Layers      TagsByLayer        `yaml:"layers"`
+	CustomTiles map[int]CustomTile `yaml:"custom_tiles,omitempty"`
 }
 
 type Tileset struct {
@@ -14,14 +13,12 @@ type Tileset struct {
 	TileHeight int    `yaml:"tile_height"`
 }
 
-type TagsByLayer map[int]Tag
+type TagsByLayer map[int]map[string]Tag
 
 type Tag struct {
 	TileValue `yaml:",inline"`
-	Values    map[string]TilesByLayer `yaml:"values,omitempty"`
+	Values    map[string]TileValue `yaml:"values,omitempty"`
 }
-
-type TilesByLayer map[int]TileValue
 
 type TileValue struct {
 	Tile     int           `yaml:"tile,omitempty"`

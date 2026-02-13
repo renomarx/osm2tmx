@@ -20,31 +20,7 @@ func TestMapper(t *testing.T) {
 	err = yaml.Unmarshal(yamlFile, &conf)
 	assert.NoError(t, err)
 
-	expectedConf := Conf{
-		Tileset: Tileset{
-			Source:     "tileset/basechip_pipo.png",
-			TileWidth:  16,
-			TileHeight: 16,
-		},
-		Layers: 2,
-		Default: TileValue{
-			Tile: 2,
-			Altitude: &Altitude{
-				Min:  1400,
-				Tile: 1378,
-			},
-		},
-		Tags: map[string]TagsByLayer{
-			"aerialway": {
-				1: Tag{
-					TileValue: TileValue{
-						Tile: 647,
-					},
-				},
-			},
-		},
-		// TODO: other tags
-	}
+	expectedConf := confTest
 	assert.Equal(t, expectedConf, conf)
 
 	t.Run("correctly map single tag", func(t *testing.T) {

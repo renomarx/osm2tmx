@@ -11,134 +11,121 @@ default:
     min: 1400
     tile: 1378
 
-tags:
-  aerialway:
-    1:
-      tile: 647
-  aeroway:
-    1:
-      tile: 847
-  building:
-    1:
-      tile: 417
-      values:
-        religious:
-          1:
-            tile: 465
-        cathedral:
-          1:
-            tile: 465
-        chapel:
-          1:
-            tile: 465
-        church:
-          1:
-            tile: 465
-  highway:
-    1:
-      tile: 120
-  waterway:
-    0:
-      tile: 318
-  water:
-    0:
-      tile: 318
-  natural:
-    values:
-      water:
-        0:
+layers:
+  0:
+    tags:
+      waterway:
           tile: 318
-      wood:
-        0:
-          tile: 4
-        1:
-          random:
-            - min: 80
-              max: 85
-              tile: 41
-              altitude:
-                min: 1400
-                tile: 1351
-            - min: 85
-              max: 90
-              tile: 42
-              altitude:
-                min: 1400
-                tile: 1351
-            - min: 90
-              max: 95
-              tile: 43
-              altitude:
-                min: 1400
-                tile: 1351
-            - min: 95
-              max: 100
-              tile: 44
-              altitude:
-                min: 1400
-                tile: 1351
-      heath:
-        0:
-          tile: 6
-      mash:
-        0:
-          tile: 60
-      tree:
-        0:
-          tile: 41
-  surface:
-    0:
-      values:
-        sand:
-          tile: 5
-        asphalt:
-          tile: 8
-  landuse:
-    values:
-      forest:
-        0:
-          tile: 4
-        1:
-          random:
-            - min: 80
-              max: 85
-              tile: 41
-              altitude:
-                min: 1400
-                tile: 1351
-            - min: 85
-              max: 90
-              tile: 42
-              altitude:
-                min: 1400
-                tile: 1351
-            - min: 90
-              max: 95
-              tile: 43
-              altitude:
-                min: 1400
-                tile: 1351
-            - min: 95
-              max: 100
-              tile: 44
-              altitude:
-                min: 1400
-                tile: 1351
-      industrial:
-        0:
-          tile: 8
-      residential:
-        0:
-          tile: 8
-      construction:
-        0:
-          tile: 8
-      cemetery:
-        0:
-          tile: 251
-      meadow:
-        0:
-          tile: 1
+      water:
+          tile: 318
+      natural:
+        values:
+          water:
+            tile: 318
+          wood:
+            tile: 4
+          heath:
+            tile: 6
+          mash:
+            tile: 60
+      surface:
+          values:
+            sand:
+              tile: 5
+            asphalt:
+              tile: 8
+      landuse:
+        values:
+          forest:
+            tile: 4
+          industrial:
+            tile: 8
+          residential:
+            tile: 8
+          construction:
+            tile: 8
+          cemetery:
+            tile: 251
+          meadow:
+            tile: 1
+
+  1:
+    tags:
+      aerialway:
+        tile: 647
+      aeroway:
+        tile: 847
+      building:
+        tile: 417
+        values:
+          religious:
+            tile: 465
+          cathedral:
+            tile: 465
+          chapel:
+            tile: 465
+          church:
+            tile: 465
+      highway:
+        tile: 120
+      natural:
+        values:
+          wood:
+            random:
+              - min: 80
+                max: 85
+                tile: 41
+                altitude:
+                  min: 1400
+                  tile: 1351
+              - min: 85
+                max: 90
+                tile: 42
+                altitude:
+                  min: 1400
+                  tile: 1351
+              - min: 90
+                max: 95
+                tile: 43
+                altitude:
+                  min: 1400
+                  tile: 1351
+              - min: 95
+                max: 100
+                tile: 44
+                altitude:
+                  min: 1400
+                  tile: 1351
+          tree:
+            tile: 41
+      landuse:
+        values:
+          forest:
+            random:
+              - min: 80
+                max: 85
+                tile: 41
+                altitude:
+                  min: 1400
+                  tile: 1351
+              - min: 85
+                max: 90
+                tile: 42
+                altitude:
+                  min: 1400
+                  tile: 1351
+              - min: 90
+                max: 95
+                tile: 43
+                altitude:
+                  min: 1400
+                  tile: 1351
+              - min: 95
+                max: 100
+                tile: 44
+                altitude:
+                  min: 1400
+                  tile: 1351
 
 custom_tiles:
   1378:
