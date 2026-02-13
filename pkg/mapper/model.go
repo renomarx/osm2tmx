@@ -13,7 +13,11 @@ type Tileset struct {
 	TileHeight int    `yaml:"tile_height"`
 }
 
-type TagsByLayer map[int]map[string]Tag
+type TagsByLayer map[int]LayerTags
+
+type LayerTags struct {
+	Tags map[string]Tag
+}
 
 type Tag struct {
 	TileValue `yaml:",inline"`

@@ -14,97 +14,107 @@ var confTest = Conf{
 		},
 	},
 	Layers: TagsByLayer{
-		0: map[string]Tag{
-			"waterway": Tag{
-				TileValue: TileValue{
-					Tile: 318,
-				},
-			},
-			"water": Tag{
-				TileValue: TileValue{
-					Tile: 318,
-				},
-			},
-			"natural": Tag{
-				Values: map[string]TileValue{
-					"water": TileValue{
+		0: LayerTags{
+			Tags: map[string]Tag{
+				"waterway": {
+					TileValue: TileValue{
 						Tile: 318,
 					},
 				},
-			},
-		},
-		1: map[string]Tag{
-			"aerialway": Tag{
-				TileValue: TileValue{
-					Tile: 647,
-				},
-			},
-		},
-	},
-	Tags: map[string]TagsByLayer{
-		"aerialway": {
-			1: Tag{
-				TileValue: TileValue{
-					Tile: 647,
-				},
-			},
-		},
-		"aeroway": {
-			1: Tag{
-				TileValue: TileValue{
-					Tile: 847,
-				},
-			},
-		},
-		"building": {
-			1: Tag{
-				TileValue: TileValue{
-					Tile: 417,
-				},
-				Values: map[string]TilesByLayer{
-					"religious": {
-						1: TileValue{
-							Tile: 465,
-						},
-					},
-					"cathedral": {
-						1: TileValue{
-							Tile: 465,
-						},
-					},
-					"chapel": {
-						1: TileValue{
-							Tile: 465,
-						},
-					},
-					"church": {
-						1: TileValue{
-							Tile: 465,
-						},
+				"water": {
+					TileValue: TileValue{
+						Tile: 318,
 					},
 				},
-			},
-		},
-		"highway": {
-			1: Tag{
-				TileValue: TileValue{
-					Tile: 120,
-				},
-			},
-		},
-		"natural": {
-			1: Tag{
-				Values: map[string]TilesByLayer{
-					"water": {
-						0: TileValue{
+				"natural": {
+					Values: map[string]TileValue{
+						"water": {
 							Tile: 318,
 						},
-					},
-					"wood": {
-						0: TileValue{
+						"wood": {
 							Tile: 4,
 						},
-						1: TileValue{
+						"heath": {
+							Tile: 6,
+						},
+						"mash": {
+							Tile: 60,
+						},
+					},
+				},
+				"surface": {
+					Values: map[string]TileValue{
+						"sand": {
+							Tile: 5,
+						},
+						"asphalt": {
+							Tile: 8,
+						},
+					},
+				},
+				"landuse": {
+					Values: map[string]TileValue{
+						"forest": {
+							Tile: 4,
+						},
+						"industrial": {
+							Tile: 8,
+						},
+						"residential": {
+							Tile: 8,
+						},
+						"construction": {
+							Tile: 8,
+						},
+						"cemetery": {
+							Tile: 251,
+						},
+						"meadow": {
+							Tile: 1,
+						},
+					},
+				},
+			},
+		},
+		1: LayerTags{
+			Tags: map[string]Tag{
+				"aerialway": {
+					TileValue: TileValue{
+						Tile: 647,
+					},
+				},
+				"aeroway": {
+					TileValue: TileValue{
+						Tile: 847,
+					},
+				},
+				"building": {
+					TileValue: TileValue{
+						Tile: 417,
+					},
+					Values: map[string]TileValue{
+						"religious": {
+							Tile: 465,
+						},
+						"cathedral": {
+							Tile: 465,
+						},
+						"chapel": {
+							Tile: 465,
+						},
+						"church": {
+							Tile: 465,
+						},
+					},
+				},
+				"highway": {
+					TileValue: TileValue{
+						Tile: 120,
+					},
+				},
+				"natural": {
+					Values: map[string]TileValue{
+						"wood": {
 							Random: []RandomRange{
 								{
 									Min:  80,
@@ -144,49 +154,14 @@ var confTest = Conf{
 								},
 							},
 						},
-					},
-					"heath": {
-						0: TileValue{
-							Tile: 6,
-						},
-					},
-					"mash": {
-						0: TileValue{
-							Tile: 60,
-						},
-					},
-					"tree": {
-						1: TileValue{
+						"tree": {
 							Tile: 41,
 						},
 					},
 				},
-			},
-		},
-		"surface": {
-			1: Tag{
-				Values: map[string]TilesByLayer{
-					"sand": {
-						0: TileValue{
-							Tile: 5,
-						},
-					},
-					"asphalt": {
-						0: TileValue{
-							Tile: 8,
-						},
-					},
-				},
-			},
-		},
-		"landuse": {
-			1: Tag{
-				Values: map[string]TilesByLayer{
-					"forest": {
-						0: TileValue{
-							Tile: 4,
-						},
-						1: TileValue{
+				"landuse": Tag{
+					Values: map[string]TileValue{
+						"forest": {
 							Random: []RandomRange{
 								{
 									Min:  80,
@@ -225,31 +200,6 @@ var confTest = Conf{
 									},
 								},
 							},
-						},
-					},
-					"industrial": {
-						0: TileValue{
-							Tile: 8,
-						},
-					},
-					"residential": {
-						0: TileValue{
-							Tile: 8,
-						},
-					},
-					"construction": {
-						0: TileValue{
-							Tile: 8,
-						},
-					},
-					"cemetery": {
-						0: TileValue{
-							Tile: 8,
-						},
-					},
-					"meadow": {
-						0: TileValue{
-							Tile: 8,
 						},
 					},
 				},
