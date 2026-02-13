@@ -137,7 +137,7 @@ func main() {
 
 	log.Printf("Number of points out of bounds: %d", rstMap.Meta.NodesOutOfBounds)
 
-	writer := tmx.NewWriter("tileset/basechip_pipo.tsx", 16, 16) // TODO: get from conf
+	writer := tmx.NewWriter(mapping.Tileset.Source, mapping.Tileset.TileWidth, mapping.Tileset.TileHeight)
 	if err := writer.Write(rstMap, tmxFilename); err != nil {
 		log.Fatal(err)
 	}

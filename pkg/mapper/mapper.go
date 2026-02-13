@@ -60,6 +60,7 @@ func (m *Mapper) mapTileValue(tv TileValue, pos model.Position) model.Tile {
 			}
 		}
 	}
+
 	return tv.Tile
 }
 
@@ -77,7 +78,10 @@ func (m *Mapper) mapToTiles(tags osm.Tags, pos model.Position) MapTile {
 			if !exists {
 				continue
 			}
-			byLayer[layer] = m.mapTileValue(tag.TileValue, pos)
+			tile := m.mapTileValue(tag.TileValue, pos)
+			if tile != 0 {
+				byLayer[layer] = tile
+			}
 			if len(tag.Values) == 0 {
 				continue
 			}
@@ -85,11 +89,37 @@ func (m *Mapper) mapToTiles(tags osm.Tags, pos model.Position) MapTile {
 			if !exists {
 				continue
 			}
-			byLayer[layer] = m.mapTileValue(tagValue, pos)
+			tile = m.mapTileValue(tagValue, pos)
+			if tile != 0 {
+				byLayer[layer] = tile
+			}
 		}
 	}
 
 	return MapTile{ByLayer: byLayer}
+}
+
+func (m *Mapper) getTagTile(tags osm.Tags, pos model.Position, tagsMapping LayerTags, layer int) *model.Tile {
+	for _, osmTag := range tags {
+		tag, exists := tagsMapping.Tags[osmTag.Key]
+		if !exists {
+			continue
+		}
+		tile := m.mapTileValue(tag.TileValue, pos)
+		if len(tag.Values) == 0 {
+			continue
+		}
+		tagValue, exists := tag.Values[osmTag.Value]
+		if !exists {
+			continue
+		}
+		tile = m.mapTileValue(tagValue, pos)
+		if tile == 0 {
+			continue
+		}
+		return &tile
+	}
+	return nil
 }
 
 func (m *Mapper) GetCustomTile(pos model.Position) MapTile {

@@ -30,7 +30,7 @@ In addition, you can add SRTM files to the program, to be able to handle differe
 - With downscale 10, srtm file and drawing
 
 ```bash
-./osm2tmx -downscale 10 -srtm-tif data/N46E006.tif -draw -mapping example/example01/mapping.yaml -out example/example01/les_gets.osm.tmx example/example01/les_gets.osm.pbf
+./osm2tmx -downscale 10 -srtm-tif example/example01/N46E006.tif -draw -mapping example/example01/mapping.yaml -out example/example01/les_gets.osm.tmx example/example01/les_gets.osm.pbf
 ```
 
 ### Get OSM files
@@ -71,37 +71,14 @@ To get your SRTM files, we can go for instance visit: https://portal.opentopogra
 
 - List of all possible tags here: https://wiki.openstreetmap.org/wiki/Map_features
 
-Example:
+Examples:
 
-```yaml
-# TODO: replace with real example
-tileset:
-  source: "tileset/basechip_pipo.png"
-  tile_width: 16
-  tile_height: 16
-
-layers: 3
-
-tags:
-  default:
-    0:
-      tile: 2
-  building:
-    1:
-      tile: 38
-      values:
-        roof:
-          2:
-            tile: 21
-  highway:
-    1:
-      tile: 42
-```
+- [example01](example/example01/mapping.yaml)
 
 ## TODO
 
-- Conf & handle the mapping.yaml file
 - More examples with other tilesets
+- Mapping validation + better mapper tests
 - Generate a tileset like OSM stylesheets to have a pretty map in tmx :)
 - Optimisation
   - See simd/archisimd in go1.26

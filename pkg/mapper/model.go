@@ -2,10 +2,16 @@ package mapper
 
 import "github.com/renomarx/osm2tmx/pkg/model"
 
+// Conf represents the global entity of the mapping file
 type Conf struct {
-	Tileset     Tileset                   `yaml:"tileset"`
-	Default     TileValue                 `yaml:"default"`
-	Layers      TagsByLayer               `yaml:"layers"`
+	// Informations of the tileset used
+	Tileset Tileset `yaml:"tileset"`
+	// Informations about the default tile to use
+	Default TileValue `yaml:"default"`
+	// Mapping, by layer, of tags & tags values => tiles
+	Layers TagsByLayer `yaml:"layers"`
+	// Custom tiles replacement, generally depending on
+	// the position of the point on a line or inside a polygon
 	CustomTiles map[model.Tile]CustomTile `yaml:"custom_tiles,omitempty"`
 }
 
@@ -41,6 +47,8 @@ type RandomRange struct {
 	Altitude *Altitude  `yaml:"altitude,omitempty"`
 }
 
+// Altitude allows to set a different tile for points upper than the altitude.min
+// not considered if no srtm file was given to the program
 type Altitude struct {
 	Min  model.Altitude `yaml:"min"`
 	Tile model.Tile     `yaml:"tile,omitempty"`
