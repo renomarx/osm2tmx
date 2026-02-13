@@ -70,6 +70,7 @@ To get your SRTM files, we can go for instance visit: https://portal.opentopogra
 ### Mapping file format: YAML
 
 - List of all possible tags here: https://wiki.openstreetmap.org/wiki/Map_features
+- See the [go model file](pkg/mapper/model.go) to have a full description of supported features
 
 Examples:
 
