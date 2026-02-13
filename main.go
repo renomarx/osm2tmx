@@ -8,19 +8,21 @@ import (
 	"runtime"
 
 	"github.com/renomarx/osm2tmx/pkg/draw"
+	"github.com/renomarx/osm2tmx/pkg/mapper"
 	"github.com/renomarx/osm2tmx/pkg/model"
 	"github.com/renomarx/osm2tmx/pkg/raster"
 	"github.com/renomarx/osm2tmx/pkg/tmx"
 	"github.com/renomarx/osm2tmx/pkg/topography/srtm"
+	"github.com/stretchr/testify/assert/yaml"
 )
 
 func printUsageAndExit() {
 	var Usage = fmt.Sprintf(`
-Usage: %s -conf <my_mapping_file.yaml> [-out <my.osm.tmx>] <my.osm.pbf>
+Usage: %s -mapping <my_mapping_file.yaml> [-out <my.osm.tmx>] <my.osm.pbf>
 
 Options:
 -help: display usage and exit
--conf: configuration file for tileset
+-mapping: mapping file for tileset, mandatory
 -out: output pathname, default to my.osm.tmx
 -downscale: downscale factor (int): for example, -downscale 10 will reduce the map to 10 times its original size
 -offset-x: offset x (after downscale if any)
@@ -39,6 +41,7 @@ Options:
 func main() {
 	var helpFlag = flag.Bool("help", false, "display help")
 	var outputFlag = flag.String("out", "", "output pathname, default to my.osm.tmx")
+	var mappingFlag = flag.String("mapping", "", "mapping file for tileset, mandatory")
 	// TODO: add mapping flag
 	var downscaleFlag = flag.Int("downscale", 1, "downscale factor (int): for example, -downscale 10 will reduce the map to 10 times its original size")
 	var offsetXFlag = flag.Int("offset-x", 0, "offset x (after downscale if any)")
@@ -60,6 +63,19 @@ func main() {
 	args := flag.Args()
 	if len(args) != 1 {
 		printUsageAndExit()
+	}
+
+	if mappingFlag == nil || *mappingFlag == "" {
+		log.Printf("ERROR: no mapping file in parameter. Please specify the -mapping option.")
+		printUsageAndExit()
+	}
+	mappingFile, err := os.ReadFile(*mappingFlag)
+	if err != nil {
+		log.Fatal(err)
+	}
+	mapping := mapper.Conf{}
+	if err := yaml.Unmarshal(mappingFile, &mapping); err != nil {
+		log.Fatal(err)
 	}
 
 	workers := 1
@@ -84,7 +100,7 @@ func main() {
 		LimitX:  *limitXFlag,
 		LimitY:  *limitYFlag,
 	}
-	rst := raster.New(*downscaleFlag, bounds).WithWorkers(workers)
+	rst := raster.New(*downscaleFlag, bounds, mapping).WithWorkers(workers)
 
 	topography := model.Topography{}
 	srtmParser := srtm.NewTifParser(&topography)

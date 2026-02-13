@@ -1,16 +1,27 @@
 package raster
 
 import (
+	"os"
 	"testing"
 
 	"github.com/paulmach/osm"
+	"github.com/renomarx/osm2tmx/pkg/mapper"
 	"github.com/renomarx/osm2tmx/pkg/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/assert/yaml"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDrawWayLine(t *testing.T) {
+	yamlFile, err := os.ReadFile("test/mapping.yaml")
+	require.NoError(t, err)
+
+	mapping := mapper.Conf{}
+	err = yaml.Unmarshal(yamlFile, &mapping)
+	assert.NoError(t, err)
+
 	t.Run("normal", func(t *testing.T) {
-		r := New(1, Bounds{})
+		r := New(1, Bounds{}, mapping)
 		r.m.Init(3, 12, 6, func(x, y int) model.Tile { return 0 })
 
 		way := osm.Way{
@@ -70,7 +81,7 @@ func TestDrawWayLine(t *testing.T) {
 	})
 
 	t.Run("highway_primary", func(t *testing.T) {
-		r := New(1, Bounds{})
+		r := New(1, Bounds{}, mapping)
 		r.m.Init(3, 12, 6, func(x, y int) model.Tile { return 0 })
 
 		way := osm.Way{
@@ -130,7 +141,7 @@ func TestDrawWayLine(t *testing.T) {
 	})
 
 	t.Run("highway_secondary_2_lanes", func(t *testing.T) {
-		r := New(1, Bounds{})
+		r := New(1, Bounds{}, mapping)
 		r.m.Init(3, 12, 6, func(x, y int) model.Tile { return 0 })
 
 		way := osm.Way{
@@ -191,7 +202,14 @@ func TestDrawWayLine(t *testing.T) {
 }
 
 func TestDrawWayArea(t *testing.T) {
-	r := New(1, Bounds{})
+	yamlFile, err := os.ReadFile("test/mapping.yaml")
+	require.NoError(t, err)
+
+	mapping := mapper.Conf{}
+	err = yaml.Unmarshal(yamlFile, &mapping)
+	assert.NoError(t, err)
+
+	r := New(1, Bounds{}, mapping)
 	r.m.Init(3, 12, 6, func(x, y int) model.Tile { return 0 })
 
 	way := osm.Way{

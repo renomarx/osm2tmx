@@ -7,9 +7,9 @@ In addition, you can add SRTM files to the program, to be able to handle differe
 ## Usage
 
 ```bash
-./osm2tmx -conf <conf.yaml> [-out <my.osm.tmx>] [-options...] <my.osm.pbf>
+./osm2tmx -mapping <mapping.yaml> [-out <my.osm.tmx>] [-options...] <my.osm.pbf>
 
-- conf: configuration file for tileset, see below
+- mapping: mapping file for tileset, see below
 - out: default to my.osm.tmx
 ```
 
@@ -18,19 +18,19 @@ In addition, you can add SRTM files to the program, to be able to handle differe
 - Simple
 
 ```bash
-./osm2tmx -out example/example01/centre_les_gets.osm.tmx data/centre_les_gets.osm.pbf
+./osm2tmx -mapping example/example01/mapping.yaml -out example/example01/centre_les_gets.osm.tmx example/example01/centre_les_gets.osm.pbf
 ```
 
 - With downscale 4 and drawing
 
 ```bash
-./osm2tmx -downscale 4 -draw -out example/example01/centre_les_gets.osm.tmx data/centre_les_gets.osm.pbf
+./osm2tmx -downscale 4 -draw -mapping example/example01/mapping.yaml -out example/example01/centre_les_gets.osm.tmx example/example01/centre_les_gets.osm.pbf
 ```
 
-- With downscale 4, srtm file and drawing
+- With downscale 10, srtm file and drawing
 
 ```bash
-./osm2tmx -downscale 10 -srtm-tif data/N46E006.tif -draw -out example/example01/les_gets.osm.tmx data/les_gets.osm.pbf
+./osm2tmx -downscale 10 -srtm-tif data/N46E006.tif -draw -mapping example/example01/mapping.yaml -out example/example01/les_gets.osm.tmx example/example01/les_gets.osm.pbf
 ```
 
 ### Get OSM files
@@ -67,7 +67,7 @@ And `S56E158.tif` handles (lat,lon) from (-56.0,1580.0) to (-56.9999999,1580.999
 
 To get your SRTM files, we can go for instance visit: https://portal.opentopography.org/datasetMetadata?otCollectionID=OT.042013.4326.1 (you'll need a free account to download the data).
 
-### Conf file format: YAML
+### Mapping file format: YAML
 
 - List of all possible tags here: https://wiki.openstreetmap.org/wiki/Map_features
 

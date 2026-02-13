@@ -1,5 +1,7 @@
 package mapper
 
+import "github.com/renomarx/osm2tmx/pkg/model"
+
 var confTest = Conf{
 	Tileset: Tileset{
 		Source:     "tileset/basechip_pipo.png",
@@ -206,7 +208,7 @@ var confTest = Conf{
 			},
 		},
 	},
-	CustomTiles: map[int]CustomTile{
+	CustomTiles: map[model.Tile]CustomTile{
 		1378: {
 			Position: &Position{
 				Standalone: &PositionTile{

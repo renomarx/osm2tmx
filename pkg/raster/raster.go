@@ -44,9 +44,9 @@ type topography struct {
 	precision int
 }
 
-func New(downscale int, bounds Bounds) *Raster {
+func New(downscale int, bounds Bounds, mapping mapper.Conf) *Raster {
 	m := model.Map{}
-	mapper := mapper.New(&m)
+	mapper := mapper.New(&m, mapping)
 	return &Raster{
 		m:                   &m,
 		pointsByNodeID:      make(map[int64]model.Point),
@@ -281,7 +281,7 @@ func (r *Raster) getDefaultTile(x, y int) model.Tile {
 		Z: height,
 	}
 
-	return r.mapper.GetDefaultTile(&pos)
+	return r.mapper.GetDefaultTile(pos)
 }
 
 func (r *Raster) getAltitude(x, y int) model.Altitude {

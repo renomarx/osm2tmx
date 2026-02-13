@@ -2,19 +2,30 @@ package raster
 
 import (
 	"math"
+	"os"
 	"testing"
 	"time"
 
 	"github.com/paulmach/osm"
+	"github.com/renomarx/osm2tmx/pkg/mapper"
 	"github.com/renomarx/osm2tmx/pkg/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/assert/yaml"
+	"github.com/stretchr/testify/require"
 )
 
 func TestRaster(t *testing.T) {
+	yamlFile, err := os.ReadFile("test/mapping.yaml")
+	require.NoError(t, err)
+
+	mapping := mapper.Conf{}
+	err = yaml.Unmarshal(yamlFile, &mapping)
+	assert.NoError(t, err)
+
 	osmfilename := "test.osm.pbf"
 
 	t.Run("original_size", func(t *testing.T) {
-		raster := New(1, Bounds{})
+		raster := New(1, Bounds{}, mapping)
 
 		begin := time.Now()
 		result, err := raster.Parse(osmfilename)
@@ -61,7 +72,7 @@ func TestRaster(t *testing.T) {
 	})
 
 	t.Run("downscale_4", func(t *testing.T) {
-		raster := New(4, Bounds{})
+		raster := New(4, Bounds{}, mapping)
 
 		result, err := raster.Parse(osmfilename)
 		assert.NoError(t, err)
@@ -103,7 +114,7 @@ func TestRaster(t *testing.T) {
 			OffsetY: 40,
 			LimitX:  100,
 			LimitY:  95,
-		})
+		}, mapping)
 
 		result, err := raster.Parse(osmfilename)
 		assert.NoError(t, err)

@@ -1,0 +1,215 @@
+tileset:
+  source: "tileset/basechip_pipo.png"
+  tile_width: 16
+  tile_height: 16
+
+default:
+  tile: 2
+  altitude:
+    min: 1400
+    tile: 1378
+
+layers:
+  0:
+    tags:
+      waterway:
+          tile: 318
+      water:
+          tile: 318
+      natural:
+        values:
+          water:
+            tile: 318
+          wood:
+            tile: 4
+          heath:
+            tile: 6
+          mash:
+            tile: 60
+      surface:
+          values:
+            sand:
+              tile: 5
+            asphalt:
+              tile: 8
+      landuse:
+        values:
+          forest:
+            tile: 4
+          industrial:
+            tile: 8
+          residential:
+            tile: 8
+          construction:
+            tile: 8
+          cemetery:
+            tile: 251
+          meadow:
+            tile: 1
+
+  1:
+    tags:
+      aerialway:
+        tile: 647
+      aeroway:
+        tile: 847
+      building:
+        tile: 417
+        values:
+          religious:
+            tile: 465
+          cathedral:
+            tile: 465
+          chapel:
+            tile: 465
+          church:
+            tile: 465
+      highway:
+        tile: 120
+      natural:
+        values:
+          wood:
+            random:
+              - min: 80
+                max: 85
+                tile: 41
+                altitude:
+                  min: 1400
+                  tile: 1351
+              - min: 85
+                max: 90
+                tile: 42
+                altitude:
+                  min: 1400
+                  tile: 1351
+              - min: 90
+                max: 95
+                tile: 43
+                altitude:
+                  min: 1400
+                  tile: 1351
+              - min: 95
+                max: 100
+                tile: 44
+                altitude:
+                  min: 1400
+                  tile: 1351
+          tree:
+            tile: 41
+      landuse:
+        values:
+          forest:
+            random:
+              - min: 80
+                max: 85
+                tile: 41
+                altitude:
+                  min: 1400
+                  tile: 1351
+              - min: 85
+                max: 90
+                tile: 42
+                altitude:
+                  min: 1400
+                  tile: 1351
+              - min: 90
+                max: 95
+                tile: 43
+                altitude:
+                  min: 1400
+                  tile: 1351
+              - min: 95
+                max: 100
+                tile: 44
+                altitude:
+                  min: 1400
+                  tile: 1351
+
+custom_tiles:
+  1378:
+    position:
+      standalone:
+        tile: 1376
+      corner_top_left:
+        tile: 1369
+      corner_top_right:
+        tile: 1371
+      corner_bottom_left:
+        tile: 1385
+      corner_bottom_right:
+        tile: 1387
+      border_top:
+        tile: 1370
+      border_bottom:
+        tile: 1386
+      border_left:
+        tile: 1377
+      border_right:
+        tile: 1379
+      border_left_and_right:
+        tile: 1399
+      border_top_and_bottom:
+        tile: 1405
+      end_way_right:
+        tile: 1406
+      end_way_left:
+        tile: 1404
+      end_way_bottom:
+        tile: 1407
+      end_way_top:
+        tile: 1391
+  120:
+    position:
+      standalone:
+        tile: 128
+      corner_top_left:
+        tile: 113
+      corner_top_right:
+        tile: 115
+      corner_bottom_left:
+        tile: 129
+      corner_bottom_right:
+        tile: 131
+      border_top:
+        tile: 114
+      border_bottom:
+        tile: 130
+      border_left:
+        tile: 121
+      border_right:
+        tile: 123
+      border_left_and_right:
+        tile: 144
+      border_top_and_bottom:
+        tile: 149
+      end_way_right:
+        tile: 150
+      end_way_left:
+        tile: 148
+      end_way_bottom:
+        tile: 152
+      end_way_top:
+        tile: 135
+  465:
+    position:
+      standalone:
+        tile: 431
+    walls:
+      - height: 4
+        pos: 1
+        tile: 489
+      - height: 4
+        pos: 2
+        tile: 481
+      - height: 4
+        pos: 3
+        tile: 473
+      - height: 3
+        pos: 1
+        tile: 419
+      - height: 3
+        pos: 2
+        tile: 419
+      - height: 2
+        pos: 1
+        tile: 419

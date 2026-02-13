@@ -8,10 +8,8 @@ import (
 )
 
 type Mapper struct {
-	// TODO add conf
-	m           *model.Map
-	defaultTile model.Tile
-	layers      int
+	m    *model.Map
+	conf Conf
 }
 
 // MapTileFunc is a function that maps a position to a MapTile
@@ -20,11 +18,10 @@ type MapTile struct {
 	ByLayer map[int]model.Tile
 }
 
-func New(m *model.Map) *Mapper {
+func New(m *model.Map, conf Conf) *Mapper {
 	return &Mapper{
-		m:           m,
-		defaultTile: 2,
-		layers:      2,
+		m:    m,
+		conf: conf,
 	}
 }
 
@@ -45,140 +42,51 @@ func (m *Mapper) GetMapTileFunc(tags osm.Tags) MapTileFunc {
 	}
 }
 
-func (m *Mapper) GetDefaultTile(pos *model.Position) model.Tile {
-	if pos == nil {
-		return m.defaultTile
+func (m *Mapper) GetDefaultTile(pos model.Position) model.Tile {
+	return m.mapTileValue(m.conf.Default, pos)
+}
+
+func (m *Mapper) mapTileValue(tv TileValue, pos model.Position) model.Tile {
+	if tv.Altitude != nil {
+		if pos.Z > tv.Altitude.Min {
+			return tv.Altitude.Tile
+		}
 	}
-	if pos.Z > model.Altitude(1400) {
-		return 1378
+	if len(tv.Random) > 0 {
+		r := rand.Intn(100)
+		for _, rr := range tv.Random {
+			if r >= rr.Min && r < rr.Max {
+				return rr.Tile
+			}
+		}
 	}
-	return m.defaultTile
+	return tv.Tile
 }
 
 func (m *Mapper) Layers() int {
-	return m.layers
+	return len(m.conf.Layers)
 }
 
 func (m *Mapper) mapToTiles(tags osm.Tags, pos model.Position) MapTile {
 	byLayer := make(map[int]model.Tile)
-	byLayer[0] = m.defaultTile
-	for _, tag := range tags {
-		// TODO: use atlas-index instead of hard-coded switch
-		// Get the tile ID from tiled editor, +1
-		switch tag.Key {
-		case "aerialway":
-			byLayer[1] = 647
-		case "aeroway":
-			byLayer[1] = 847
-		case "building":
-			byLayer[1] = 417
-			switch tag.Value {
-			case "apartments":
-			case "detached", "house":
-			case "hotel", "residential":
-			case "religious", "cathedral", "chapel", "church":
-				byLayer[1] = 465
-			case "commercial", "industrial", "kiosk", "office", "retail", "supermarket", "warehouse":
-			case "hospital":
-			case "museum":
-			case "school":
-			case "train_station":
-			case "university":
-			case "fire_station":
-			case "government", "public":
+	byLayer[0] = m.GetDefaultTile(pos)
+
+	for layer, tagsMapping := range m.conf.Layers {
+		for _, osmTag := range tags {
+			tag, exists := tagsMapping.Tags[osmTag.Key]
+			if !exists {
+				continue
 			}
-			// apartments
-		case "highway":
-			byLayer[1] = 120
-			switch tag.Value {
-			case "motorway", "trunk", "primary", "secondary", "tertiary", "road":
-			case "steps":
-			case "pedestrian", "footway":
-			case "service":
+			byLayer[layer] = m.mapTileValue(tag.TileValue, pos)
+			if len(tag.Values) == 0 {
+				continue
 			}
-		case "waterway", "water":
-			byLayer[0] = 318
-		case "natural":
-			switch tag.Value {
-			case "water":
-				byLayer[0] = 318
-			case "wood":
-				r := rand.Intn(100)
-				byLayer[0] = 4
-				switch {
-				case r >= 80 && r < 85:
-					byLayer[1] = 41
-					if pos.Z > model.Altitude(1400) {
-						byLayer[1] = 1351
-					}
-				case r >= 85 && r < 90:
-					byLayer[1] = 42
-					if pos.Z > model.Altitude(1400) {
-						byLayer[1] = 1351
-					}
-				case r >= 90 && r < 95:
-					byLayer[1] = 43
-					if pos.Z > model.Altitude(1400) {
-						byLayer[1] = 1351
-					}
-				case r >= 95 && r < 100:
-					byLayer[1] = 44
-					if pos.Z > model.Altitude(1400) {
-						byLayer[1] = 1351
-					}
-				}
-			case "heath":
-				byLayer[0] = 6
-			case "mash":
-				byLayer[0] = 60
-			case "tree":
-				byLayer[1] = 41
+			tagValue, exists := tag.Values[osmTag.Value]
+			if !exists {
+				continue
 			}
-		case "surface":
-			switch tag.Value {
-			case "sand":
-				byLayer[0] = 5
-			case "asphalt":
-				byLayer[0] = 8
-			}
-		case "landuse":
-			switch tag.Value {
-			case "forest":
-				r := rand.Intn(100)
-				byLayer[0] = 4
-				switch {
-				case r >= 80 && r < 85:
-					byLayer[1] = 41
-					if pos.Z > model.Altitude(1400) {
-						byLayer[1] = 1351
-					}
-				case r >= 85 && r < 90:
-					byLayer[1] = 42
-					if pos.Z > model.Altitude(1400) {
-						byLayer[1] = 1351
-					}
-				case r >= 90 && r < 95:
-					byLayer[1] = 43
-					if pos.Z > model.Altitude(1400) {
-						byLayer[1] = 1351
-					}
-				case r >= 95 && r < 100:
-					byLayer[1] = 44
-					if pos.Z > model.Altitude(1400) {
-						byLayer[1] = 1351
-					}
-				}
-			case "industrial", "residential", "construction":
-				byLayer[0] = 8
-			case "cemetery":
-				byLayer[0] = 251
-			case "meadow":
-				byLayer[0] = 1
-			}
+			byLayer[layer] = m.mapTileValue(tagValue, pos)
 		}
-	}
-	if pos.Z > model.Altitude(1400) {
-		byLayer[0] = 1378
 	}
 
 	return MapTile{ByLayer: byLayer}
@@ -188,89 +96,50 @@ func (m *Mapper) GetCustomTile(pos model.Position) MapTile {
 	byLayer := make(map[int]model.Tile)
 	for layer := range m.m.Layers {
 		tile := m.m.Layers[layer].GetCell(pos.X, pos.Y).Tile
-		switch tile {
-		case 1378:
-			switch {
-			case m.isStandalone(layer, pos, tile):
-				tile = 1376
-			case m.isCornerTopLeft(layer, pos, tile):
-				tile = 1369
-			case m.isCornerTopRight(layer, pos, tile):
-				tile = 1371
-			case m.isCornerBottomLeft(layer, pos, tile):
-				tile = 1385
-			case m.isCornerBottomRight(layer, pos, tile):
-				tile = 1387
-			case m.isBorderTop(layer, pos, tile):
-				tile = 1370
-			case m.isBorderBottom(layer, pos, tile):
-				tile = 1386
-			case m.isBorderLeft(layer, pos, tile):
-				tile = 1377
-			case m.isBorderRight(layer, pos, tile):
-				tile = 1379
-			case m.isBorderLeftAndRight(layer, pos, tile):
-				tile = 1399
-			case m.isBorderTopAndBottom(layer, pos, tile):
-				tile = 1405
-			case m.isEndWayRight(layer, pos, tile):
-				tile = 1406
-			case m.isEndWayLeft(layer, pos, tile):
-				tile = 1404
-			case m.isEndWayBottom(layer, pos, tile):
-				tile = 1407
-			case m.isEndWayTop(layer, pos, tile):
-				tile = 1391
-			}
-		case 465:
-			switch {
-			case m.isWall(4, 1, layer, pos, tile):
-				tile = 489
-			case m.isWall(4, 2, layer, pos, tile):
-				tile = 481
-			case m.isWall(4, 3, layer, pos, tile):
-				tile = 473
-			case m.isWall(3, 1, layer, pos, tile):
-				tile = 419
-			case m.isWall(3, 2, layer, pos, tile):
-				tile = 419
-			case m.isWall(2, 1, layer, pos, tile):
-				tile = 419
-			case m.isStandalone(layer, pos, tile):
-				tile = 431
-			}
-		case 120:
-			switch {
-			case m.isStandalone(layer, pos, tile):
-				tile = 128
-			case m.isCornerTopLeft(layer, pos, tile):
-				tile = 113
-			case m.isCornerTopRight(layer, pos, tile):
-				tile = 115
-			case m.isCornerBottomLeft(layer, pos, tile):
-				tile = 129
-			case m.isCornerBottomRight(layer, pos, tile):
-				tile = 131
-			case m.isBorderTop(layer, pos, tile):
-				tile = 114
-			case m.isBorderBottom(layer, pos, tile):
-				tile = 130
-			case m.isBorderLeft(layer, pos, tile):
-				tile = 121
-			case m.isBorderRight(layer, pos, tile):
-				tile = 123
-			case m.isBorderLeftAndRight(layer, pos, tile):
-				tile = 144
-			case m.isBorderTopAndBottom(layer, pos, tile):
-				tile = 149
-			case m.isEndWayRight(layer, pos, tile):
-				tile = 150
-			case m.isEndWayLeft(layer, pos, tile):
-				tile = 148
-			case m.isEndWayBottom(layer, pos, tile):
-				tile = 152
-			case m.isEndWayTop(layer, pos, tile):
-				tile = 135
+		// if any, overload tile with custom tile
+		for tileMapped, customTile := range m.conf.CustomTiles {
+			if tile == tileMapped {
+				if customTile.Position != nil {
+					switch {
+					case customTile.Position.Standalone != nil && m.isStandalone(layer, pos, tile):
+						tile = customTile.Position.Standalone.Tile
+					case customTile.Position.CornerTopLeft != nil && m.isCornerTopLeft(layer, pos, tile):
+						tile = customTile.Position.CornerTopLeft.Tile
+					case customTile.Position.CornerTopRight != nil && m.isCornerTopRight(layer, pos, tile):
+						tile = customTile.Position.CornerTopRight.Tile
+					case customTile.Position.CornerBottomLeft != nil && m.isCornerBottomLeft(layer, pos, tile):
+						tile = customTile.Position.CornerBottomLeft.Tile
+					case customTile.Position.CornerBottomRight != nil && m.isCornerBottomRight(layer, pos, tile):
+						tile = customTile.Position.CornerBottomRight.Tile
+					case customTile.Position.BorderTop != nil && m.isBorderTop(layer, pos, tile):
+						tile = customTile.Position.BorderTop.Tile
+					case customTile.Position.BorderBottom != nil && m.isBorderBottom(layer, pos, tile):
+						tile = customTile.Position.BorderBottom.Tile
+					case customTile.Position.BorderLeft != nil && m.isBorderLeft(layer, pos, tile):
+						tile = customTile.Position.BorderLeft.Tile
+					case customTile.Position.BorderRight != nil && m.isBorderRight(layer, pos, tile):
+						tile = customTile.Position.BorderRight.Tile
+					case customTile.Position.BorderTopAndBottom != nil && m.isBorderTopAndBottom(layer, pos, tile):
+						tile = customTile.Position.BorderTopAndBottom.Tile
+					case customTile.Position.BorderLeftAndRight != nil && m.isBorderLeftAndRight(layer, pos, tile):
+						tile = customTile.Position.BorderLeftAndRight.Tile
+					case customTile.Position.EndWayLeft != nil && m.isEndWayLeft(layer, pos, tile):
+						tile = customTile.Position.EndWayLeft.Tile
+					case customTile.Position.EndWayTop != nil && m.isEndWayTop(layer, pos, tile):
+						tile = customTile.Position.EndWayTop.Tile
+					case customTile.Position.EndWayBottom != nil && m.isEndWayBottom(layer, pos, tile):
+						tile = customTile.Position.EndWayBottom.Tile
+					case customTile.Position.EndWayRight != nil && m.isEndWayRight(layer, pos, tile):
+						tile = customTile.Position.EndWayRight.Tile
+					}
+				}
+				if len(customTile.Walls) > 0 {
+					for _, wall := range customTile.Walls {
+						if m.isWall(wall.Height, wall.Pos, layer, pos, tile) {
+							tile = wall.Tile
+						}
+					}
+				}
 			}
 		}
 		byLayer[layer] = tile

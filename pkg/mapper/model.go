@@ -1,10 +1,12 @@
 package mapper
 
+import "github.com/renomarx/osm2tmx/pkg/model"
+
 type Conf struct {
-	Tileset     Tileset            `yaml:"tileset"`
-	Default     TileValue          `yaml:"default"`
-	Layers      TagsByLayer        `yaml:"layers"`
-	CustomTiles map[int]CustomTile `yaml:"custom_tiles,omitempty"`
+	Tileset     Tileset                   `yaml:"tileset"`
+	Default     TileValue                 `yaml:"default"`
+	Layers      TagsByLayer               `yaml:"layers"`
+	CustomTiles map[model.Tile]CustomTile `yaml:"custom_tiles,omitempty"`
 }
 
 type Tileset struct {
@@ -25,7 +27,7 @@ type Tag struct {
 }
 
 type TileValue struct {
-	Tile     int           `yaml:"tile,omitempty"`
+	Tile     model.Tile    `yaml:"tile,omitempty"`
 	Altitude *Altitude     `yaml:"altitude,omitempty"`
 	Random   []RandomRange `yaml:"random,omitempty"`
 }
@@ -34,14 +36,14 @@ type RandomRange struct {
 	// Min is a percentage (0-100)
 	Min int `yaml:"min"`
 	// Max is a percentage (0-100)
-	Max      int       `yaml:"max"`
-	Tile     int       `yaml:"tile,omitempty"`
-	Altitude *Altitude `yaml:"altitude,omitempty"`
+	Max      int        `yaml:"max"`
+	Tile     model.Tile `yaml:"tile,omitempty"`
+	Altitude *Altitude  `yaml:"altitude,omitempty"`
 }
 
 type Altitude struct {
-	Min  uint16 `yaml:"min"`
-	Tile int    `yaml:"tile,omitempty"`
+	Min  model.Altitude `yaml:"min"`
+	Tile model.Tile     `yaml:"tile,omitempty"`
 }
 
 type CustomTile struct {
@@ -50,9 +52,9 @@ type CustomTile struct {
 }
 
 type Wall struct {
-	Height int `yaml:"height"`
-	Pos    int `yaml:"pos"`
-	Tile   int `yaml:"tile"`
+	Height int        `yaml:"height"`
+	Pos    int        `yaml:"pos"`
+	Tile   model.Tile `yaml:"tile"`
 }
 
 type Position struct {
@@ -74,7 +76,7 @@ type Position struct {
 }
 
 type PositionTile struct {
-	Tile int `yaml:"tile"`
+	Tile model.Tile `yaml:"tile"`
 }
 
 // TODO: conf validation
