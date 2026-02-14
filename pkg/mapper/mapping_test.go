@@ -2,7 +2,7 @@ package mapper
 
 import "github.com/renomarx/osm2tmx/pkg/model"
 
-var confTest = Conf{
+var confTest = Mapping{
 	Tileset: Tileset{
 		Source:     "tileset/basechip_pipo.png",
 		TileWidth:  16,

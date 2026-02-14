@@ -2,8 +2,8 @@ package mapper
 
 import "github.com/renomarx/osm2tmx/pkg/model"
 
-// Conf represents the global entity of the mapping file
-type Conf struct {
+// Mapping represents the global entity of the mapping file
+type Mapping struct {
 	// Tileset informations of the tileset used
 	Tileset Tileset `yaml:"tileset"`
 	// Default informations about the default tile to use

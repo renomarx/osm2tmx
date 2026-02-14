@@ -9,14 +9,14 @@ import (
 
 type Mapper struct {
 	m    *model.Map
-	conf Conf
+	conf Mapping
 }
 
 type MapTile struct {
 	ByLayer map[int]model.Tile
 }
 
-func New(m *model.Map, conf Conf) *Mapper {
+func New(m *model.Map, conf Mapping) *Mapper {
 	return &Mapper{
 		m:    m,
 		conf: conf,

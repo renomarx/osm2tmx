@@ -16,7 +16,7 @@ func TestMapper(t *testing.T) {
 	yamlFile, err := os.ReadFile("test/mapping.yaml")
 	require.NoError(t, err)
 
-	conf := Conf{}
+	conf := Mapping{}
 	err = yaml.Unmarshal(yamlFile, &conf)
 	assert.NoError(t, err)
 

@@ -73,7 +73,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	mapping := mapper.Conf{}
+	mapping := mapper.Mapping{}
 	if err := yaml.Unmarshal(mappingFile, &mapping); err != nil {
 		log.Fatal(err)
 	}

@@ -18,7 +18,7 @@ func TestRaster(t *testing.T) {
 	yamlFile, err := os.ReadFile("test/mapping.yaml")
 	require.NoError(t, err)
 
-	mapping := mapper.Conf{}
+	mapping := mapper.Mapping{}
 	err = yaml.Unmarshal(yamlFile, &mapping)
 	assert.NoError(t, err)
 

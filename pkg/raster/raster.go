@@ -44,7 +44,7 @@ type topography struct {
 	precision int
 }
 
-func New(downscale int, bounds Bounds, mapping mapper.Conf) *Raster {
+func New(downscale int, bounds Bounds, mapping mapper.Mapping) *Raster {
 	m := model.Map{}
 	mapper := mapper.New(&m, mapping)
 	return &Raster{
