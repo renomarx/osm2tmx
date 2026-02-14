@@ -80,16 +80,11 @@ type CustomTile struct {
 	Position *Position `yaml:"position,omitempty"`
 }
 
-// Wall represents a 2D wall inside a polygon:
-// - the point under the wall (Y+1) is outside the polygon
-// - All the points of the wall (from 0 to Height) are inside the polygon
+// Wall represents a 2D wall inside a polygon (filled by the same tile):
+// - the point under the wall (Y+1) is outside the polygon (different tile)
+// - All the points of the wall (from 0 to len(TilesFromBottom)) are inside the polygon
 type Wall struct {
-	// Height represents the height of the wall
-	Height int `yaml:"height"`
-	// pos represents the position (from bottom to top, begin to 1) of the point in the wall
-	Pos int `yaml:"pos"`
-	// Tile is the tile to be selected if the conditions match
-	Tile model.Tile `yaml:"tile"`
+	TilesFromBottom []model.Tile `yaml:"tiles_from_bottom"`
 }
 
 // Position represents a tile mapping depending on the position of a point within a line or a polygon
@@ -241,8 +236,8 @@ func (ct CustomTile) Validate() error {
 		if err := wall.Validate(); err != nil {
 			return fmt.Errorf("error validating Wall #%d: %w", i, err)
 		}
-		if wall.Tile == 0 {
-			return fmt.Errorf("wall %d must have a tile defined", i)
+		if len(wall.TilesFromBottom) == 0 {
+			return fmt.Errorf("wall %d must have tiles defined", i)
 		}
 	}
 	return nil
@@ -298,14 +293,5 @@ func (p Position) Validate() error {
 }
 
 func (w Wall) Validate() error {
-	if w.Height <= 0 {
-		return fmt.Errorf("Height must be > 0")
-	}
-	if w.Pos <= 0 {
-		return fmt.Errorf("Pos must be > 0")
-	}
-	if w.Pos > w.Height {
-		return fmt.Errorf("Pos must be <= Height")
-	}
 	return nil
 }

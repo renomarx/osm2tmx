@@ -315,34 +315,13 @@ var mappingTest = Mapping{
 			},
 			Walls: []Wall{
 				{
-					Height: 4,
-					Pos:    1,
-					Tile:   489,
+					TilesFromBottom: []model.Tile{489, 481, 473, 465},
 				},
 				{
-					Height: 4,
-					Pos:    2,
-					Tile:   481,
+					TilesFromBottom: []model.Tile{419, 419, 465},
 				},
 				{
-					Height: 4,
-					Pos:    3,
-					Tile:   473,
-				},
-				{
-					Height: 3,
-					Pos:    1,
-					Tile:   419,
-				},
-				{
-					Height: 3,
-					Pos:    2,
-					Tile:   419,
-				},
-				{
-					Height: 2,
-					Pos:    1,
-					Tile:   419,
+					TilesFromBottom: []model.Tile{419, 465},
 				},
 			},
 		},

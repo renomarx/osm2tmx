@@ -130,8 +130,9 @@ func (m *Mapper) GetCustomTile(pos model.Position) MapTile {
 				}
 				if len(customTile.Walls) > 0 {
 					for _, wall := range customTile.Walls {
-						if m.isWall(wall.Height, wall.Pos, layer, pos, tile) {
-							tile = wall.Tile
+						posInWall := m.getWallPos(wall, layer, pos, tile)
+						if posInWall != -1 {
+							tile = wall.TilesFromBottom[posInWall]
 						}
 					}
 				}
@@ -143,21 +144,26 @@ func (m *Mapper) GetCustomTile(pos model.Position) MapTile {
 	return MapTile{ByLayer: byLayer}
 }
 
-func (m *Mapper) isWall(height, wallPos int, layer int, pos model.Position, tile model.Tile) bool {
-	if m.m.Layers[layer].GetCell(pos.X, pos.Y+wallPos).Tile == tile {
-		return false
-	}
-	for y, j := pos.Y, 0; y > 0 && j <= height-wallPos; y, j = y-1, j+1 {
-		if m.m.Layers[layer].GetCell(pos.X, y).Tile != tile {
-			return false
+func (m *Mapper) getWallPos(wall Wall, layer int, pos model.Position, tile model.Tile) int {
+	distanceFromBottom := 0
+	for y := 0; y <= len(wall.TilesFromBottom); y++ {
+		if m.m.Layers[layer].GetCell(pos.X, pos.Y+y).Tile != tile {
+			distanceFromBottom = y
+			break
 		}
 	}
-	for y, j := pos.Y, 0; y < m.m.Layers[layer].SizeY() && j < wallPos; y, j = y+1, j+1 {
-		if m.m.Layers[layer].GetCell(pos.X, y).Tile != tile {
-			return false
+	if distanceFromBottom == 0 || distanceFromBottom == len(wall.TilesFromBottom) {
+		// Point not inside the wall
+		return -1
+	}
+	// All the points on top of pos, contained in the wall, should have the same tile
+	// if not, the wall is too short, so it does not match
+	for y := 0; y <= len(wall.TilesFromBottom)-distanceFromBottom; y++ {
+		if m.m.Layers[layer].GetCell(pos.X, pos.Y-y).Tile != tile {
+			return -1
 		}
 	}
-	return true
+	return distanceFromBottom - 1
 }
 
 func (m *Mapper) isStandalone(layer int, pos model.Position, tile model.Tile) bool {
