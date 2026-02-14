@@ -126,7 +126,7 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 				continue
 			}
 			height := r.getAltitude(x, y)
-			mapTile := r.mapper.GetMapTileFunc(node.Tags)(model.Position{X: x, Y: y, Z: height})
+			mapTile := r.mapper.MapTile(node.Tags, model.Position{X: x, Y: y, Z: height})
 			for z, tile := range mapTile.ByLayer {
 				r.m.Layers[z].SetTile(x, y, tile)
 			}
@@ -219,11 +219,10 @@ func (r *Raster) drawCustomTiles() {
 
 func (r *Raster) workerWay(waysQueue chan *osm.Way) {
 	for way := range waysQueue {
-		mapTileFunc := r.mapper.GetMapTileFunc(way.Tags)
 		if r.isPolygon(way) {
-			r.drawWayArea(way, mapTileFunc)
+			r.drawWayArea(way)
 		} else {
-			r.drawWayLine(way, mapTileFunc)
+			r.drawWayLine(way)
 		}
 	}
 }
@@ -236,18 +235,17 @@ func (r *Raster) workerRelation(relationsQueue chan *osm.Relation) {
 		if !r.isMultipolygon(relation) {
 			continue
 		}
-		mapTileFunc := r.mapper.GetMapTileFunc(relation.Tags)
-		r.drawRelationArea(relation, mapTileFunc)
+		r.drawRelationArea(relation)
 	}
 }
 
-func (r *Raster) fillPolygon(mapTileFunc mapper.MapTileFunc, polygon *model.Polygon) {
+func (r *Raster) fillPolygon(tags osm.Tags, polygon *model.Polygon) {
 	for y := polygon.YMin.Y; y <= polygon.YMax.Y; y++ {
 		for x := polygon.XMin.X; x <= polygon.XMax.X; x++ {
 			if evenodd.IsInsidePolygon(x, y, polygon.Vertices) {
 				height := r.getAltitude(x, y)
 				pos := model.Position{X: x, Y: y, Z: height}
-				mapTile := mapTileFunc(pos)
+				mapTile := r.mapper.MapTile(tags, pos)
 				for z, tile := range mapTile.ByLayer {
 					r.m.Layers[z].SetTile(x, y, tile)
 				}

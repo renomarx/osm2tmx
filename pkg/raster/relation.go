@@ -2,7 +2,6 @@ package raster
 
 import (
 	"github.com/paulmach/osm"
-	"github.com/renomarx/osm2tmx/pkg/mapper"
 	"github.com/renomarx/osm2tmx/pkg/model"
 )
 
@@ -15,7 +14,7 @@ func (r *Raster) isMultipolygon(relation *osm.Relation) bool {
 	return false
 }
 
-func (r *Raster) drawRelationArea(relation *osm.Relation, mapTileFunc mapper.MapTileFunc) {
+func (r *Raster) drawRelationArea(relation *osm.Relation) {
 	polygon := model.NewPolygon()
 	// Follow the Scan Line Algorithm
 
@@ -46,5 +45,5 @@ func (r *Raster) drawRelationArea(relation *osm.Relation, mapTileFunc mapper.Map
 	}
 
 	// 2. Apply the scanline + even-odd algorithm
-	r.fillPolygon(mapTileFunc, polygon)
+	r.fillPolygon(relation.Tags, polygon)
 }

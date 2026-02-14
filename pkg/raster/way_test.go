@@ -55,7 +55,7 @@ func TestDrawWayLine(t *testing.T) {
 		pointsByNodeID[9] = model.Point{X: 1, Y: 1}
 		r.pointsByNodeID = pointsByNodeID
 
-		r.drawWayLine(&way, r.mapper.GetMapTileFunc(way.Tags))
+		r.drawWayLine(&way)
 
 		expectedFilledLayerView := `
 0,0,0,0,0,0,0,0,0,0,0,0,
@@ -115,7 +115,7 @@ func TestDrawWayLine(t *testing.T) {
 		pointsByNodeID[9] = model.Point{X: 1, Y: 1}
 		r.pointsByNodeID = pointsByNodeID
 
-		r.drawWayLine(&way, r.mapper.GetMapTileFunc(way.Tags))
+		r.drawWayLine(&way)
 
 		expectedFilledLayerView := `
 0,120,120,120,120,120,120,120,120,120,120,0,
@@ -175,7 +175,7 @@ func TestDrawWayLine(t *testing.T) {
 		pointsByNodeID[9] = model.Point{X: 1, Y: 1}
 		r.pointsByNodeID = pointsByNodeID
 
-		r.drawWayLine(&way, r.mapper.GetMapTileFunc(way.Tags))
+		r.drawWayLine(&way)
 
 		expectedFilledLayerView := `
 0,120,120,120,120,120,120,120,120,120,120,0,
@@ -243,7 +243,7 @@ func TestDrawWayArea(t *testing.T) {
 	pointsByNodeID[9] = model.Point{X: 1, Y: 1}
 	r.pointsByNodeID = pointsByNodeID
 
-	r.drawWayArea(&way, r.mapper.GetMapTileFunc(way.Tags))
+	r.drawWayArea(&way)
 
 	expectedFilledLayerView := `
 0,0,0,0,0,0,0,0,0,0,0,0,

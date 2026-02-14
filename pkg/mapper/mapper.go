@@ -12,8 +12,6 @@ type Mapper struct {
 	conf Conf
 }
 
-// MapTileFunc is a function that maps a position to a MapTile
-type MapTileFunc func(pos model.Position) MapTile
 type MapTile struct {
 	ByLayer map[int]model.Tile
 }
@@ -25,50 +23,15 @@ func New(m *model.Map, conf Conf) *Mapper {
 	}
 }
 
-// GetMapTileFunc returns a function that returns the mapTile mapped to the tags
-// The interest of using this function is to cache non-dynamic tile (will always return the same tile for the same tags)
-func (m *Mapper) GetMapTileFunc(tags osm.Tags) MapTileFunc {
-	// mapTile := m.mapToTiles(tags, nil)
-	// if mapTile.dynamic {
-	// 	return func(pos *model.Position) MapTile {
-	// 		return m.mapToTiles(tags, pos)
-	// 	}
-	// }
-	// return func(pos *model.Position) MapTile {
-	// 	return mapTile
-	// }
-	return func(pos model.Position) MapTile {
-		return m.mapToTiles(tags, pos)
-	}
-}
-
 func (m *Mapper) GetDefaultTile(pos model.Position) model.Tile {
 	return m.mapTileValue(m.conf.Default, pos)
-}
-
-func (m *Mapper) mapTileValue(tv TileValue, pos model.Position) model.Tile {
-	if tv.Altitude != nil {
-		if pos.Z > tv.Altitude.Min {
-			return tv.Altitude.Tile
-		}
-	}
-	if len(tv.Random) > 0 {
-		r := rand.Intn(100)
-		for _, rr := range tv.Random {
-			if r >= rr.Min && r < rr.Max {
-				return rr.Tile
-			}
-		}
-	}
-
-	return tv.Tile
 }
 
 func (m *Mapper) Layers() int {
 	return len(m.conf.Layers)
 }
 
-func (m *Mapper) mapToTiles(tags osm.Tags, pos model.Position) MapTile {
+func (m *Mapper) MapTile(tags osm.Tags, pos model.Position) MapTile {
 	byLayer := make(map[int]model.Tile)
 	byLayer[0] = m.GetDefaultTile(pos)
 
@@ -97,6 +60,24 @@ func (m *Mapper) mapToTiles(tags osm.Tags, pos model.Position) MapTile {
 	}
 
 	return MapTile{ByLayer: byLayer}
+}
+
+func (m *Mapper) mapTileValue(tv TileValue, pos model.Position) model.Tile {
+	if tv.Altitude != nil {
+		if pos.Z > tv.Altitude.Min {
+			return tv.Altitude.Tile
+		}
+	}
+	if len(tv.Random) > 0 {
+		r := rand.Intn(100)
+		for _, rr := range tv.Random {
+			if r >= rr.Min && r < rr.Max {
+				return rr.Tile
+			}
+		}
+	}
+
+	return tv.Tile
 }
 
 func (m *Mapper) getTagTile(tags osm.Tags, pos model.Position, tagsMapping LayerTags, layer int) *model.Tile {

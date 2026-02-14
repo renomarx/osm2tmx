@@ -6,11 +6,10 @@ import (
 
 	"github.com/paulmach/osm"
 	"github.com/renomarx/osm2tmx/pkg/bresenham"
-	"github.com/renomarx/osm2tmx/pkg/mapper"
 	"github.com/renomarx/osm2tmx/pkg/model"
 )
 
-func (r *Raster) drawWayLine(way *osm.Way, mapTileFunc mapper.MapTileFunc) {
+func (r *Raster) drawWayLine(way *osm.Way) {
 	var lastPoint *model.Point
 	line := model.NewLine()
 	width, lanes := r.getWayWidthAndLanes(way)
@@ -42,7 +41,7 @@ func (r *Raster) drawWayLine(way *osm.Way, mapTileFunc mapper.MapTileFunc) {
 		pos := model.Position{X: point.X, Y: point.Y}
 		height := r.getAltitude(point.X, point.Y)
 		pos.Z = height
-		mapTile := mapTileFunc(pos)
+		mapTile := r.mapper.MapTile(way.Tags, pos)
 		for z, tile := range mapTile.ByLayer {
 			r.m.Layers[z].SetTile(point.X, point.Y, tile)
 		}
@@ -87,7 +86,7 @@ func (r *Raster) isPolygon(way *osm.Way) bool {
 	return way.Nodes[0] == way.Nodes[len(way.Nodes)-1]
 }
 
-func (r *Raster) drawWayArea(way *osm.Way, mapTileFunc mapper.MapTileFunc) {
+func (r *Raster) drawWayArea(way *osm.Way) {
 	polygon := model.NewPolygon()
 	// Follow the Scan Line Algorithm
 
@@ -102,5 +101,5 @@ func (r *Raster) drawWayArea(way *osm.Way, mapTileFunc mapper.MapTileFunc) {
 	}
 
 	// 2. Apply the scanline + even-odd algorithm
-	r.fillPolygon(mapTileFunc, polygon)
+	r.fillPolygon(way.Tags, polygon)
 }

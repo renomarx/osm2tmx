@@ -38,7 +38,7 @@ func TestMapper(t *testing.T) {
 			},
 		}
 
-		mapTile := mapper.GetMapTileFunc(tags)(model.Position{})
+		mapTile := mapper.MapTile(tags, model.Position{})
 		assert.Equal(t, model.Tile(120), mapTile.ByLayer[1])
 	})
 
@@ -52,7 +52,7 @@ func TestMapper(t *testing.T) {
 			},
 		}
 
-		mapTile := mapper.GetMapTileFunc(tags)(model.Position{})
+		mapTile := mapper.MapTile(tags, model.Position{})
 		assert.Equal(t, model.Tile(2), mapTile.ByLayer[0])
 	})
 
@@ -74,7 +74,7 @@ func TestMapper(t *testing.T) {
 			},
 		}
 
-		mapTile := mapper.GetMapTileFunc(tags)(model.Position{})
+		mapTile := mapper.MapTile(tags, model.Position{})
 		assert.Equal(t, model.Tile(8), mapTile.ByLayer[0])
 		assert.Equal(t, model.Tile(417), mapTile.ByLayer[1])
 	})
@@ -94,8 +94,7 @@ func TestMapper(t *testing.T) {
 			},
 		}
 
-		mapTileFunc := mapper.GetMapTileFunc(tags)
-		assert.Equal(t, model.Tile(120), mapTileFunc(model.Position{}).ByLayer[1]) // TODO: fill position
+		assert.Equal(t, model.Tile(120), mapper.MapTile(tags, model.Position{}).ByLayer[1]) // TODO: fill position
 		// assert.Equal(t, model.Tile(128), mapTileFunc(model.Position{}).ByLayer[1]) // TODO: fill position
 		// assert.Equal(t, model.Tile(113), mapTileFunc(model.Position{}).ByLayer[1]) // TODO: fill position
 	})
