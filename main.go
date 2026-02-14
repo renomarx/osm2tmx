@@ -77,6 +77,9 @@ func main() {
 	if err := yaml.Unmarshal(mappingFile, &mapping); err != nil {
 		log.Fatal(err)
 	}
+	if err := mapping.Validate(); err != nil {
+		log.Fatal(err)
+	}
 
 	workers := 1
 	cpusNumber := runtime.NumCPU()

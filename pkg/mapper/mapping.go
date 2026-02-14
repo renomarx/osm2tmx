@@ -1,6 +1,10 @@
 package mapper
 
-import "github.com/renomarx/osm2tmx/pkg/model"
+import (
+	"fmt"
+
+	"github.com/renomarx/osm2tmx/pkg/model"
+)
 
 // Mapping represents the global entity of the mapping file
 type Mapping struct {
@@ -111,4 +115,197 @@ type PositionTile struct {
 	Tile model.Tile `yaml:"tile"`
 }
 
-// TODO: conf validation
+func (m Mapping) Validate() error {
+	if err := m.Tileset.Validate(); err != nil {
+		return fmt.Errorf("error validating Tileset: %w", err)
+	}
+	if err := m.Default.Validate(); err != nil {
+		return fmt.Errorf("error validating Default: %w", err)
+	}
+	if err := m.Layers.Validate(); err != nil {
+		return fmt.Errorf("error validating TagsByLayer: %w", err)
+	}
+	for tile, ct := range m.CustomTiles {
+		if err := ct.Validate(); err != nil {
+			return fmt.Errorf("error validating CustomTile %d: %w", tile, err)
+		}
+	}
+	return nil
+}
+
+func (t Tileset) Validate() error {
+	if t.Source == "" {
+		return fmt.Errorf("Source cannot be empty")
+	}
+	if t.TileWidth <= 0 {
+		return fmt.Errorf("TileWidth must be strictly positive")
+	}
+	if t.TileHeight <= 0 {
+		return fmt.Errorf("TileHeight must be strictly positive")
+	}
+	return nil
+}
+
+func (t TileValue) Validate() error {
+	if t.Altitude != nil {
+		if err := t.Altitude.Validate(); err != nil {
+			return fmt.Errorf("error validating Altitude: %w", err)
+		}
+	}
+	for i, rr := range t.Random {
+		if err := rr.Validate(); err != nil {
+			return fmt.Errorf("error validating RandomRange #%d: %w", i, err)
+		}
+		// TODO: validate that random ranges do not intersect ?
+	}
+	return nil
+}
+
+func (t TagsByLayer) Validate() error {
+	for layer, tags := range t {
+		if err := tags.Validate(); err != nil {
+			return fmt.Errorf("error validating Tags of layer #%d: %w", layer, err)
+		}
+	}
+	return nil
+}
+
+func (lt LayerTags) Validate() error {
+	for key, tag := range lt.Tags {
+		if err := tag.Validate(); err != nil {
+			return fmt.Errorf("error validating Tag %s: %w", key, err)
+		}
+	}
+	return nil
+}
+
+func (t Tag) Validate() error {
+	if err := t.TileValue.Validate(); err != nil {
+		return fmt.Errorf("error validating tag TileValue: %w", err)
+	}
+	if len(t.Values) == 0 && !t.TileValue.HasTile() {
+		return fmt.Errorf("tag must have either at least one value, or a defined tile")
+	}
+	for value, tv := range t.Values {
+		if err := tv.Validate(); err != nil {
+			return fmt.Errorf("error validating tag value %s: %w", value, err)
+		}
+		if !tv.HasTile() {
+			return fmt.Errorf("tag value %s must have a defined tile", value)
+		}
+	}
+	return nil
+}
+
+func (t TileValue) HasTile() bool {
+	if t.Altitude != nil && t.Altitude.Tile != 0 {
+		return true
+	}
+	for _, rr := range t.Random {
+		if rr.Tile != 0 {
+			return true
+		}
+	}
+	return t.Tile != 0
+}
+
+func (a Altitude) Validate() error {
+	return nil
+}
+
+func (rr RandomRange) Validate() error {
+	if rr.Altitude != nil {
+		if err := rr.Altitude.Validate(); err != nil {
+			return fmt.Errorf("error validating Altitude: %w", err)
+		}
+	}
+	if rr.Max < 0 || rr.Max > 100 {
+		return fmt.Errorf("Max must be in interval [0;100]")
+	}
+	if rr.Min < 0 || rr.Min > 100 {
+		return fmt.Errorf("Min must be in interval [0;100]")
+	}
+	if rr.Max <= rr.Min {
+		return fmt.Errorf("Max must be > Min")
+	}
+	return nil
+}
+
+func (ct CustomTile) Validate() error {
+	if ct.Position != nil {
+		if err := ct.Position.Validate(); err != nil {
+			return fmt.Errorf("error validation Position: %w", err)
+		}
+	}
+	for i, wall := range ct.Walls {
+		if err := wall.Validate(); err != nil {
+			return fmt.Errorf("error validating Wall #%d: %w", i, err)
+		}
+		if wall.Tile == 0 {
+			return fmt.Errorf("wall %d must have a tile defined", i)
+		}
+	}
+	return nil
+}
+
+func (p Position) Validate() error {
+	if p.Standalone != nil && p.Standalone.Tile == 0 {
+		return fmt.Errorf("Standalone must have a tile defined if present")
+	}
+	if p.CornerTopLeft != nil && p.CornerTopLeft.Tile == 0 {
+		return fmt.Errorf("CornerTopLeft must have a tile defined if present")
+	}
+	if p.CornerTopRight != nil && p.CornerTopRight.Tile == 0 {
+		return fmt.Errorf("CornerTopRight must have a tile defined if present")
+	}
+	if p.CornerBottomLeft != nil && p.CornerBottomLeft.Tile == 0 {
+		return fmt.Errorf("CornerBottomLeft must have a tile defined if present")
+	}
+	if p.CornerBottomRight != nil && p.CornerBottomRight.Tile == 0 {
+		return fmt.Errorf("CornerBottomRight must have a tile defined if present")
+	}
+	if p.BorderLeft != nil && p.BorderLeft.Tile == 0 {
+		return fmt.Errorf("BorderLeft must have a tile defined if present")
+	}
+	if p.BorderTop != nil && p.BorderTop.Tile == 0 {
+		return fmt.Errorf("BorderTop must have a tile defined if present")
+	}
+	if p.BorderBottom != nil && p.BorderBottom.Tile == 0 {
+		return fmt.Errorf("BorderBottom must have a tile defined if present")
+	}
+	if p.BorderRight != nil && p.BorderRight.Tile == 0 {
+		return fmt.Errorf("BorderRight must have a tile defined if present")
+	}
+	if p.BorderTopAndBottom != nil && p.BorderTopAndBottom.Tile == 0 {
+		return fmt.Errorf("BorderTopAndBottom must have a tile defined if present")
+	}
+	if p.BorderLeftAndRight != nil && p.BorderLeftAndRight.Tile == 0 {
+		return fmt.Errorf("BorderLeftAndRight must have a tile defined if present")
+	}
+	if p.EndWayLeft != nil && p.EndWayLeft.Tile == 0 {
+		return fmt.Errorf("EndWayLeft must have a tile defined if present")
+	}
+	if p.EndWayTop != nil && p.EndWayTop.Tile == 0 {
+		return fmt.Errorf("EndWayTop must have a tile defined if present")
+	}
+	if p.EndWayRight != nil && p.EndWayRight.Tile == 0 {
+		return fmt.Errorf("EndWayRight must have a tile defined if present")
+	}
+	if p.EndWayBottom != nil && p.EndWayBottom.Tile == 0 {
+		return fmt.Errorf("EndWayBottom must have a tile defined if present")
+	}
+	return nil
+}
+
+func (w Wall) Validate() error {
+	if w.Height <= 0 {
+		return fmt.Errorf("Height must be > 0")
+	}
+	if w.Pos < 0 {
+		return fmt.Errorf("Pos must be >= 0")
+	}
+	if w.Pos >= w.Height {
+		return fmt.Errorf("Pos must be < Height")
+	}
+	return nil
+}

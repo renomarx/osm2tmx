@@ -16,16 +16,19 @@ func TestMapper(t *testing.T) {
 	yamlFile, err := os.ReadFile("test/mapping.yaml")
 	require.NoError(t, err)
 
-	conf := Mapping{}
-	err = yaml.Unmarshal(yamlFile, &conf)
+	mapping := Mapping{}
+	err = yaml.Unmarshal(yamlFile, &mapping)
 	assert.NoError(t, err)
 
-	expectedConf := confTest
-	assert.Equal(t, expectedConf, conf)
+	expectedMapping := mappingTest
+	assert.Equal(t, expectedMapping, mapping)
+
+	err = mapping.Validate()
+	assert.NoError(t, err)
 
 	t.Run("correctly map single tag", func(t *testing.T) {
 		// TODO: table test for each tag
-		mapper := New(&model.Map{}, conf)
+		mapper := New(&model.Map{}, mapping)
 
 		tags := osm.Tags{
 			osm.Tag{
@@ -43,7 +46,7 @@ func TestMapper(t *testing.T) {
 	})
 
 	t.Run("correctly default to defaultTile", func(t *testing.T) {
-		mapper := New(&model.Map{}, conf)
+		mapper := New(&model.Map{}, mapping)
 
 		tags := osm.Tags{
 			osm.Tag{
@@ -57,7 +60,7 @@ func TestMapper(t *testing.T) {
 	})
 
 	t.Run("correctly map all tiles for multiple tags", func(t *testing.T) {
-		mapper := New(&model.Map{}, conf)
+		mapper := New(&model.Map{}, mapping)
 
 		tags := osm.Tags{
 			osm.Tag{
@@ -81,7 +84,7 @@ func TestMapper(t *testing.T) {
 
 	t.Run("correctly map with pos", func(t *testing.T) {
 		// TODO: table test for each tag
-		mapper := New(&model.Map{}, conf) // TODO: fill map
+		mapper := New(&model.Map{}, mapping) // TODO: fill map
 
 		tags := osm.Tags{
 			osm.Tag{
