@@ -1,5 +1,5 @@
 tileset:
-  source: "tileset/basechip_pipo.png"
+  source: "tileset/basechip_pipo.tsx"
   tile_width: 16
   tile_height: 16
 

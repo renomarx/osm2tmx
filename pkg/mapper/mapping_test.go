@@ -4,7 +4,7 @@ import "github.com/renomarx/osm2tmx/pkg/model"
 
 var mappingTest = Mapping{
 	Tileset: Tileset{
-		Source:     "tileset/basechip_pipo.png",
+		Source:     "tileset/basechip_pipo.tsx",
 		TileWidth:  16,
 		TileHeight: 16,
 	},

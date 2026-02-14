@@ -79,7 +79,6 @@ Examples:
 ## TODO
 
 - More examples with other tilesets
-- Better mapper tests
 - Generate a tileset like OSM stylesheets to have a pretty map in tmx :)
 - Optimisation
   - See simd/archisimd in go1.26

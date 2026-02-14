@@ -86,7 +86,7 @@ type CustomTile struct {
 type Wall struct {
 	// Height represents the height of the wall
 	Height int `yaml:"height"`
-	// pos represents the position (from bottom to top) of the point in the wall
+	// pos represents the position (from bottom to top, begin to 1) of the point in the wall
 	Pos int `yaml:"pos"`
 	// Tile is the tile to be selected if the conditions match
 	Tile model.Tile `yaml:"tile"`
@@ -301,11 +301,11 @@ func (w Wall) Validate() error {
 	if w.Height <= 0 {
 		return fmt.Errorf("Height must be > 0")
 	}
-	if w.Pos < 0 {
-		return fmt.Errorf("Pos must be >= 0")
+	if w.Pos <= 0 {
+		return fmt.Errorf("Pos must be > 0")
 	}
-	if w.Pos >= w.Height {
-		return fmt.Errorf("Pos must be < Height")
+	if w.Pos > w.Height {
+		return fmt.Errorf("Pos must be <= Height")
 	}
 	return nil
 }

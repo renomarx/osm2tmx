@@ -8,8 +8,9 @@ import (
 )
 
 type Mapper struct {
-	m    *model.Map
-	conf Mapping
+	m        *model.Map
+	conf     Mapping
+	randFunc func(int) int
 }
 
 type MapTile struct {
@@ -18,8 +19,9 @@ type MapTile struct {
 
 func New(m *model.Map, conf Mapping) *Mapper {
 	return &Mapper{
-		m:    m,
-		conf: conf,
+		m:        m,
+		conf:     conf,
+		randFunc: rand.Intn,
 	}
 }
 
@@ -69,38 +71,20 @@ func (m *Mapper) mapTileValue(tv TileValue, pos model.Position) model.Tile {
 		}
 	}
 	if len(tv.Random) > 0 {
-		r := rand.Intn(100)
+		r := m.randFunc(100)
 		for _, rr := range tv.Random {
 			if r >= rr.Min && r < rr.Max {
+				if rr.Altitude != nil {
+					if pos.Z > rr.Altitude.Min {
+						return rr.Altitude.Tile
+					}
+				}
 				return rr.Tile
 			}
 		}
 	}
 
 	return tv.Tile
-}
-
-func (m *Mapper) getTagTile(tags osm.Tags, pos model.Position, tagsMapping LayerTags, layer int) *model.Tile {
-	for _, osmTag := range tags {
-		tag, exists := tagsMapping.Tags[osmTag.Key]
-		if !exists {
-			continue
-		}
-		tile := m.mapTileValue(tag.TileValue, pos)
-		if len(tag.Values) == 0 {
-			continue
-		}
-		tagValue, exists := tag.Values[osmTag.Value]
-		if !exists {
-			continue
-		}
-		tile = m.mapTileValue(tagValue, pos)
-		if tile == 0 {
-			continue
-		}
-		return &tile
-	}
-	return nil
 }
 
 func (m *Mapper) GetCustomTile(pos model.Position) MapTile {
