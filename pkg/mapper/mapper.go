@@ -162,7 +162,7 @@ func (m *Mapper) getWallPos(wall Wall, layer int, pos model.Position, tile model
 			break
 		}
 	}
-	if distanceFromBottom == 0 || distanceFromBottom == len(wall.TilesFromBottom) {
+	if distanceFromBottom == 0 || distanceFromBottom > len(wall.TilesFromBottom) {
 		// Point not inside the wall
 		return -1
 	}
