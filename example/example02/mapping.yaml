@@ -1,0 +1,170 @@
+tileset:
+  source: "tiles.tsx"
+  tile_width: 32
+  tile_height: 32
+
+default:
+  tile: 592
+
+layers:
+  0:
+    tags:
+      waterway:
+          tile: 1446
+      water:
+          tile: 1446
+      natural:
+        values:
+          water:
+            tile: 1446
+          wood:
+            tile: 593
+          heath:
+            tile: 613
+          mash:
+            tile: 491
+      surface:
+          values:
+            sand:
+              tile: 618
+            asphalt:
+              tile: 334
+      landuse:
+        values:
+          forest:
+            tile: 593
+          industrial:
+            tile: 334
+          residential:
+            tile: 334
+          construction:
+            tile: 334
+          cemetery:
+            tile: 148
+          meadow:
+            tile: 616
+
+  1:
+    tags:
+      aerialway:
+        tile: 129
+      aeroway:
+        tile: 502
+      highway:
+        tile: 618
+      natural:
+        values:
+          wood:
+            random:
+              - min: 80
+                max: 85
+                tile: 848
+              - min: 85
+                max: 90
+                tile: 849
+              - min: 90
+                max: 95
+                tile: 850
+              - min: 95
+                max: 100
+                tile: 852
+          tree:
+            tile: 848
+      landuse:
+        values:
+          forest:
+            random:
+              - min: 80
+                max: 85
+                tile: 848
+              - min: 85
+                max: 90
+                tile: 849
+              - min: 90
+                max: 95
+                tile: 850
+              - min: 95
+                max: 100
+                tile: 852
+
+  2:
+    tags:
+      building:
+        tile: 1039
+        values:
+          religious:
+            tile: 1041
+          cathedral:
+            tile: 1041
+          chapel:
+            tile: 1041
+          church:
+            tile: 1041
+
+custom_tiles:
+  618:
+    position:
+      standalone:
+        tile: 0
+      corner_top_left:
+        tile: 622
+      corner_top_right:
+        tile: 620
+      corner_bottom_left:
+        tile: 628
+      corner_bottom_right:
+        tile: 626
+      border_top:
+        tile: 624
+      border_bottom:
+        tile: 630
+      border_left:
+        tile: 632
+      border_right:
+        tile: 598
+      border_left_and_right:
+        tile: 632
+      border_top_and_bottom:
+        tile: 630
+      end_way_right:
+        tile: 598
+      end_way_left:
+        tile: 632
+      end_way_bottom:
+        tile: 630
+      end_way_top:
+        tile: 624
+  1041:
+    position:
+      # removing all "lonely" points of the building
+      standalone:
+        tile: 0
+      end_way_right:
+        tile: 0
+      end_way_left:
+        tile: 0
+      end_way_top:
+        tile: 0
+      border_top_and_bottom:
+        tile: 0
+    walls:
+      - tiles_from_bottom: [472,472,472,1041]
+      - tiles_from_bottom: [472,472,1041]
+      - tiles_from_bottom: [472,1041]
+  1039:
+    position:
+      # removing all "lonely" points of the building
+      standalone:
+        tile: 0
+      end_way_right:
+        tile: 0
+      end_way_left:
+        tile: 0
+      end_way_top:
+        tile: 0
+      border_top_and_bottom:
+        tile: 0
+    walls:
+      - tiles_from_bottom: [1169,1169,1169,1039]
+      - tiles_from_bottom: [1169,1169,1039]
+      - tiles_from_bottom: [1169,1039]
