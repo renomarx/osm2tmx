@@ -97,6 +97,7 @@ func (m *Mapper) GetCustomTile(pos model.Position) CustomMapTile {
 	rectanglesByLayer := make([]Rectangle, len(m.m.Layers))
 	for layer := range m.m.Layers {
 		tile := m.m.Layers[layer].GetCell(pos.X, pos.Y).Tile
+		initialTile := tile
 		// if any, overload tile with custom tile
 		customTile, exists := m.conf.CustomTiles[tile]
 		if exists {
@@ -136,9 +137,10 @@ func (m *Mapper) GetCustomTile(pos model.Position) CustomMapTile {
 			}
 			if len(customTile.Walls) > 0 {
 				for _, wall := range customTile.Walls {
-					posInWall := m.getWallPos(wall, layer, pos, tile)
+					posInWall := m.getWallPos(wall, layer, pos, initialTile)
 					if posInWall != -1 {
 						tile = wall.TilesFromBottom[posInWall]
+						break
 					}
 				}
 			}

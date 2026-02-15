@@ -57,13 +57,13 @@ layers:
         tile: 565
         values:
           religious:
-            tile: 465
+            tile: 466
           cathedral:
-            tile: 465
+            tile: 466
           chapel:
-            tile: 465
+            tile: 466
           church:
-            tile: 465
+            tile: 466
       highway:
         tile: 120
       natural:
@@ -253,7 +253,7 @@ custom_tiles:
         tile: 152
       end_way_top:
         tile: 135
-  465:
+  466:
     position:
       # removing all "lonely" points of the building
       standalone:
@@ -266,11 +266,15 @@ custom_tiles:
         tile: 0
       border_top_and_bottom:
         tile: 0
+      border_left:
+        tile: 465
+      border_right:
+        tile: 467
     walls:
-      - tiles_from_bottom: [489,481,481,473,465]
-      - tiles_from_bottom: [489,481,473,465]
-      - tiles_from_bottom: [419,419,465]
-      - tiles_from_bottom: [419,465]
+      - tiles_from_bottom: [489,481,481,474,466]
+      - tiles_from_bottom: [489,481,474,466]
+      - tiles_from_bottom: [419,419,466]
+      - tiles_from_bottom: [419,466]
   565:
     position:
       # removing all "lonely" points of the building
