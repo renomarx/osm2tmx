@@ -259,51 +259,6 @@ func (ct CustomTile) Validate() error {
 }
 
 func (p Position) Validate() error {
-	if p.Standalone != nil && p.Standalone.Tile == 0 {
-		return fmt.Errorf("Standalone must have a tile defined if present")
-	}
-	if p.CornerTopLeft != nil && p.CornerTopLeft.Tile == 0 {
-		return fmt.Errorf("CornerTopLeft must have a tile defined if present")
-	}
-	if p.CornerTopRight != nil && p.CornerTopRight.Tile == 0 {
-		return fmt.Errorf("CornerTopRight must have a tile defined if present")
-	}
-	if p.CornerBottomLeft != nil && p.CornerBottomLeft.Tile == 0 {
-		return fmt.Errorf("CornerBottomLeft must have a tile defined if present")
-	}
-	if p.CornerBottomRight != nil && p.CornerBottomRight.Tile == 0 {
-		return fmt.Errorf("CornerBottomRight must have a tile defined if present")
-	}
-	if p.BorderLeft != nil && p.BorderLeft.Tile == 0 {
-		return fmt.Errorf("BorderLeft must have a tile defined if present")
-	}
-	if p.BorderTop != nil && p.BorderTop.Tile == 0 {
-		return fmt.Errorf("BorderTop must have a tile defined if present")
-	}
-	if p.BorderBottom != nil && p.BorderBottom.Tile == 0 {
-		return fmt.Errorf("BorderBottom must have a tile defined if present")
-	}
-	if p.BorderRight != nil && p.BorderRight.Tile == 0 {
-		return fmt.Errorf("BorderRight must have a tile defined if present")
-	}
-	if p.BorderTopAndBottom != nil && p.BorderTopAndBottom.Tile == 0 {
-		return fmt.Errorf("BorderTopAndBottom must have a tile defined if present")
-	}
-	if p.BorderLeftAndRight != nil && p.BorderLeftAndRight.Tile == 0 {
-		return fmt.Errorf("BorderLeftAndRight must have a tile defined if present")
-	}
-	if p.EndWayLeft != nil && p.EndWayLeft.Tile == 0 {
-		return fmt.Errorf("EndWayLeft must have a tile defined if present")
-	}
-	if p.EndWayTop != nil && p.EndWayTop.Tile == 0 {
-		return fmt.Errorf("EndWayTop must have a tile defined if present")
-	}
-	if p.EndWayRight != nil && p.EndWayRight.Tile == 0 {
-		return fmt.Errorf("EndWayRight must have a tile defined if present")
-	}
-	if p.EndWayBottom != nil && p.EndWayBottom.Tile == 0 {
-		return fmt.Errorf("EndWayBottom must have a tile defined if present")
-	}
 	return nil
 }
 

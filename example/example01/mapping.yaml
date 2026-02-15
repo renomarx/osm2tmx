@@ -54,7 +54,7 @@ layers:
       aeroway:
         tile: 847
       building:
-        tile: 417
+        tile: 565
         values:
           religious:
             tile: 465
@@ -224,7 +224,7 @@ custom_tiles:
   120:
     position:
       standalone:
-        tile: 128
+        tile: 0
       corner_top_left:
         tile: 113
       corner_top_right:
@@ -255,12 +255,39 @@ custom_tiles:
         tile: 135
   465:
     position:
+      # removing all "lonely" points of the building
       standalone:
-        tile: 431
+        tile: 0
+      end_way_right:
+        tile: 0
+      end_way_left:
+        tile: 0
+      end_way_top:
+        tile: 0
+      border_top_and_bottom:
+        tile: 0
     walls:
+      - tiles_from_bottom: [489,481,481,473,465]
       - tiles_from_bottom: [489,481,473,465]
       - tiles_from_bottom: [419,419,465]
       - tiles_from_bottom: [419,465]
+  565:
+    position:
+      # removing all "lonely" points of the building
+      standalone:
+        tile: 0
+      end_way_right:
+        tile: 0
+      end_way_left:
+        tile: 0
+      end_way_top:
+        tile: 0
+      border_top_and_bottom:
+        tile: 0
+    walls:
+      - tiles_from_bottom: [425,417,573,565]
+      - tiles_from_bottom: [425,573,565]
+      - tiles_from_bottom: [425,573]
   41:
     rectangle: [
       [11, 12],
