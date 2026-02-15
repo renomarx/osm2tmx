@@ -14,7 +14,8 @@ type Mapper struct {
 }
 
 type MapTile struct {
-	ByLayer map[int]model.Tile
+	ByLayer           map[int]model.Tile
+	RectanglesByLayer map[int][][]model.Tile
 }
 
 func New(m *model.Map, conf Mapping) *Mapper {
@@ -89,59 +90,62 @@ func (m *Mapper) mapTileValue(tv TileValue, pos model.Position) model.Tile {
 
 func (m *Mapper) GetCustomTile(pos model.Position) MapTile {
 	byLayer := make(map[int]model.Tile)
+	rectanglesByLayer := make(map[int][][]model.Tile)
 	for layer := range m.m.Layers {
 		tile := m.m.Layers[layer].GetCell(pos.X, pos.Y).Tile
 		// if any, overload tile with custom tile
-		for tileMapped, customTile := range m.conf.CustomTiles {
-			if tile == tileMapped {
-				if customTile.Position != nil {
-					switch {
-					case customTile.Position.Standalone != nil && m.isStandalone(layer, pos, tile):
-						tile = customTile.Position.Standalone.Tile
-					case customTile.Position.CornerTopLeft != nil && m.isCornerTopLeft(layer, pos, tile):
-						tile = customTile.Position.CornerTopLeft.Tile
-					case customTile.Position.CornerTopRight != nil && m.isCornerTopRight(layer, pos, tile):
-						tile = customTile.Position.CornerTopRight.Tile
-					case customTile.Position.CornerBottomLeft != nil && m.isCornerBottomLeft(layer, pos, tile):
-						tile = customTile.Position.CornerBottomLeft.Tile
-					case customTile.Position.CornerBottomRight != nil && m.isCornerBottomRight(layer, pos, tile):
-						tile = customTile.Position.CornerBottomRight.Tile
-					case customTile.Position.BorderTop != nil && m.isBorderTop(layer, pos, tile):
-						tile = customTile.Position.BorderTop.Tile
-					case customTile.Position.BorderBottom != nil && m.isBorderBottom(layer, pos, tile):
-						tile = customTile.Position.BorderBottom.Tile
-					case customTile.Position.BorderLeft != nil && m.isBorderLeft(layer, pos, tile):
-						tile = customTile.Position.BorderLeft.Tile
-					case customTile.Position.BorderRight != nil && m.isBorderRight(layer, pos, tile):
-						tile = customTile.Position.BorderRight.Tile
-					case customTile.Position.BorderTopAndBottom != nil && m.isBorderTopAndBottom(layer, pos, tile):
-						tile = customTile.Position.BorderTopAndBottom.Tile
-					case customTile.Position.BorderLeftAndRight != nil && m.isBorderLeftAndRight(layer, pos, tile):
-						tile = customTile.Position.BorderLeftAndRight.Tile
-					case customTile.Position.EndWayLeft != nil && m.isEndWayLeft(layer, pos, tile):
-						tile = customTile.Position.EndWayLeft.Tile
-					case customTile.Position.EndWayTop != nil && m.isEndWayTop(layer, pos, tile):
-						tile = customTile.Position.EndWayTop.Tile
-					case customTile.Position.EndWayBottom != nil && m.isEndWayBottom(layer, pos, tile):
-						tile = customTile.Position.EndWayBottom.Tile
-					case customTile.Position.EndWayRight != nil && m.isEndWayRight(layer, pos, tile):
-						tile = customTile.Position.EndWayRight.Tile
+		customTile, exists := m.conf.CustomTiles[tile]
+		if exists {
+			if customTile.Position != nil {
+				switch {
+				case customTile.Position.Standalone != nil && m.isStandalone(layer, pos, tile):
+					tile = customTile.Position.Standalone.Tile
+				case customTile.Position.CornerTopLeft != nil && m.isCornerTopLeft(layer, pos, tile):
+					tile = customTile.Position.CornerTopLeft.Tile
+				case customTile.Position.CornerTopRight != nil && m.isCornerTopRight(layer, pos, tile):
+					tile = customTile.Position.CornerTopRight.Tile
+				case customTile.Position.CornerBottomLeft != nil && m.isCornerBottomLeft(layer, pos, tile):
+					tile = customTile.Position.CornerBottomLeft.Tile
+				case customTile.Position.CornerBottomRight != nil && m.isCornerBottomRight(layer, pos, tile):
+					tile = customTile.Position.CornerBottomRight.Tile
+				case customTile.Position.BorderTop != nil && m.isBorderTop(layer, pos, tile):
+					tile = customTile.Position.BorderTop.Tile
+				case customTile.Position.BorderBottom != nil && m.isBorderBottom(layer, pos, tile):
+					tile = customTile.Position.BorderBottom.Tile
+				case customTile.Position.BorderLeft != nil && m.isBorderLeft(layer, pos, tile):
+					tile = customTile.Position.BorderLeft.Tile
+				case customTile.Position.BorderRight != nil && m.isBorderRight(layer, pos, tile):
+					tile = customTile.Position.BorderRight.Tile
+				case customTile.Position.BorderTopAndBottom != nil && m.isBorderTopAndBottom(layer, pos, tile):
+					tile = customTile.Position.BorderTopAndBottom.Tile
+				case customTile.Position.BorderLeftAndRight != nil && m.isBorderLeftAndRight(layer, pos, tile):
+					tile = customTile.Position.BorderLeftAndRight.Tile
+				case customTile.Position.EndWayLeft != nil && m.isEndWayLeft(layer, pos, tile):
+					tile = customTile.Position.EndWayLeft.Tile
+				case customTile.Position.EndWayTop != nil && m.isEndWayTop(layer, pos, tile):
+					tile = customTile.Position.EndWayTop.Tile
+				case customTile.Position.EndWayBottom != nil && m.isEndWayBottom(layer, pos, tile):
+					tile = customTile.Position.EndWayBottom.Tile
+				case customTile.Position.EndWayRight != nil && m.isEndWayRight(layer, pos, tile):
+					tile = customTile.Position.EndWayRight.Tile
+				}
+			}
+			if len(customTile.Walls) > 0 {
+				for _, wall := range customTile.Walls {
+					posInWall := m.getWallPos(wall, layer, pos, tile)
+					if posInWall != -1 {
+						tile = wall.TilesFromBottom[posInWall]
 					}
 				}
-				if len(customTile.Walls) > 0 {
-					for _, wall := range customTile.Walls {
-						posInWall := m.getWallPos(wall, layer, pos, tile)
-						if posInWall != -1 {
-							tile = wall.TilesFromBottom[posInWall]
-						}
-					}
-				}
+			}
+			if len(customTile.Rectangle) > 0 {
+				rectanglesByLayer[layer] = customTile.Rectangle
 			}
 		}
 		byLayer[layer] = tile
 	}
 
-	return MapTile{ByLayer: byLayer}
+	return MapTile{ByLayer: byLayer, RectanglesByLayer: rectanglesByLayer}
 }
 
 func (m *Mapper) getWallPos(wall Wall, layer int, pos model.Position, tile model.Tile) int {

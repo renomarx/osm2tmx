@@ -125,6 +125,69 @@ layers:
                   min: 1400
                   tile: 1351
 
+  2:
+    tags:
+      highway:
+        tile: 120
+      natural:
+        values:
+          wood:
+            random:
+              - min: 80
+                max: 85
+                tile: 41
+                altitude:
+                  min: 1400
+                  tile: 1351
+              - min: 85
+                max: 90
+                tile: 42
+                altitude:
+                  min: 1400
+                  tile: 1351
+              - min: 90
+                max: 95
+                tile: 43
+                altitude:
+                  min: 1400
+                  tile: 1351
+              - min: 95
+                max: 100
+                tile: 44
+                altitude:
+                  min: 1400
+                  tile: 1351
+          tree:
+            tile: 41
+      landuse:
+        values:
+          forest:
+            random:
+              - min: 80
+                max: 85
+                tile: 41
+                altitude:
+                  min: 1400
+                  tile: 1351
+              - min: 85
+                max: 90
+                tile: 42
+                altitude:
+                  min: 1400
+                  tile: 1351
+              - min: 90
+                max: 95
+                tile: 43
+                altitude:
+                  min: 1400
+                  tile: 1351
+              - min: 95
+                max: 100
+                tile: 44
+                altitude:
+                  min: 1400
+                  tile: 1351
+
 custom_tiles:
   1378:
     position:
@@ -193,14 +256,13 @@ custom_tiles:
   465:
     position:
       standalone:
-        tile: 479
-      end_way_right:
-        tile: 479
-      end_way_left:
-        tile: 479
-      end_way_top:
-        tile: 479
+        tile: 431
     walls:
       - tiles_from_bottom: [489,481,473,465]
       - tiles_from_bottom: [419,419,465]
       - tiles_from_bottom: [419,465]
+  41:
+    rectangle: [
+      [11, 12],
+      [19, 20]
+    ]

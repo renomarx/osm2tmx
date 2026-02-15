@@ -212,6 +212,15 @@ func (r *Raster) drawCustomTiles() {
 			for z, tile := range mapTile.ByLayer {
 				newMap.Layers[z].SetTile(x, y, tile)
 			}
+			for z, rect := range mapTile.RectanglesByLayer {
+				for j := 0; j < len(rect); j++ {
+					for i := 0; i < len(rect[j]); i++ {
+						// Rectangle is drawed from bottom-right corner
+						// ! important in order to not be overloaded by the next loop
+						newMap.Layers[z].SetTile(x-i, y-j, rect[len(rect)-1-j][len(rect[j])-1-i])
+					}
+				}
+			}
 		}
 	}
 	r.m = &newMap

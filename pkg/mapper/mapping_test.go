@@ -325,5 +325,11 @@ var mappingTest = Mapping{
 				},
 			},
 		},
+		41: {
+			Rectangle: [][]model.Tile{
+				{11, 12},
+				{19, 20},
+			},
+		},
 	},
 }

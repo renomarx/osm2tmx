@@ -277,5 +277,18 @@ func TestMapper(t *testing.T) {
 			assert.Equal(t, model.Tile(481), mapper.GetCustomTile(model.Position{X: 2, Y: 3}).ByLayer[0])
 			assert.Equal(t, model.Tile(489), mapper.GetCustomTile(model.Position{X: 2, Y: 4}).ByLayer[0])
 		})
+		t.Run("rectangle", func(t *testing.T) {
+			m := model.Map{}
+			m.Init(1, 6, 6, func(x, y int) model.Tile { return 2 })
+			m.Layers[0].SetTile(2, 2, 41)
+			mapper := New(&m, mapping)
+
+			mapTile := mapper.GetCustomTile(model.Position{X: 2, Y: 2})
+			rect := mapTile.RectanglesByLayer[0]
+			assert.Equal(t, [][]model.Tile{
+				{11, 12},
+				{19, 20},
+			}, rect)
+		})
 	})
 }

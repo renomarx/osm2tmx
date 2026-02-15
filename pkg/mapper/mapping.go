@@ -76,8 +76,9 @@ type Altitude struct {
 
 // CustomTile represents a custom mapping for a tile
 type CustomTile struct {
-	Walls    []Wall    `yaml:"walls,omitempty"`
-	Position *Position `yaml:"position,omitempty"`
+	Walls     []Wall         `yaml:"walls,omitempty"`
+	Position  *Position      `yaml:"position,omitempty"`
+	Rectangle [][]model.Tile `yaml:"rectangle,omitempty"`
 }
 
 // Wall represents a 2D wall inside a polygon (filled by the same tile):
