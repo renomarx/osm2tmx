@@ -199,7 +199,9 @@ custom_tiles:
       - tiles_from_bottom: [419,419,465]
       - tiles_from_bottom: [419,465]
   41:
-    rectangle: [
-      [11, 12],
-      [19, 20]
-    ]
+    rectangle:
+      tiles: [
+        [11, 12],
+        [19, 20]
+      ]
+      overlap: true

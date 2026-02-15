@@ -77,18 +77,23 @@ type Altitude struct {
 
 // CustomTile represents a custom mapping for a tile
 type CustomTile struct {
-	Walls     []Wall    `yaml:"walls,omitempty"`
-	Position  *Position `yaml:"position,omitempty"`
-	Rectangle Rectangle `yaml:"rectangle,omitempty"`
+	Walls     []Wall     `yaml:"walls,omitempty"`
+	Position  *Position  `yaml:"position,omitempty"`
+	Rectangle *Rectangle `yaml:"rectangle,omitempty"`
 }
 
 // Rectangle 2D sub-map points: [y][x] => Tile
 // used to represent custom objects
-type Rectangle [][]model.Tile
+type Rectangle struct {
+	Tiles [][]model.Tile `yaml:"tiles,omitempty"`
+	// Overlap forces the layer + 1 of the tile to be set with the new tile
+	// usefull to handle trees overlapping other trees in a forest for instance
+	Overlap bool `yaml:"overlap,omitempty"`
+}
 
 func (r Rectangle) Contains(tile model.Tile) bool {
-	for y := range r {
-		if slices.Contains(r[y], tile) {
+	for y := range r.Tiles {
+		if slices.Contains(r.Tiles[y], tile) {
 			return true
 		}
 	}

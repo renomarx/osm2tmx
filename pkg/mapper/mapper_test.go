@@ -286,8 +286,11 @@ func TestMapper(t *testing.T) {
 			mapTile := mapper.GetCustomTile(model.Position{X: 2, Y: 2})
 			rect := mapTile.RectanglesByLayer[0]
 			assert.Equal(t, Rectangle{
-				{11, 12},
-				{19, 20},
+				Tiles: [][]model.Tile{
+					{11, 12},
+					{19, 20},
+				},
+				Overlap: true,
 			}, rect)
 		})
 	})

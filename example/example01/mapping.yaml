@@ -53,17 +53,6 @@ layers:
         tile: 647
       aeroway:
         tile: 847
-      building:
-        tile: 565
-        values:
-          religious:
-            tile: 466
-          cathedral:
-            tile: 466
-          chapel:
-            tile: 466
-          church:
-            tile: 466
       highway:
         tile: 120
       natural:
@@ -127,66 +116,17 @@ layers:
 
   2:
     tags:
-      highway:
-        tile: 120
-      natural:
+      building:
+        tile: 565
         values:
-          wood:
-            random:
-              - min: 80
-                max: 85
-                tile: 41
-                altitude:
-                  min: 1400
-                  tile: 1351
-              - min: 85
-                max: 90
-                tile: 42
-                altitude:
-                  min: 1400
-                  tile: 1351
-              - min: 90
-                max: 95
-                tile: 43
-                altitude:
-                  min: 1400
-                  tile: 1351
-              - min: 95
-                max: 100
-                tile: 44
-                altitude:
-                  min: 1400
-                  tile: 1351
-          tree:
-            tile: 41
-      landuse:
-        values:
-          forest:
-            random:
-              - min: 80
-                max: 85
-                tile: 41
-                altitude:
-                  min: 1400
-                  tile: 1351
-              - min: 85
-                max: 90
-                tile: 42
-                altitude:
-                  min: 1400
-                  tile: 1351
-              - min: 90
-                max: 95
-                tile: 43
-                altitude:
-                  min: 1400
-                  tile: 1351
-              - min: 95
-                max: 100
-                tile: 44
-                altitude:
-                  min: 1400
-                  tile: 1351
+          religious:
+            tile: 466
+          cathedral:
+            tile: 466
+          chapel:
+            tile: 466
+          church:
+            tile: 466
 
 custom_tiles:
   1378:
@@ -293,7 +233,9 @@ custom_tiles:
       - tiles_from_bottom: [425,573,565]
       - tiles_from_bottom: [425,573]
   41:
-    rectangle: [
-      [11, 12],
-      [19, 20]
-    ]
+    rectangle:
+      tiles: [
+        [11, 12],
+        [19, 20]
+      ]
+      overlap: true

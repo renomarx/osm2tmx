@@ -144,8 +144,11 @@ func (m *Mapper) GetCustomTile(pos model.Position) CustomMapTile {
 					}
 				}
 			}
-			if len(customTile.Rectangle) > 0 {
-				rectanglesByLayer[layer] = customTile.Rectangle
+			if customTile.Rectangle != nil {
+				rectanglesByLayer[layer] = *customTile.Rectangle
+				if customTile.Rectangle.Overlap && layer < len(rectanglesByLayer)-1 {
+					rectanglesByLayer[layer+1] = *customTile.Rectangle
+				}
 			}
 		}
 		byLayer[layer] = tile
