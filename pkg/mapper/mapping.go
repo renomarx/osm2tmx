@@ -2,6 +2,7 @@ package mapper
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/renomarx/osm2tmx/pkg/model"
 )
@@ -76,9 +77,22 @@ type Altitude struct {
 
 // CustomTile represents a custom mapping for a tile
 type CustomTile struct {
-	Walls     []Wall         `yaml:"walls,omitempty"`
-	Position  *Position      `yaml:"position,omitempty"`
-	Rectangle [][]model.Tile `yaml:"rectangle,omitempty"`
+	Walls     []Wall    `yaml:"walls,omitempty"`
+	Position  *Position `yaml:"position,omitempty"`
+	Rectangle Rectangle `yaml:"rectangle,omitempty"`
+}
+
+// Rectangle 2D sub-map points: [y][x] => Tile
+// used to represent custom objects
+type Rectangle [][]model.Tile
+
+func (r Rectangle) Contains(tile model.Tile) bool {
+	for y := range r {
+		if slices.Contains(r[y], tile) {
+			return true
+		}
+	}
+	return false
 }
 
 // Wall represents a 2D wall inside a polygon (filled by the same tile):

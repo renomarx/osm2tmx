@@ -14,8 +14,7 @@ type Mapper struct {
 }
 
 type MapTile struct {
-	ByLayer           map[int]model.Tile
-	RectanglesByLayer map[int][][]model.Tile
+	ByLayer map[int]model.Tile
 }
 
 func New(m *model.Map, conf Mapping) *Mapper {
@@ -88,9 +87,14 @@ func (m *Mapper) mapTileValue(tv TileValue, pos model.Position) model.Tile {
 	return tv.Tile
 }
 
-func (m *Mapper) GetCustomTile(pos model.Position) MapTile {
-	byLayer := make(map[int]model.Tile)
-	rectanglesByLayer := make(map[int][][]model.Tile)
+type CustomMapTile struct {
+	ByLayer           []model.Tile
+	RectanglesByLayer []Rectangle
+}
+
+func (m *Mapper) GetCustomTile(pos model.Position) CustomMapTile {
+	byLayer := make([]model.Tile, m.Layers())
+	rectanglesByLayer := make([]Rectangle, m.Layers())
 	for layer := range m.m.Layers {
 		tile := m.m.Layers[layer].GetCell(pos.X, pos.Y).Tile
 		// if any, overload tile with custom tile
@@ -145,7 +149,7 @@ func (m *Mapper) GetCustomTile(pos model.Position) MapTile {
 		byLayer[layer] = tile
 	}
 
-	return MapTile{ByLayer: byLayer, RectanglesByLayer: rectanglesByLayer}
+	return CustomMapTile{ByLayer: byLayer, RectanglesByLayer: rectanglesByLayer}
 }
 
 func (m *Mapper) getWallPos(wall Wall, layer int, pos model.Position, tile model.Tile) int {
