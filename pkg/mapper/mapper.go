@@ -93,8 +93,8 @@ type CustomMapTile struct {
 }
 
 func (m *Mapper) GetCustomTile(pos model.Position) CustomMapTile {
-	byLayer := make([]model.Tile, m.Layers())
-	rectanglesByLayer := make([]Rectangle, m.Layers())
+	byLayer := make([]model.Tile, len(m.m.Layers))
+	rectanglesByLayer := make([]Rectangle, len(m.m.Layers))
 	for layer := range m.m.Layers {
 		tile := m.m.Layers[layer].GetCell(pos.X, pos.Y).Tile
 		// if any, overload tile with custom tile
