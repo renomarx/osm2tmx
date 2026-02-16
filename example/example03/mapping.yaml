@@ -4,7 +4,7 @@ tileset:
   tile_height: 32
 
 default:
-  tile: 711
+  tile: 182
 
 layers:
   0:
@@ -28,7 +28,7 @@ layers:
             sand:
               tile: 61
             asphalt:
-              tile: 711
+              tile: 182
       landuse:
         values:
           forest:
@@ -43,6 +43,8 @@ layers:
     tags:
       building:
         tile: 174
+  3:
+  # only here to allow building overlapping
 
 custom_tiles:
   174:
@@ -56,19 +58,30 @@ custom_tiles:
         tile: 0
       end_way_top:
         tile: 0
+      border_left_and_right:
+        tile: 0
       border_top_and_bottom:
         tile: 0
       border_top:
-        tile: 142
+        tile: 0
       corner_top_left:
-        tile: 141
+        tile: 0
       border_left:
-        tile: 173
+        tile: 0
       corner_top_right:
-        tile: 147
+        tile: 0
       border_right:
-        tile: 179
-    walls:
-      - tiles_from_bottom: [270,238,206,174]
-      - tiles_from_bottom: [270,238,206]
-      - tiles_from_bottom: [270,206]
+        tile: 0
+      border_bottom:
+        tile: 0
+      end_way_bottom:
+        tile: 0
+    rectangle:
+      tiles: [
+        [141, 142, 143, 144, 145, 146, 147],
+        [173, 174, 175, 176, 177, 178, 179],
+        [205, 206, 207, 208, 209, 210, 211],
+        [237, 238, 239, 240, 241, 242, 243],
+        [269, 270, 271, 272, 273, 274, 275]
+      ]
+      overlap: true
