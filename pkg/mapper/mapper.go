@@ -145,32 +145,36 @@ func (m *Mapper) GetCustomTile(pos model.Position) CustomMapTile {
 				}
 			}
 			if customTile.Rectangle != nil {
+				drawRectangle := true
 				if customTile.Rectangle.Density > 0 {
 					tile = 0
 					rect := customTile.Rectangle.Tiles
-					if m.m.Layers[layer].GetCell(pos.X-len(rect[0]), pos.Y-len(rect)).Tile == initialTile &&
-						pos.X%len(rect[0]) == 0 && pos.Y%(len(rect)/int(customTile.Rectangle.Density)) == 0 {
-						rectanglesByLayer[layer] = *customTile.Rectangle
-						if customTile.Rectangle.Overlap && layer < len(rectanglesByLayer)-1 {
-							rectanglesByLayer[layer+1] = *customTile.Rectangle
-						}
-					}
-				} else {
+					drawRectangle = m.isRectangleInsidePolygon(layer, pos, *customTile.Rectangle, initialTile) &&
+						pos.X%len(rect[0]) == 0 && pos.Y%(len(rect)/int(customTile.Rectangle.Density)) == 0
+				}
+				if drawRectangle {
 					rectanglesByLayer[layer] = *customTile.Rectangle
 					if customTile.Rectangle.Overlap && layer < len(rectanglesByLayer)-1 {
 						rectanglesByLayer[layer+1] = *customTile.Rectangle
 					}
 				}
-				// TODO:
-				// if not overlap: only draw rectangles in a way to not overlap the others:
-				// for instance, we could only draw rectangles when x % len(rect[y]) == 0 && y % len(rect) == 0
-				// and map.layer[layer].GetCell(x-len(rect[y]),y-len(rect)).Tile == tile
 			}
 		}
 		byLayer[layer] = tile
 	}
 
 	return CustomMapTile{ByLayer: byLayer, RectanglesByLayer: rectanglesByLayer}
+}
+
+func (m *Mapper) isRectangleInsidePolygon(layer int, pos model.Position, rectangle Rectangle, tile model.Tile) bool {
+	for y := 0; y < len(rectangle.Tiles); y++ {
+		for x := 0; x < len(rectangle.Tiles[y]); x++ {
+			if m.m.Layers[layer].GetCell(pos.X-x, pos.Y-y).Tile != tile {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 func (m *Mapper) getWallPos(wall Wall, layer int, pos model.Position, tile model.Tile) int {
