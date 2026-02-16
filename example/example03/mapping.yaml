@@ -43,39 +43,10 @@ layers:
     tags:
       building:
         tile: 174
-  3:
-  # only here to allow building overlapping
 
 custom_tiles:
   174:
     position:
-      # removing all "lonely" points of the building
-      standalone:
-        tile: 0
-      end_way_right:
-        tile: 0
-      end_way_left:
-        tile: 0
-      end_way_top:
-        tile: 0
-      border_left_and_right:
-        tile: 0
-      border_top_and_bottom:
-        tile: 0
-      border_top:
-        tile: 0
-      corner_top_left:
-        tile: 0
-      border_left:
-        tile: 0
-      corner_top_right:
-        tile: 0
-      border_right:
-        tile: 0
-      border_bottom:
-        tile: 0
-      end_way_bottom:
-        tile: 0
     rectangle:
       tiles: [
         [141, 142, 143, 144, 145, 146, 147],
@@ -84,4 +55,4 @@ custom_tiles:
         [237, 238, 239, 240, 241, 242, 243],
         [269, 270, 271, 272, 273, 274, 275]
       ]
-      overlap: true
+      density: 1

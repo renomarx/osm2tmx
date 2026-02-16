@@ -89,6 +89,16 @@ type Rectangle struct {
 	// Overlap forces the layer + 1 of the tile to be set with the new tile
 	// usefull to handle trees overlapping other trees in a forest for instance
 	Overlap bool `yaml:"overlap,omitempty"`
+	// Density, if filled (>0), allows to fill a polygon (defined by the same tile)
+	// with multiple instances of the rectangle on Y axis:
+	//	- density == 0 means that no special handling will be made, and the rectangle will be drawed independently of its potential polygon container
+	//	- density == 1 means there will be only 1 rectangle covering the same points (no overlap) within a polygon
+	//	- density == 2 means there can be an overlap of 2 rectangles over the Y axis within a polygon
+	//	- etc...
+	// Having a density > 0 will set to 0 the tiles outside the rectanlges,
+	// so it will result in the transformation of the original polygon if it isn't a rectangle itself,
+	// and a multiple of Rectangle / density.
+	Density uint8 `yaml:"density,omitempty"`
 }
 
 func (r Rectangle) Contains(tile model.Tile) bool {

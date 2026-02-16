@@ -145,9 +145,21 @@ func (m *Mapper) GetCustomTile(pos model.Position) CustomMapTile {
 				}
 			}
 			if customTile.Rectangle != nil {
-				rectanglesByLayer[layer] = *customTile.Rectangle
-				if customTile.Rectangle.Overlap && layer < len(rectanglesByLayer)-1 {
-					rectanglesByLayer[layer+1] = *customTile.Rectangle
+				if customTile.Rectangle.Density > 0 {
+					tile = 0
+					rect := customTile.Rectangle.Tiles
+					if m.m.Layers[layer].GetCell(pos.X-len(rect[0]), pos.Y-len(rect)).Tile == initialTile &&
+						pos.X%len(rect[0]) == 0 && pos.Y%(len(rect)/int(customTile.Rectangle.Density)) == 0 {
+						rectanglesByLayer[layer] = *customTile.Rectangle
+						if customTile.Rectangle.Overlap && layer < len(rectanglesByLayer)-1 {
+							rectanglesByLayer[layer+1] = *customTile.Rectangle
+						}
+					}
+				} else {
+					rectanglesByLayer[layer] = *customTile.Rectangle
+					if customTile.Rectangle.Overlap && layer < len(rectanglesByLayer)-1 {
+						rectanglesByLayer[layer+1] = *customTile.Rectangle
+					}
 				}
 				// TODO:
 				// if not overlap: only draw rectangles in a way to not overlap the others:
