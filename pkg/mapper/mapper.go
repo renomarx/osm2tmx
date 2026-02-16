@@ -149,6 +149,10 @@ func (m *Mapper) GetCustomTile(pos model.Position) CustomMapTile {
 				if customTile.Rectangle.Overlap && layer < len(rectanglesByLayer)-1 {
 					rectanglesByLayer[layer+1] = *customTile.Rectangle
 				}
+				// TODO:
+				// if not overlap: only draw rectangles in a way to not overlap the others:
+				// for instance, we could only draw rectangles when x % len(rect[y]) == 0 && y % len(rect) == 0
+				// and map.layer[layer].GetCell(x-len(rect[y]),y-len(rect)).Tile == tile
 			}
 		}
 		byLayer[layer] = tile
