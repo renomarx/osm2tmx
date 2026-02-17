@@ -70,26 +70,22 @@ layers:
         values:
           wood:
             random:
-              - min: 80
-                max: 85
+              - probability: 5
                 tile: 41
                 altitude:
                   min: 1400
                   tile: 1351
-              - min: 85
-                max: 90
+              - probability: 5
                 tile: 42
                 altitude:
                   min: 1400
                   tile: 1351
-              - min: 90
-                max: 95
+              - probability: 5
                 tile: 43
                 altitude:
                   min: 1400
                   tile: 1351
-              - min: 95
-                max: 100
+              - probability: 5
                 tile: 44
                 altitude:
                   min: 1400
@@ -100,26 +96,22 @@ layers:
         values:
           forest:
             random:
-              - min: 80
-                max: 85
+              - probability: 5
                 tile: 41
                 altitude:
                   min: 1400
                   tile: 1351
-              - min: 85
-                max: 90
+              - probability: 5
                 tile: 42
                 altitude:
                   min: 1400
                   tile: 1351
-              - min: 90
-                max: 95
+              - probability: 5
                 tile: 43
                 altitude:
                   min: 1400
                   tile: 1351
-              - min: 95
-                max: 100
+              - probability: 5
                 tile: 44
                 altitude:
                   min: 1400

@@ -51,21 +51,16 @@ type TileValue struct {
 	Tile model.Tile `yaml:"tile,omitempty"`
 	// If not nil, the mapper will try to map the tile depending on the altitude of the point
 	Altitude *Altitude `yaml:"altitude,omitempty"`
-	// If filled, the mapper will choose a random value between [0,100] and associate the corresponding tile
-	// if the number is contained within one of the RandomRange
-	Random []RandomRange `yaml:"random,omitempty"`
+	// If filled, the mapper will choose a random tile depending on its probability
+	Random []RandomTile `yaml:"random,omitempty"`
 }
 
-// RandomRange is a range [Min,Max[, in percentage, to map a random tile:
-// the mapper will choose a random value between [0,100] and associate the corresponding tile
-// if the number is contained within the RandomRange
-type RandomRange struct {
-	// Min is a percentage (0-100)
-	Min int `yaml:"min"`
-	// Max is a percentage (0-100)
-	Max      int        `yaml:"max"`
-	Tile     model.Tile `yaml:"tile,omitempty"`
-	Altitude *Altitude  `yaml:"altitude,omitempty"`
+// RandomTile allows to randomly select a tile, with a frequency depending on its Probability
+type RandomTile struct {
+	// Probability is a percentage (1-100)
+	Probability int        `yaml:"probability"`
+	Tile        model.Tile `yaml:"tile,omitempty"`
+	Altitude    *Altitude  `yaml:"altitude,omitempty"`
 }
 
 // Altitude allows to set a different tile for points upper than the altitude.Min
@@ -177,11 +172,15 @@ func (t TileValue) Validate() error {
 			return fmt.Errorf("error validating Altitude: %w", err)
 		}
 	}
+	sumOfProbabilities := 0
 	for i, rr := range t.Random {
 		if err := rr.Validate(); err != nil {
 			return fmt.Errorf("error validating RandomRange #%d: %w", i, err)
 		}
-		// TODO: validate that random ranges do not intersect ?
+		sumOfProbabilities += rr.Probability
+	}
+	if sumOfProbabilities > 100 {
+		return fmt.Errorf("sum of random probabilities must be <= 100")
 	}
 	return nil
 }
@@ -238,20 +237,14 @@ func (a Altitude) Validate() error {
 	return nil
 }
 
-func (rr RandomRange) Validate() error {
+func (rr RandomTile) Validate() error {
 	if rr.Altitude != nil {
 		if err := rr.Altitude.Validate(); err != nil {
 			return fmt.Errorf("error validating Altitude: %w", err)
 		}
 	}
-	if rr.Max < 0 || rr.Max > 100 {
-		return fmt.Errorf("Max must be in interval [0;100]")
-	}
-	if rr.Min < 0 || rr.Min > 100 {
-		return fmt.Errorf("Min must be in interval [0;100]")
-	}
-	if rr.Max <= rr.Min {
-		return fmt.Errorf("Max must be > Min")
+	if rr.Probability < 1 || rr.Probability > 100 {
+		return fmt.Errorf("Probability must be in interval [1;100]")
 	}
 	return nil
 }

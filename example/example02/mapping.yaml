@@ -56,17 +56,13 @@ layers:
         values:
           wood:
             random:
-              - min: 80
-                max: 85
+              - probability: 5
                 tile: 848
-              - min: 85
-                max: 90
+              - probability: 5
                 tile: 849
-              - min: 90
-                max: 95
+              - probability: 5
                 tile: 850
-              - min: 95
-                max: 100
+              - probability: 5
                 tile: 852
           tree:
             tile: 848
@@ -74,17 +70,13 @@ layers:
         values:
           forest:
             random:
-              - min: 80
-                max: 85
+              - probability: 5
                 tile: 848
-              - min: 85
-                max: 90
+              - probability: 5
                 tile: 849
-              - min: 90
-                max: 95
+              - probability: 5
                 tile: 850
-              - min: 95
-                max: 100
+              - probability: 5
                 tile: 852
 
   2:

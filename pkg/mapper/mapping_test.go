@@ -117,38 +117,34 @@ var mappingTest = Mapping{
 				"natural": {
 					Values: map[string]TileValue{
 						"wood": {
-							Random: []RandomRange{
+							Random: []RandomTile{
 								{
-									Min:  80,
-									Max:  85,
-									Tile: 41,
+									Probability: 5,
+									Tile:        41,
 									Altitude: &Altitude{
 										Min:  1400,
 										Tile: 1351,
 									},
 								},
 								{
-									Min:  85,
-									Max:  90,
-									Tile: 42,
+									Probability: 5,
+									Tile:        42,
 									Altitude: &Altitude{
 										Min:  1400,
 										Tile: 1351,
 									},
 								},
 								{
-									Min:  90,
-									Max:  95,
-									Tile: 43,
+									Probability: 5,
+									Tile:        43,
 									Altitude: &Altitude{
 										Min:  1400,
 										Tile: 1351,
 									},
 								},
 								{
-									Min:  95,
-									Max:  100,
-									Tile: 44,
+									Probability: 5,
+									Tile:        44,
 									Altitude: &Altitude{
 										Min:  1400,
 										Tile: 1351,
@@ -164,38 +160,34 @@ var mappingTest = Mapping{
 				"landuse": Tag{
 					Values: map[string]TileValue{
 						"forest": {
-							Random: []RandomRange{
+							Random: []RandomTile{
 								{
-									Min:  80,
-									Max:  85,
-									Tile: 41,
+									Probability: 5,
+									Tile:        41,
 									Altitude: &Altitude{
 										Min:  1400,
 										Tile: 1351,
 									},
 								},
 								{
-									Min:  85,
-									Max:  90,
-									Tile: 42,
+									Probability: 5,
+									Tile:        42,
 									Altitude: &Altitude{
 										Min:  1400,
 										Tile: 1351,
 									},
 								},
 								{
-									Min:  90,
-									Max:  95,
-									Tile: 43,
+									Probability: 5,
+									Tile:        43,
 									Altitude: &Altitude{
 										Min:  1400,
 										Tile: 1351,
 									},
 								},
 								{
-									Min:  95,
-									Max:  100,
-									Tile: 44,
+									Probability: 5,
+									Tile:        44,
 									Altitude: &Altitude{
 										Min:  1400,
 										Tile: 1351,

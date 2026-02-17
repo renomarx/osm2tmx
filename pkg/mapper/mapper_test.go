@@ -97,7 +97,7 @@ func TestMapper(t *testing.T) {
 
 	t.Run("correctly map random & altitude", func(t *testing.T) {
 		mapper := New(&model.Map{}, mapping)
-		mapper.randFunc = func(i int) int { return 91 }
+		mapper.randFunc = func(i int) int { return 11 }
 
 		tags := osm.Tags{
 			osm.Tag{

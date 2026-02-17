@@ -72,8 +72,9 @@ func (m *Mapper) mapTileValue(tv TileValue, pos model.Position) model.Tile {
 	}
 	if len(tv.Random) > 0 {
 		r := m.randFunc(100)
+		p := 0
 		for _, rr := range tv.Random {
-			if r >= rr.Min && r < rr.Max {
+			if r >= p && r < p+rr.Probability {
 				if rr.Altitude != nil {
 					if pos.Z > rr.Altitude.Min {
 						return rr.Altitude.Tile
@@ -81,6 +82,7 @@ func (m *Mapper) mapTileValue(tv TileValue, pos model.Position) model.Tile {
 				}
 				return rr.Tile
 			}
+			p += rr.Probability
 		}
 	}
 
