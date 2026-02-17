@@ -92,7 +92,7 @@ func TestMapper(t *testing.T) {
 
 		mapTile := mapper.MapTile(tags, model.Position{})
 		assert.Equal(t, model.Tile(8), mapTile.ByLayer[0])
-		assert.Equal(t, model.Tile(417), mapTile.ByLayer[1])
+		assert.Equal(t, model.Tile(565), mapTile.ByLayer[2])
 	})
 
 	t.Run("correctly map random & altitude", func(t *testing.T) {
@@ -121,7 +121,7 @@ func TestMapper(t *testing.T) {
 			m.Layers[0].SetTile(2, 2, 120)
 			mapper := New(&m, mapping)
 
-			assert.Equal(t, model.Tile(128), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
+			assert.Equal(t, model.Tile(0), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
 		})
 		t.Run("position corner_top_left", func(t *testing.T) {
 			m := model.Map{}
@@ -263,20 +263,6 @@ func TestMapper(t *testing.T) {
 
 			assert.Equal(t, model.Tile(135), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
 		})
-		t.Run("wall", func(t *testing.T) {
-			m := model.Map{}
-			m.Init(1, 6, 6, func(x, y int) model.Tile { return 2 })
-			m.Layers[0].SetTile(2, 1, 465)
-			m.Layers[0].SetTile(2, 2, 465)
-			m.Layers[0].SetTile(2, 3, 465)
-			m.Layers[0].SetTile(2, 4, 465)
-			mapper := New(&m, mapping)
-
-			assert.Equal(t, model.Tile(465), mapper.GetCustomTile(model.Position{X: 2, Y: 1}).ByLayer[0])
-			assert.Equal(t, model.Tile(473), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
-			assert.Equal(t, model.Tile(481), mapper.GetCustomTile(model.Position{X: 2, Y: 3}).ByLayer[0])
-			assert.Equal(t, model.Tile(489), mapper.GetCustomTile(model.Position{X: 2, Y: 4}).ByLayer[0])
-		})
 		t.Run("rectangle", func(t *testing.T) {
 			m := model.Map{}
 			m.Init(1, 6, 6, func(x, y int) model.Tile { return 2 })
@@ -292,6 +278,60 @@ func TestMapper(t *testing.T) {
 				},
 				Overlap: true,
 			}, rect)
+		})
+		t.Run("rectangle with one column", func(t *testing.T) {
+			m := model.Map{}
+			m.Init(1, 6, 6, func(x, y int) model.Tile { return 2 })
+			m.Layers[0].SetTile(2, 1, 466)
+			m.Layers[0].SetTile(2, 2, 466)
+			m.Layers[0].SetTile(2, 3, 466)
+			m.Layers[0].SetTile(2, 4, 466)
+			mapper := New(&m, mapping)
+
+			for y := 1; y <= 4; y++ {
+				mapTile := mapper.GetCustomTile(model.Position{X: 2, Y: y})
+				rect := mapTile.RectanglesByLayer[0]
+				assert.Equal(t, Rectangle{
+					Tiles: [][]model.Tile{
+						{466},
+						{474},
+						{481},
+						{489},
+					},
+					Overlap: true,
+				}, rect)
+			}
+		})
+		t.Run("rectangle with density 2 inside polygon", func(t *testing.T) {
+			m := model.Map{}
+			m.Init(1, 16, 16, func(x, y int) model.Tile { return 2 })
+			for y := 3; y < 12; y++ {
+				for x := 3; x < 12; x++ {
+					m.Layers[0].SetTile(x, y, 565)
+				}
+			}
+			mapper := New(&m, mapping)
+
+			for y := 3; y < 12; y++ {
+				for x := 3; x < 12; x++ {
+					mapTile := mapper.GetCustomTile(model.Position{X: x, Y: y})
+					assert.Equal(t, model.Tile(0), mapTile.ByLayer[0])
+					rect := mapTile.RectanglesByLayer[0]
+					if (x == 8 && y == 6) || (x == 8 && y == 8) || (x == 8 && y == 10) {
+						assert.Equal(t, Rectangle{
+							Tiles: [][]model.Tile{
+								{433, 434, 434, 435},
+								{441, 442, 442, 443},
+								{449, 440, 450, 451},
+								{457, 448, 458, 459},
+							},
+							Density: 2,
+						}, rect)
+					} else {
+						assert.Empty(t, rect)
+					}
+				}
+			}
 		})
 	})
 }

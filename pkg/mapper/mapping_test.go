@@ -90,25 +90,6 @@ var mappingTest = Mapping{
 						Tile: 847,
 					},
 				},
-				"building": {
-					TileValue: TileValue{
-						Tile: 417,
-					},
-					Values: map[string]TileValue{
-						"religious": {
-							Tile: 465,
-						},
-						"cathedral": {
-							Tile: 465,
-						},
-						"chapel": {
-							Tile: 465,
-						},
-						"church": {
-							Tile: 465,
-						},
-					},
-				},
 				"highway": {
 					TileValue: TileValue{
 						Tile: 120,
@@ -194,6 +175,29 @@ var mappingTest = Mapping{
 									},
 								},
 							},
+						},
+					},
+				},
+			},
+		},
+		2: LayerTags{
+			Tags: map[string]Tag{
+				"building": {
+					TileValue: TileValue{
+						Tile: 565,
+					},
+					Values: map[string]TileValue{
+						"religious": {
+							Tile: 466,
+						},
+						"cathedral": {
+							Tile: 466,
+						},
+						"chapel": {
+							Tile: 466,
+						},
+						"church": {
+							Tile: 466,
 						},
 					},
 				},

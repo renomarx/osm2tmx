@@ -53,17 +53,6 @@ layers:
         tile: 647
       aeroway:
         tile: 847
-      building:
-        tile: 417
-        values:
-          religious:
-            tile: 465
-          cathedral:
-            tile: 465
-          chapel:
-            tile: 465
-          church:
-            tile: 465
       highway:
         tile: 120
       natural:
@@ -117,6 +106,20 @@ layers:
                   min: 1400
                   tile: 1351
 
+  2:
+    tags:
+      building:
+        tile: 565
+        values:
+          religious:
+            tile: 466
+          cathedral:
+            tile: 466
+          chapel:
+            tile: 466
+          church:
+            tile: 466
+
 custom_tiles:
   1378:
     position:
@@ -153,7 +156,7 @@ custom_tiles:
   120:
     position:
       standalone:
-        tile: 128
+        tile: 0
       corner_top_left:
         tile: 113
       corner_top_right:
@@ -182,14 +185,24 @@ custom_tiles:
         tile: 152
       end_way_top:
         tile: 135
-  465:
-    position:
-      standalone:
-        tile: 431
-    walls:
-      - tiles_from_bottom: [489,481,473,465]
-      - tiles_from_bottom: [419,419,465]
-      - tiles_from_bottom: [419,465]
+  466:
+    rectangle:
+      tiles: [
+        [466],
+        [474],
+        [481],
+        [489]
+      ]
+      overlap: true
+  565:
+    rectangle:
+      tiles: [
+        [433, 434, 434, 435],
+        [441, 442, 442, 443],
+        [449, 440, 450, 451],
+        [457, 448, 458, 459]
+      ]
+      density: 2
   41:
     rectangle:
       tiles: [
