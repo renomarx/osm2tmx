@@ -72,7 +72,6 @@ type Altitude struct {
 
 // CustomTile represents a custom mapping for a tile
 type CustomTile struct {
-	Walls     []Wall     `yaml:"walls,omitempty"`
 	Position  *Position  `yaml:"position,omitempty"`
 	Rectangle *Rectangle `yaml:"rectangle,omitempty"`
 }
@@ -103,13 +102,6 @@ func (r Rectangle) Contains(tile model.Tile) bool {
 		}
 	}
 	return false
-}
-
-// Wall represents a 2D wall inside a polygon (filled by the same tile):
-// - the point under the wall (Y+1) is outside the polygon (different tile)
-// - All the points of the wall (from 0 to len(TilesFromBottom)) are inside the polygon
-type Wall struct {
-	TilesFromBottom []model.Tile `yaml:"tiles_from_bottom"`
 }
 
 // Position represents a tile mapping depending on the position of a point within a line or a polygon
@@ -255,21 +247,9 @@ func (ct CustomTile) Validate() error {
 			return fmt.Errorf("error validation Position: %w", err)
 		}
 	}
-	for i, wall := range ct.Walls {
-		if err := wall.Validate(); err != nil {
-			return fmt.Errorf("error validating Wall #%d: %w", i, err)
-		}
-		if len(wall.TilesFromBottom) == 0 {
-			return fmt.Errorf("wall %d must have tiles defined", i)
-		}
-	}
 	return nil
 }
 
 func (p Position) Validate() error {
-	return nil
-}
-
-func (w Wall) Validate() error {
 	return nil
 }

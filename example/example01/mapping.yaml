@@ -186,44 +186,23 @@ custom_tiles:
       end_way_top:
         tile: 135
   466:
-    position:
-      # removing all "lonely" points of the building
-      standalone:
-        tile: 0
-      end_way_right:
-        tile: 0
-      end_way_left:
-        tile: 0
-      end_way_top:
-        tile: 0
-      border_top_and_bottom:
-        tile: 0
-      border_left:
-        tile: 465
-      border_right:
-        tile: 467
-    walls:
-      - tiles_from_bottom: [489,481,481,474,466]
-      - tiles_from_bottom: [489,481,474,466]
-      - tiles_from_bottom: [419,419,466]
-      - tiles_from_bottom: [419,466]
+    rectangle:
+      tiles: [
+        [466],
+        [474],
+        [481],
+        [489]
+      ]
+      overlap: true
   565:
-    position:
-      # removing all "lonely" points of the building
-      standalone:
-        tile: 0
-      end_way_right:
-        tile: 0
-      end_way_left:
-        tile: 0
-      end_way_top:
-        tile: 0
-      border_top_and_bottom:
-        tile: 0
-    walls:
-      - tiles_from_bottom: [425,417,573,565]
-      - tiles_from_bottom: [425,573,565]
-      - tiles_from_bottom: [425,573]
+    rectangle:
+      tiles: [
+        [433, 434, 434, 435],
+        [441, 442, 442, 443],
+        [449, 440, 450, 451],
+        [457, 448, 458, 459]
+      ]
+      density: 2
   41:
     rectangle:
       tiles: [

@@ -253,7 +253,7 @@ var mappingTest = Mapping{
 		120: {
 			Position: &Position{
 				Standalone: &PositionTile{
-					Tile: 128,
+					Tile: 0,
 				},
 				CornerTopLeft: &PositionTile{
 					Tile: 113,
@@ -299,22 +299,26 @@ var mappingTest = Mapping{
 				},
 			},
 		},
-		465: {
-			Position: &Position{
-				Standalone: &PositionTile{
-					Tile: 431,
+		466: {
+			Rectangle: &Rectangle{
+				Tiles: [][]model.Tile{
+					{466},
+					{474},
+					{481},
+					{489},
 				},
+				Overlap: true,
 			},
-			Walls: []Wall{
-				{
-					TilesFromBottom: []model.Tile{489, 481, 473, 465},
+		},
+		565: {
+			Rectangle: &Rectangle{
+				Tiles: [][]model.Tile{
+					{433, 434, 434, 435},
+					{441, 442, 442, 443},
+					{449, 440, 450, 451},
+					{457, 448, 458, 459},
 				},
-				{
-					TilesFromBottom: []model.Tile{419, 419, 465},
-				},
-				{
-					TilesFromBottom: []model.Tile{419, 465},
-				},
+				Density: 2,
 			},
 		},
 		41: {
