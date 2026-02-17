@@ -78,6 +78,7 @@ Examples:
 
 ## TODO
 
+- Add randomness on custom_tiles.rectangle
 - More examples with other tilesets
 - Generate a tileset like OSM stylesheets to have a pretty map in tmx :)
 - Optimisation
