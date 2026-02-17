@@ -104,59 +104,84 @@ func (m *Mapper) GetCustomTile(pos model.Position) CustomMapTile {
 		customTile, exists := m.conf.CustomTiles[tile]
 		if exists {
 			if customTile.Position != nil {
-				switch {
-				case customTile.Position.Standalone != nil && m.isStandalone(layer, pos, tile):
-					tile = customTile.Position.Standalone.Tile
-				case customTile.Position.CornerTopLeft != nil && m.isCornerTopLeft(layer, pos, tile):
-					tile = customTile.Position.CornerTopLeft.Tile
-				case customTile.Position.CornerTopRight != nil && m.isCornerTopRight(layer, pos, tile):
-					tile = customTile.Position.CornerTopRight.Tile
-				case customTile.Position.CornerBottomLeft != nil && m.isCornerBottomLeft(layer, pos, tile):
-					tile = customTile.Position.CornerBottomLeft.Tile
-				case customTile.Position.CornerBottomRight != nil && m.isCornerBottomRight(layer, pos, tile):
-					tile = customTile.Position.CornerBottomRight.Tile
-				case customTile.Position.BorderTop != nil && m.isBorderTop(layer, pos, tile):
-					tile = customTile.Position.BorderTop.Tile
-				case customTile.Position.BorderBottom != nil && m.isBorderBottom(layer, pos, tile):
-					tile = customTile.Position.BorderBottom.Tile
-				case customTile.Position.BorderLeft != nil && m.isBorderLeft(layer, pos, tile):
-					tile = customTile.Position.BorderLeft.Tile
-				case customTile.Position.BorderRight != nil && m.isBorderRight(layer, pos, tile):
-					tile = customTile.Position.BorderRight.Tile
-				case customTile.Position.BorderTopAndBottom != nil && m.isBorderTopAndBottom(layer, pos, tile):
-					tile = customTile.Position.BorderTopAndBottom.Tile
-				case customTile.Position.BorderLeftAndRight != nil && m.isBorderLeftAndRight(layer, pos, tile):
-					tile = customTile.Position.BorderLeftAndRight.Tile
-				case customTile.Position.EndWayLeft != nil && m.isEndWayLeft(layer, pos, tile):
-					tile = customTile.Position.EndWayLeft.Tile
-				case customTile.Position.EndWayTop != nil && m.isEndWayTop(layer, pos, tile):
-					tile = customTile.Position.EndWayTop.Tile
-				case customTile.Position.EndWayBottom != nil && m.isEndWayBottom(layer, pos, tile):
-					tile = customTile.Position.EndWayBottom.Tile
-				case customTile.Position.EndWayRight != nil && m.isEndWayRight(layer, pos, tile):
-					tile = customTile.Position.EndWayRight.Tile
-				}
+				tile = m.mapCustomTilePosition(layer, pos, tile, *customTile.Position)
 			}
 			if customTile.Rectangle != nil {
-				drawRectangle := true
-				if customTile.Rectangle.Density > 0 {
-					tile = 0
-					rect := customTile.Rectangle.Tiles
-					drawRectangle = m.isRectangleInsidePolygon(layer, pos, *customTile.Rectangle, initialTile) &&
-						pos.X%len(rect[0]) == 0 && pos.Y%(len(rect)/int(customTile.Rectangle.Density)) == 0
-				}
-				if drawRectangle {
-					rectanglesByLayer[layer] = *customTile.Rectangle
-					if customTile.Rectangle.Overlap && layer < len(rectanglesByLayer)-1 {
-						rectanglesByLayer[layer+1] = *customTile.Rectangle
+				tile, rectanglesByLayer = m.mapCustomTileRectangle(layer, pos, tile, rectanglesByLayer, *customTile.Rectangle, initialTile)
+			}
+		}
+		if len(customTile.Random) > 0 {
+			r := m.randFunc(100)
+			p := 0
+			for _, rr := range customTile.Random {
+				if r >= p && r < p+rr.Probability {
+					if rr.Position != nil {
+						tile = m.mapCustomTilePosition(layer, pos, tile, *rr.Position)
+					}
+					if rr.Rectangle != nil {
+						tile, rectanglesByLayer = m.mapCustomTileRectangle(layer, pos, tile, rectanglesByLayer, *rr.Rectangle, initialTile)
 					}
 				}
+				p += rr.Probability
 			}
 		}
 		byLayer[layer] = tile
 	}
 
 	return CustomMapTile{ByLayer: byLayer, RectanglesByLayer: rectanglesByLayer}
+}
+
+func (m *Mapper) mapCustomTilePosition(layer int, pos model.Position, tile model.Tile, customTilePosition Position) model.Tile {
+	switch {
+	case customTilePosition.Standalone != nil && m.isStandalone(layer, pos, tile):
+		tile = customTilePosition.Standalone.Tile
+	case customTilePosition.CornerTopLeft != nil && m.isCornerTopLeft(layer, pos, tile):
+		tile = customTilePosition.CornerTopLeft.Tile
+	case customTilePosition.CornerTopRight != nil && m.isCornerTopRight(layer, pos, tile):
+		tile = customTilePosition.CornerTopRight.Tile
+	case customTilePosition.CornerBottomLeft != nil && m.isCornerBottomLeft(layer, pos, tile):
+		tile = customTilePosition.CornerBottomLeft.Tile
+	case customTilePosition.CornerBottomRight != nil && m.isCornerBottomRight(layer, pos, tile):
+		tile = customTilePosition.CornerBottomRight.Tile
+	case customTilePosition.BorderTop != nil && m.isBorderTop(layer, pos, tile):
+		tile = customTilePosition.BorderTop.Tile
+	case customTilePosition.BorderBottom != nil && m.isBorderBottom(layer, pos, tile):
+		tile = customTilePosition.BorderBottom.Tile
+	case customTilePosition.BorderLeft != nil && m.isBorderLeft(layer, pos, tile):
+		tile = customTilePosition.BorderLeft.Tile
+	case customTilePosition.BorderRight != nil && m.isBorderRight(layer, pos, tile):
+		tile = customTilePosition.BorderRight.Tile
+	case customTilePosition.BorderTopAndBottom != nil && m.isBorderTopAndBottom(layer, pos, tile):
+		tile = customTilePosition.BorderTopAndBottom.Tile
+	case customTilePosition.BorderLeftAndRight != nil && m.isBorderLeftAndRight(layer, pos, tile):
+		tile = customTilePosition.BorderLeftAndRight.Tile
+	case customTilePosition.EndWayLeft != nil && m.isEndWayLeft(layer, pos, tile):
+		tile = customTilePosition.EndWayLeft.Tile
+	case customTilePosition.EndWayTop != nil && m.isEndWayTop(layer, pos, tile):
+		tile = customTilePosition.EndWayTop.Tile
+	case customTilePosition.EndWayBottom != nil && m.isEndWayBottom(layer, pos, tile):
+		tile = customTilePosition.EndWayBottom.Tile
+	case customTilePosition.EndWayRight != nil && m.isEndWayRight(layer, pos, tile):
+		tile = customTilePosition.EndWayRight.Tile
+	}
+	return tile
+}
+
+func (m *Mapper) mapCustomTileRectangle(layer int, pos model.Position, tile model.Tile, rectanglesByLayer []Rectangle, customTileRectangle Rectangle, initialTile model.Tile) (model.Tile, []Rectangle) {
+	drawRectangle := true
+	if customTileRectangle.Density > 0 {
+		tile = 0
+		rect := customTileRectangle.Tiles
+		drawRectangle = m.isRectangleInsidePolygon(layer, pos, customTileRectangle, initialTile) &&
+			pos.X%len(rect[0]) == 0 && pos.Y%(len(rect)/int(customTileRectangle.Density)) == 0
+	}
+	if drawRectangle {
+		rectanglesByLayer[layer] = customTileRectangle
+		if customTileRectangle.Overlap && layer < len(rectanglesByLayer)-1 {
+			rectanglesByLayer[layer+1] = customTileRectangle
+		}
+	}
+	return tile, rectanglesByLayer
 }
 
 func (m *Mapper) isRectangleInsidePolygon(layer int, pos model.Position, rectangle Rectangle, tile model.Tile) bool {

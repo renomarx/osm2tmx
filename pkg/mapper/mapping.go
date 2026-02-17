@@ -74,6 +74,16 @@ type Altitude struct {
 type CustomTile struct {
 	Position  *Position  `yaml:"position,omitempty"`
 	Rectangle *Rectangle `yaml:"rectangle,omitempty"`
+	// If filled, the mapper will choose a random custom tile depending on its probability
+	Random []RandomCustomTile `yaml:"random,omitempty"`
+}
+
+// RandomCustomTile represents a random custom mapping for a tile
+type RandomCustomTile struct {
+	// Probability is a percentage (1-100)
+	Probability int        `yaml:"probability"`
+	Position    *Position  `yaml:"position,omitempty"`
+	Rectangle   *Rectangle `yaml:"rectangle,omitempty"`
 }
 
 // Rectangle 2D sub-map points: [y][x] => Tile

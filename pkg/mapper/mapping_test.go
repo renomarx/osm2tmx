@@ -324,6 +324,20 @@ var mappingTest = Mapping{
 				},
 				Density: 2,
 			},
+			Random: []RandomCustomTile{
+				{
+					Probability: 50,
+					Rectangle: &Rectangle{
+						Tiles: [][]model.Tile{
+							{385, 386, 386, 387},
+							{393, 394, 394, 395},
+							{401, 408, 402, 403},
+							{409, 416, 410, 411},
+						},
+						Density: 2,
+					},
+				},
+			},
 		},
 		41: {
 			Rectangle: &Rectangle{
