@@ -1,7 +1,7 @@
 tileset:
-  source: "tileset/basechip_pipo.tsx"
-  tile_width: 16
-  tile_height: 16
+  source: "tileset/[Base]BaseChip_pipo.tsx"
+  tile_width: 32
+  tile_height: 32
 
 default:
   tile: 2
@@ -43,7 +43,7 @@ layers:
           construction:
             tile: 8
           cemetery:
-            tile: 251
+            tile: 291
           meadow:
             tile: 1
 
@@ -105,6 +105,10 @@ layers:
                 altitude:
                   min: 1400
                   tile: 1351
+          cemetery:
+            random:
+              - probability: 10
+                tile: 616
 
   2:
     tags:
