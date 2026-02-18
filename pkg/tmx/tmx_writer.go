@@ -26,7 +26,7 @@ func (w *TMXWriter) Write(rasterResult model.RasterMap, tmxFilename string) erro
 		data := PrintCSVWithLastComma(&layer)
 		layers[z] = Layer{
 			ID:     z + 1,
-			Name:   fmt.Sprintf("Calque %d", z+1),
+			Name:   fmt.Sprintf("Layer %d", z+1),
 			Width:  rasterResult.Meta.MapSizeX,
 			Height: rasterResult.Meta.MapSizeY,
 			Data: Data{

@@ -72,7 +72,7 @@ func generateLayerTest(t *testing.T) *model.Layer {
 
 const expectedXML = `<map version="1.4" tiledversion="1.4.3" orientation="orthogonal" renderorder="right-down" width="12" height="6" tilewidth="16" tileheight="16">
   <tileset firstgid="1" source="tileset/basechip_pipo.tsx"></tileset>
-  <layer id="1" name="Calque 1" width="12" height="6">
+  <layer id="1" name="Layer 1" width="12" height="6">
     <data encoding="csv">0,0,0,0,0,0,0,0,0,0,0,0,
 0,2,2,2,2,2,2,2,2,2,2,0,
 0,2,0,0,0,0,0,0,0,0,2,0,
@@ -81,7 +81,7 @@ const expectedXML = `<map version="1.4" tiledversion="1.4.3" orientation="orthog
 0,0,0,0,0,0,0,0,0,0,0,0
 </data>
   </layer>
-  <layer id="2" name="Calque 2" width="12" height="6">
+  <layer id="2" name="Layer 2" width="12" height="6">
     <data encoding="csv">0,0,0,0,0,0,0,0,0,0,0,0,
 0,2,2,2,2,2,2,2,2,2,2,0,
 0,2,0,0,0,0,0,0,0,0,2,0,
