@@ -1,7 +1,7 @@
-tileset:
-  source: "tiles.tsx"
-  tile_width: 32
-  tile_height: 32
+tilesets:
+  - source: "tiles.tsx"
+    tile_width: 32
+    tile_height: 32
 
 default:
   tile: 592

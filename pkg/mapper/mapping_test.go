@@ -3,10 +3,12 @@ package mapper
 import "github.com/renomarx/osm2tmx/pkg/model"
 
 var mappingTest = Mapping{
-	Tileset: Tileset{
-		Source:     "tileset/basechip_pipo.tsx",
-		TileWidth:  16,
-		TileHeight: 16,
+	Tilesets: []Tileset{
+		{
+			Source:     "tiles.tsx",
+			TileWidth:  32,
+			TileHeight: 32,
+		},
 	},
 	Default: TileValue{
 		Tile: 2,

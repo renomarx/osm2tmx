@@ -140,7 +140,7 @@ func main() {
 
 	log.Printf("Number of points out of bounds: %d", rstMap.Meta.NodesOutOfBounds)
 
-	writer := tmx.NewWriter(mapping.Tileset.Source, mapping.Tileset.TileWidth, mapping.Tileset.TileHeight)
+	writer := tmx.NewWriter(mapping.Tilesets)
 	if err := writer.Write(rstMap, tmxFilename); err != nil {
 		log.Fatal(err)
 	}

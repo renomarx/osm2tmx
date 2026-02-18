@@ -3,19 +3,17 @@ package tmx
 import (
 	"fmt"
 
+	"github.com/renomarx/osm2tmx/pkg/mapper"
 	"github.com/renomarx/osm2tmx/pkg/model"
 )
 
 type TMXWriter struct {
-	tileset               string
-	tileWidth, tileHeight int
+	tilesets []mapper.Tileset
 }
 
-func NewWriter(tileset string, tileWidth, tileHeight int) *TMXWriter {
+func NewWriter(tilesets []mapper.Tileset) *TMXWriter {
 	return &TMXWriter{
-		tileset:    tileset,
-		tileWidth:  tileWidth,
-		tileHeight: tileHeight,
+		tilesets: tilesets,
 	}
 }
 
@@ -42,15 +40,16 @@ func (w *TMXWriter) Write(rasterResult model.RasterMap, tmxFilename string) erro
 		RenderOrder: "right-down",
 		Width:       rasterResult.Meta.MapSizeX,
 		Height:      rasterResult.Meta.MapSizeY,
-		TileWidth:   w.tileWidth,
-		TileHeight:  w.tileHeight,
-		Tilesets: []Tileset{
-			{
-				FirstGID: 1,
-				Source:   w.tileset,
-			},
-		},
-		Layers: layers,
+		TileWidth:   w.tilesets[0].TileWidth,
+		TileHeight:  w.tilesets[0].TileHeight,
+		Tilesets:    make([]Tileset, 0, len(w.tilesets)),
+		Layers:      layers,
+	}
+	for _, tileset := range w.tilesets {
+		tmxMap.Tilesets = append(tmxMap.Tilesets, Tileset{
+			FirstGID: tileset.FirstGID,
+			Source:   tileset.Source,
+		})
 	}
 	return SaveTMX(tmxFilename, &tmxMap)
 }

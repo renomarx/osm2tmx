@@ -1,7 +1,7 @@
-tileset:
-  source: "tileset/basechip_pipo.tsx"
-  tile_width: 16
-  tile_height: 16
+tilesets:
+  - source: "tiles.tsx"
+    tile_width: 32
+    tile_height: 32
 
 default:
   tile: 2

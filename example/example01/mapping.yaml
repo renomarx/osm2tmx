@@ -1,7 +1,12 @@
-tileset:
-  source: "tileset/[Base]BaseChip_pipo.tsx"
-  tile_width: 32
-  tile_height: 32
+tilesets:
+  - source: "tileset/[Base]BaseChip_pipo.tsx"
+    tile_width: 32
+    tile_height: 32
+    first_gid: 1
+  - source: "tileset/[A]Water_pipo.tsx"
+    tile_width: 32
+    tile_height: 32
+    first_gid: 1064
 
 default:
   tile: 2
@@ -12,20 +17,6 @@ default:
 layers:
   0:
     tags:
-      waterway:
-        tile: 318
-      water:
-        tile: 318
-      natural:
-        values:
-          water:
-            tile: 318
-          wood:
-            tile: 4
-          heath:
-            tile: 6
-          mash:
-            tile: 60
       surface:
         values:
           sand:
@@ -46,8 +37,24 @@ layers:
             tile: 291
           meadow:
             tile: 1
-
   1:
+    tags:
+      waterway:
+        tile: 1518 # 1064+454
+      water:
+        tile: 1518 # 1064+454
+      natural:
+        values:
+          water:
+            tile: 1518 # 1064+454
+          wood:
+            tile: 4
+          heath:
+            tile: 6
+          mash:
+            tile: 60
+
+  2:
     tags:
       aerialway:
         tile: 647
@@ -110,7 +117,7 @@ layers:
               - probability: 10
                 tile: 616
 
-  2:
+  3:
     tags:
       building:
         tile: 565
@@ -165,7 +172,7 @@ layers:
             tile: 565
 
 custom_tiles:
-  1378:
+  1378: # snow
     position:
       standalone:
         tile: 1376
@@ -197,7 +204,7 @@ custom_tiles:
         tile: 1407
       end_way_top:
         tile: 1391
-  6:
+  6: # highway
     position:
       standalone:
         tile: 0
@@ -229,6 +236,38 @@ custom_tiles:
         tile: 152
       end_way_top:
         tile: 135
+  1518: # water
+    position:
+      standalone:
+        tile: 1448 # 1064 + 384
+      corner_top_left:
+        tile: 1453 # 1064 + 389
+      corner_top_right:
+        tile: 1455 # 1064 + 391
+      corner_bottom_left:
+        tile: 1581 # 1064 + 517
+      corner_bottom_right:
+        tile: 1583 # 1064 + 519
+      border_top:
+        tile: 1454 # 1064 + 390
+      border_bottom:
+        tile: 1582 # 1064 + 518
+      border_left:
+        tile: 1517 # 1064 + 453
+      border_right:
+        tile: 1519 # 1064 + 455
+      border_left_and_right:
+        tile: 1516 # 1064 + 452
+      border_top_and_bottom:
+        tile: 1450 # 1064 + 386
+      end_way_right:
+        tile: 1451 # 1064 + 387
+      end_way_left:
+        tile: 1449 # 1064 + 385
+      end_way_bottom:
+        tile: 1580 # 1064 + 516
+      end_way_top:
+        tile: 1452 # 1064 + 388
   466:
     rectangle:
       tiles: [

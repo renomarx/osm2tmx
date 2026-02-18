@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/renomarx/osm2tmx/pkg/mapper"
 	"github.com/renomarx/osm2tmx/pkg/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -13,7 +14,21 @@ import (
 
 func TestTMXWriter(t *testing.T) {
 
-	writer := NewWriter("tileset/basechip_pipo.tsx", 16, 16)
+	tilesets := []mapper.Tileset{
+		{
+			Source:     "tileset/[Base]BaseChip_pipo.tsx",
+			TileWidth:  32,
+			TileHeight: 32,
+			FirstGID:   1,
+		},
+		{
+			Source:     "tileset/[A]Water_pipo.tsx",
+			TileWidth:  32,
+			TileHeight: 32,
+			FirstGID:   1064,
+		},
+	}
+	writer := NewWriter(tilesets)
 
 	m := model.Map{
 		Layers: []model.Layer{
@@ -70,8 +85,9 @@ func generateLayerTest(t *testing.T) *model.Layer {
 	return &layer
 }
 
-const expectedXML = `<map version="1.4" tiledversion="1.4.3" orientation="orthogonal" renderorder="right-down" width="12" height="6" tilewidth="16" tileheight="16">
-  <tileset firstgid="1" source="tileset/basechip_pipo.tsx"></tileset>
+const expectedXML = `<map version="1.4" tiledversion="1.4.3" orientation="orthogonal" renderorder="right-down" width="12" height="6" tilewidth="32" tileheight="32">
+  <tileset firstgid="1" source="tileset/[Base]BaseChip_pipo.tsx"></tileset>
+  <tileset firstgid="1064" source="tileset/[A]Water_pipo.tsx"></tileset>
   <layer id="1" name="Layer 1" width="12" height="6">
     <data encoding="csv">0,0,0,0,0,0,0,0,0,0,0,0,
 0,2,2,2,2,2,2,2,2,2,2,0,

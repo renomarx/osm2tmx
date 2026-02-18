@@ -9,8 +9,8 @@ import (
 
 // Mapping represents the global entity of the mapping file
 type Mapping struct {
-	// Tileset informations of the tileset used
-	Tileset Tileset `yaml:"tileset"`
+	// Tilesets informations of the tilesets used
+	Tilesets []Tileset `yaml:"tilesets"`
 	// Default informations about the default tile to use
 	Default TileValue `yaml:"default"`
 	// Mapping, by layer, of tags & tags values => tiles
@@ -27,6 +27,7 @@ type Tileset struct {
 	Source     string `yaml:"source"`
 	TileWidth  int    `yaml:"tile_width"`
 	TileHeight int    `yaml:"tile_height"`
+	FirstGID   int    `yaml:"first_gid"`
 }
 
 // TagsByLayer Tags mapped by layer number
@@ -146,8 +147,13 @@ type PositionTile struct {
 }
 
 func (m Mapping) Validate() error {
-	if err := m.Tileset.Validate(); err != nil {
-		return fmt.Errorf("error validating Tileset: %w", err)
+	if len(m.Tilesets) == 0 {
+		return fmt.Errorf("there must be at least one tileset defined")
+	}
+	for _, tileset := range m.Tilesets {
+		if err := tileset.Validate(); err != nil {
+			return fmt.Errorf("error validating Tileset: %w", err)
+		}
 	}
 	if err := m.Default.Validate(); err != nil {
 		return fmt.Errorf("error validating Default: %w", err)
@@ -163,7 +169,7 @@ func (m Mapping) Validate() error {
 	return nil
 }
 
-func (t Tileset) Validate() error {
+func (t *Tileset) Validate() error {
 	if t.Source == "" {
 		return fmt.Errorf("Source cannot be empty")
 	}
@@ -172,6 +178,9 @@ func (t Tileset) Validate() error {
 	}
 	if t.TileHeight <= 0 {
 		return fmt.Errorf("TileHeight must be strictly positive")
+	}
+	if t.FirstGID == 0 {
+		t.FirstGID = 1
 	}
 	return nil
 }

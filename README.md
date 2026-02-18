@@ -78,7 +78,6 @@ Examples:
 
 ## TODO
 
-- Handle multiple tilesets for 1 tmx
 - More examples with other tilesets
 
 - Explore a direct integration in 2d video games, without tilesets, using directional svg ?
