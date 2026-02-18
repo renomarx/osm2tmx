@@ -79,9 +79,6 @@ Examples:
 ## TODO
 
 - More examples with other tilesets
-- Generate a tileset like OSM stylesheets to have a pretty map in tmx :)
-- Optimisation
-  - See simd/archisimd in go1.26
 
 - Explore a direct integration in 2d video games, without tilesets, using directional svg ?
 

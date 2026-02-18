@@ -127,36 +127,18 @@ custom_tiles:
       end_way_top:
         tile: 624
   1041:
-    position:
-      # removing all "lonely" points of the building
-      standalone:
-        tile: 0
-      end_way_right:
-        tile: 0
-      end_way_left:
-        tile: 0
-      end_way_top:
-        tile: 0
-      border_top_and_bottom:
-        tile: 0
-    walls:
-      - tiles_from_bottom: [472,472,472,1041]
-      - tiles_from_bottom: [472,472,1041]
-      - tiles_from_bottom: [472,1041]
+    rectangle:
+      tiles: [
+        [1041],
+        [472],
+        [472],
+        [472]
+      ]
   1039:
-    position:
-      # removing all "lonely" points of the building
-      standalone:
-        tile: 0
-      end_way_right:
-        tile: 0
-      end_way_left:
-        tile: 0
-      end_way_top:
-        tile: 0
-      border_top_and_bottom:
-        tile: 0
-    walls:
-      - tiles_from_bottom: [1169,1169,1169,1039]
-      - tiles_from_bottom: [1169,1169,1039]
-      - tiles_from_bottom: [1169,1039]
+    rectangle:
+      tiles: [
+        [1039],
+        [1169],
+        [1169],
+        [1169]
+      ]
