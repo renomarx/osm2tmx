@@ -173,7 +173,15 @@ func (m *Mapper) mapCustomTileRectangle(layer int, pos model.Position, tile mode
 		if customTileRectangle.InsidePoylgon.Density > 0 {
 			tile = 0
 			rect := customTileRectangle.Tiles
-			drawRectangle = pos.X%len(rect[0]) == 0 && pos.Y%(len(rect)/int(customTileRectangle.InsidePoylgon.Density)) == 0
+			moduloX := len(rect[0])
+			if moduloX == 0 {
+				moduloX = 1
+			}
+			moduloY := len(rect) / int(customTileRectangle.InsidePoylgon.Density)
+			if moduloY < 1 {
+				moduloY = 1
+			}
+			drawRectangle = pos.X%moduloX == 0 && pos.Y%moduloY == 0
 		}
 		if !customTileRectangle.InsidePoylgon.Overflow {
 			drawRectangle = drawRectangle && m.isRectangleInsidePolygon(layer, pos, customTileRectangle, initialTile)

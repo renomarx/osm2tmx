@@ -13,9 +13,9 @@ layers:
   0:
     tags:
       waterway:
-          tile: 318
+        tile: 318
       water:
-          tile: 318
+        tile: 318
       natural:
         values:
           water:
@@ -27,11 +27,11 @@ layers:
           mash:
             tile: 60
       surface:
-          values:
-            sand:
-              tile: 5
-            asphalt:
-              tile: 8
+        values:
+          sand:
+            tile: 5
+          asphalt:
+            tile: 8
       landuse:
         values:
           forest:
@@ -54,7 +54,7 @@ layers:
       aeroway:
         tile: 847
       highway:
-        tile: 120
+        tile: 6
       natural:
         values:
           wood:
@@ -112,13 +112,53 @@ layers:
         tile: 565
         values:
           religious:
-            tile: 466
+            tile: 482
           cathedral:
-            tile: 466
+            tile: 482
           chapel:
-            tile: 466
+            tile: 482
           church:
+            tile: 482
+          apartments:
             tile: 466
+          detached:
+            tile: 386
+          house:
+            tile: 386
+          hotel:
+            tile: 565
+          residential:
+            tile: 565
+          commercial:
+            tile: 565
+          industrial:
+            tile: 565
+          kiosk:
+            tile: 565
+          office:
+            tile: 565
+          retail:
+            tile: 565
+          supermarket:
+            tile: 565
+          warehouse:
+            tile: 565
+          hospital:
+            tile: 565
+          museum:
+            tile: 565
+          school:
+            tile: 565
+          train_station:
+            tile: 565
+          university:
+            tile: 565
+          fire_station:
+            tile: 565
+          government:
+            tile: 565
+          public:
+            tile: 565
 
 custom_tiles:
   1378:
@@ -153,7 +193,7 @@ custom_tiles:
         tile: 1407
       end_way_top:
         tile: 1391
-  120:
+  6:
     position:
       standalone:
         tile: 0
@@ -188,40 +228,49 @@ custom_tiles:
   466:
     rectangle:
       tiles: [
+        [465, 466, 467],
+        [473, 474, 475],
+        [481, 482, 483],
+        [489, 490, 491],
+        [481, 472, 483],
+        [489, 480, 491]
+      ]
+      inside_polygon:
+        density: 2
+  482:
+    rectangle:
+      tiles: [
         [466],
         [474],
-        [481],
-        [489]
+        [482],
+        [490]
       ]
       inside_polygon:
         overflow: true
       overlap: true
   565:
     rectangle:
-      tiles: [
-        [433, 434, 434, 435],
-        [441, 442, 442, 443],
-        [449, 440, 450, 451],
-        [457, 448, 458, 459]
-      ]
+      tiles:
+        [
+          [433, 434, 434, 435],
+          [441, 442, 442, 443],
+          [449, 440, 450, 451],
+          [457, 448, 458, 459],
+        ]
       inside_polygon:
         density: 2
-    random:
-      - probability: 50
-        rectangle:
-          tiles: [
-            [385, 386, 386, 387],
-            [393, 394, 394, 395],
-            [401, 408, 402, 403],
-            [409, 416, 410, 411]
-          ]
-          inside_polygon:
-            density: 2
-            overflow: true
+  386:
+    rectangle:
+      tiles:
+        [
+          [385, 386, 386, 387],
+          [393, 394, 394, 395],
+          [401, 408, 402, 403],
+          [409, 416, 410, 411],
+        ]
+      inside_polygon:
+        density: 2
   41:
     rectangle:
-      tiles: [
-        [11, 12],
-        [19, 20]
-      ]
+      tiles: [[11, 12], [19, 20]]
       overlap: true
