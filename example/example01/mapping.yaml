@@ -193,6 +193,8 @@ custom_tiles:
         [481],
         [489]
       ]
+      inside_polygon:
+        overflow: true
       overlap: true
   565:
     rectangle:
@@ -202,7 +204,8 @@ custom_tiles:
         [449, 440, 450, 451],
         [457, 448, 458, 459]
       ]
-      density: 2
+      inside_polygon:
+        density: 2
     random:
       - probability: 50
         rectangle:
@@ -212,8 +215,9 @@ custom_tiles:
             [401, 408, 402, 403],
             [409, 416, 410, 411]
           ]
-          density: 2
-
+          inside_polygon:
+            density: 2
+            overflow: true
   41:
     rectangle:
       tiles: [

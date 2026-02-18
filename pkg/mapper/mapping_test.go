@@ -311,6 +311,9 @@ var mappingTest = Mapping{
 					{481},
 					{489},
 				},
+				InsidePoylgon: &RectangleInsidePolygon{
+					Overflow: true,
+				},
 				Overlap: true,
 			},
 		},
@@ -322,7 +325,9 @@ var mappingTest = Mapping{
 					{449, 440, 450, 451},
 					{457, 448, 458, 459},
 				},
-				Density: 2,
+				InsidePoylgon: &RectangleInsidePolygon{
+					Density: 2,
+				},
 			},
 			Random: []RandomCustomTile{
 				{
@@ -334,7 +339,10 @@ var mappingTest = Mapping{
 							{401, 408, 402, 403},
 							{409, 416, 410, 411},
 						},
-						Density: 2,
+						InsidePoylgon: &RectangleInsidePolygon{
+							Density:  2,
+							Overflow: true,
+						},
 					},
 				},
 			},

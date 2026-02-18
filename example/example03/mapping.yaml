@@ -54,4 +54,5 @@ custom_tiles:
         [237, 238, 239, 240, 241, 242, 243],
         [269, 270, 271, 272, 273, 274, 275]
       ]
-      density: 1
+      inside_polygon:
+        density: 1

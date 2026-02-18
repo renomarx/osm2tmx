@@ -279,7 +279,7 @@ func TestMapper(t *testing.T) {
 				Overlap: true,
 			}, rect)
 		})
-		t.Run("rectangle with one column", func(t *testing.T) {
+		t.Run("rectangle with one column, inside polygon wih overflow, and overlap", func(t *testing.T) {
 			m := model.Map{}
 			m.Init(1, 6, 6, func(x, y int) model.Tile { return 2 })
 			m.Layers[0].SetTile(2, 1, 466)
@@ -297,6 +297,9 @@ func TestMapper(t *testing.T) {
 						{474},
 						{481},
 						{489},
+					},
+					InsidePoylgon: &RectangleInsidePolygon{
+						Overflow: true,
 					},
 					Overlap: true,
 				}, rect)
@@ -326,7 +329,9 @@ func TestMapper(t *testing.T) {
 								{449, 440, 450, 451},
 								{457, 448, 458, 459},
 							},
-							Density: 2,
+							InsidePoylgon: &RectangleInsidePolygon{
+								Density: 2,
+							},
 						}, rect)
 					} else {
 						assert.Empty(t, rect)
@@ -334,7 +339,7 @@ func TestMapper(t *testing.T) {
 				}
 			}
 		})
-		t.Run("random rectangle with density 2 inside polygon", func(t *testing.T) {
+		t.Run("random rectangle with density 2 and overflow inside polygon", func(t *testing.T) {
 			m := model.Map{}
 			m.Init(1, 16, 16, func(x, y int) model.Tile { return 2 })
 			for y := 3; y < 12; y++ {
@@ -350,7 +355,7 @@ func TestMapper(t *testing.T) {
 					mapTile := mapper.GetCustomTile(model.Position{X: x, Y: y})
 					assert.Equal(t, model.Tile(0), mapTile.ByLayer[0])
 					rect := mapTile.RectanglesByLayer[0]
-					if (x == 8 && y == 6) || (x == 8 && y == 8) || (x == 8 && y == 10) {
+					if x%4 == 0 && y%2 == 0 {
 						assert.Equal(t, Rectangle{
 							Tiles: [][]model.Tile{
 								{385, 386, 386, 387},
@@ -358,7 +363,10 @@ func TestMapper(t *testing.T) {
 								{401, 408, 402, 403},
 								{409, 416, 410, 411},
 							},
-							Density: 2,
+							InsidePoylgon: &RectangleInsidePolygon{
+								Density:  2,
+								Overflow: true,
+							},
 						}, rect)
 					} else {
 						assert.Empty(t, rect)

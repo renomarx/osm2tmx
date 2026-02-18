@@ -169,11 +169,15 @@ func (m *Mapper) mapCustomTilePosition(layer int, pos model.Position, tile model
 
 func (m *Mapper) mapCustomTileRectangle(layer int, pos model.Position, tile model.Tile, rectanglesByLayer []Rectangle, customTileRectangle Rectangle, initialTile model.Tile) (model.Tile, []Rectangle) {
 	drawRectangle := true
-	if customTileRectangle.Density > 0 {
-		tile = 0
-		rect := customTileRectangle.Tiles
-		drawRectangle = m.isRectangleInsidePolygon(layer, pos, customTileRectangle, initialTile) &&
-			pos.X%len(rect[0]) == 0 && pos.Y%(len(rect)/int(customTileRectangle.Density)) == 0
+	if customTileRectangle.InsidePoylgon != nil {
+		if customTileRectangle.InsidePoylgon.Density > 0 {
+			tile = 0
+			rect := customTileRectangle.Tiles
+			drawRectangle = pos.X%len(rect[0]) == 0 && pos.Y%(len(rect)/int(customTileRectangle.InsidePoylgon.Density)) == 0
+		}
+		if !customTileRectangle.InsidePoylgon.Overflow {
+			drawRectangle = drawRectangle && m.isRectangleInsidePolygon(layer, pos, customTileRectangle, initialTile)
+		}
 	}
 	if drawRectangle {
 		rectanglesByLayer[layer] = customTileRectangle
