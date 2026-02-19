@@ -215,6 +215,12 @@ func (r *Raster) drawCustomTiles() {
 			for z, rect := range mapTile.RectanglesByLayer {
 				for j := 0; j < len(rect.Tiles); j++ {
 					for i := 0; i < len(rect.Tiles[j]); i++ {
+						newLayerTile := newMap.Layers[z].GetCell(x-i, y-j).Tile
+						// For rectangles on multiple layers (for example trees in a forest)
+						// we do not want to overload the tiles of the lower layers
+						if z < mapTile.RectanglesMaxLayer() && rect.Contains(newLayerTile) {
+							continue
+						}
 						// Rectangle is drawed from bottom-right corner
 						newMap.Layers[z].SetTile(x-i, y-j, rect.Tiles[len(rect.Tiles)-1-j][len(rect.Tiles[j])-1-i])
 					}

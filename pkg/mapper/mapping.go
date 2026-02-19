@@ -2,6 +2,7 @@ package mapper
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/renomarx/osm2tmx/pkg/model"
 )
@@ -108,6 +109,15 @@ type RectangleInsidePolygon struct {
 	// so it will result in the transformation of the original polygon if it isn't a rectangle itself
 	// and a multiple of Rectangle/density.
 	Overflow bool `yaml:"overflow,omitempty"`
+}
+
+func (r Rectangle) Contains(tile model.Tile) bool {
+	for y := range r.Tiles {
+		if slices.Contains(r.Tiles[y], tile) {
+			return true
+		}
+	}
+	return false
 }
 
 // Position represents a tile mapping depending on the position of a point within a line or a polygon

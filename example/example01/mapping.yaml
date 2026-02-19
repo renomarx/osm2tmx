@@ -124,8 +124,12 @@ layers:
               - probability: 10
                 tile: 616
 
-  3: # buildings
+  3: # buildings, trees (overlapping)...
     tags:
+      natural:
+        values:
+          tree:
+            tile: 41
       building:
         tile: 565
         values:

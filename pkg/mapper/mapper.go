@@ -90,13 +90,33 @@ func (m *Mapper) mapTileValue(tv TileValue, pos model.Position) model.Tile {
 }
 
 type CustomMapTile struct {
-	ByLayer           []model.Tile
-	RectanglesByLayer []Rectangle
+	ByLayer           map[int]model.Tile
+	RectanglesByLayer map[int]Rectangle
+}
+
+func (cmt CustomMapTile) MaxLayer() int {
+	max := 0
+	for i := range cmt.ByLayer {
+		if i > max {
+			max = i
+		}
+	}
+	return max
+}
+
+func (cmt CustomMapTile) RectanglesMaxLayer() int {
+	max := 0
+	for i := range cmt.RectanglesByLayer {
+		if i > max {
+			max = i
+		}
+	}
+	return max
 }
 
 func (m *Mapper) GetCustomTile(pos model.Position) CustomMapTile {
-	byLayer := make([]model.Tile, len(m.m.Layers))
-	rectanglesByLayer := make([]Rectangle, len(m.m.Layers))
+	byLayer := make(map[int]model.Tile)
+	rectanglesByLayer := make(map[int]Rectangle)
 	for layer := range m.m.Layers {
 		tile := m.m.Layers[layer].GetCell(pos.X, pos.Y).Tile
 		initialTile := tile
@@ -167,7 +187,7 @@ func (m *Mapper) mapCustomTilePosition(layer int, pos model.Position, tile model
 	return tile
 }
 
-func (m *Mapper) mapCustomTileRectangle(layer int, pos model.Position, tile model.Tile, rectanglesByLayer []Rectangle, customTileRectangle Rectangle, initialTile model.Tile) (model.Tile, []Rectangle) {
+func (m *Mapper) mapCustomTileRectangle(layer int, pos model.Position, tile model.Tile, rectanglesByLayer map[int]Rectangle, customTileRectangle Rectangle, initialTile model.Tile) (model.Tile, map[int]Rectangle) {
 	drawRectangle := true
 	if customTileRectangle.InsidePoylgon != nil {
 		if customTileRectangle.InsidePoylgon.Density > 0 {
