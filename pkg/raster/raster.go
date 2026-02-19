@@ -216,7 +216,6 @@ func (r *Raster) drawCustomTiles() {
 				for j := 0; j < len(rect.Tiles); j++ {
 					for i := 0; i < len(rect.Tiles[j]); i++ {
 						// Rectangle is drawed from bottom-right corner
-						// ! important in order to not be overloaded by the next loop
 						newMap.Layers[z].SetTile(x-i, y-j, rect.Tiles[len(rect.Tiles)-1-j][len(rect.Tiles[j])-1-i])
 					}
 				}
