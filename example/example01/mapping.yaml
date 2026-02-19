@@ -24,7 +24,7 @@ default:
 
 layers:
   0: # keeping it empty to fill the whole 0 layer with default tile
-  1:
+  1: # water, different surfaces...
     tags:
       waterway:
         tile: 1518 # 1064+454
@@ -61,7 +61,7 @@ layers:
           cemetery:
             tile: 291
 
-  2:
+  2: # highways, forests...
     tags:
       aerialway:
         tile: 647
@@ -124,7 +124,7 @@ layers:
               - probability: 10
                 tile: 616
 
-  3:
+  3: # buildings
     tags:
       building:
         tile: 565
@@ -143,6 +143,8 @@ layers:
             tile: 386
           house:
             tile: 386
+          # the following values are only here for example,
+          # because for now they are mapped to the default building tile (565)
           hotel:
             tile: 565
           residential:
@@ -177,6 +179,26 @@ layers:
             tile: 565
           public:
             tile: 565
+
+  4: # building doors and windows, custom objects...
+    tags:
+      building:
+        tile: 440
+        values:
+          religious:
+            tile: 482
+          cathedral:
+            tile: 482
+          chapel:
+            tile: 482
+          church:
+            tile: 482
+          apartments:
+            tile: 472
+          detached:
+            tile: 408
+          house:
+            tile: 408
 
 custom_tiles:
   1378: # snow
@@ -307,7 +329,19 @@ custom_tiles:
         tile: 4156 # 4136+20
       end_way_top:
         tile: 4140 # 4136+4
-  466:
+  466: # apartments background
+    rectangle:
+      tiles: [
+        [465, 466, 467],
+        [473, 474, 475],
+        [481, 482, 483],
+        [489, 490, 491],
+        [481, 482, 483],
+        [489, 490, 491]
+      ]
+      inside_polygon:
+        density: 2
+  472: # apartments with doors & windows
     rectangle:
       tiles: [
         [465, 466, 467],
@@ -319,7 +353,7 @@ custom_tiles:
       ]
       inside_polygon:
         density: 2
-  482:
+  482: # religious buildings background
     rectangle:
       tiles: [
         [466],
@@ -330,7 +364,18 @@ custom_tiles:
       inside_polygon:
         overflow: true
       overlap: true
-  565:
+  565: # default buidlings background
+    rectangle:
+      tiles:
+        [
+          [433, 434, 434, 435],
+          [441, 442, 442, 443],
+          [449, 450, 450, 451],
+          [457, 458, 458, 459],
+        ]
+      inside_polygon:
+        density: 2
+  440: # default buidlings with doors & windows
     rectangle:
       tiles:
         [
@@ -341,7 +386,18 @@ custom_tiles:
         ]
       inside_polygon:
         density: 2
-  386:
+  386: # houses background
+    rectangle:
+      tiles:
+        [
+          [385, 386, 386, 387],
+          [393, 394, 394, 395],
+          [401, 402, 402, 403],
+          [409, 410, 410, 411],
+        ]
+      inside_polygon:
+        density: 2
+  408: # houses with doors & windows
     rectangle:
       tiles:
         [
