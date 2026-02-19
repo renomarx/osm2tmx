@@ -276,10 +276,9 @@ func TestMapper(t *testing.T) {
 					{11, 12},
 					{19, 20},
 				},
-				Overlap: true,
 			}, rect)
 		})
-		t.Run("rectangle with one column, inside polygon wih overflow, and overlap", func(t *testing.T) {
+		t.Run("rectangle with one column, inside polygon wih overflow", func(t *testing.T) {
 			m := model.Map{}
 			m.Init(1, 6, 6, func(x, y int) model.Tile { return 2 })
 			m.Layers[0].SetTile(2, 1, 466)
@@ -301,7 +300,6 @@ func TestMapper(t *testing.T) {
 					InsidePoylgon: &RectangleInsidePolygon{
 						Overflow: true,
 					},
-					Overlap: true,
 				}, rect)
 			}
 		})

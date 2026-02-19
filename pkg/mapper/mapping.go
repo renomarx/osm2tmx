@@ -2,7 +2,6 @@ package mapper
 
 import (
 	"fmt"
-	"slices"
 
 	"github.com/renomarx/osm2tmx/pkg/model"
 )
@@ -91,9 +90,6 @@ type RandomCustomTile struct {
 // used to represent custom objects
 type Rectangle struct {
 	Tiles [][]model.Tile `yaml:"tiles,omitempty"`
-	// Overlap forces the layer + 1 of the tile (if layer+1 exists) to be set with the new tile
-	// usefull to handle trees overlapping other trees in a forest for instance
-	Overlap bool `yaml:"overlap,omitempty"`
 	// InsidePoylgon sepecifications when the rectangle is inside a polygon
 	InsidePoylgon *RectangleInsidePolygon `yaml:"inside_polygon,omitempty"`
 }
@@ -112,15 +108,6 @@ type RectangleInsidePolygon struct {
 	// so it will result in the transformation of the original polygon if it isn't a rectangle itself
 	// and a multiple of Rectangle/density.
 	Overflow bool `yaml:"overflow,omitempty"`
-}
-
-func (r Rectangle) Contains(tile model.Tile) bool {
-	for y := range r.Tiles {
-		if slices.Contains(r.Tiles[y], tile) {
-			return true
-		}
-	}
-	return false
 }
 
 // Position represents a tile mapping depending on the position of a point within a line or a polygon

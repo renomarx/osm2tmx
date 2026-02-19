@@ -316,7 +316,6 @@ var mappingTest = Mapping{
 				InsidePoylgon: &RectangleInsidePolygon{
 					Overflow: true,
 				},
-				Overlap: true,
 			},
 		},
 		565: {
@@ -355,7 +354,6 @@ var mappingTest = Mapping{
 					{11, 12},
 					{19, 20},
 				},
-				Overlap: true,
 			},
 		},
 	},

@@ -195,7 +195,6 @@ custom_tiles:
       ]
       inside_polygon:
         overflow: true
-      overlap: true
   565:
     rectangle:
       tiles: [
@@ -224,4 +223,3 @@ custom_tiles:
         [11, 12],
         [19, 20]
       ]
-      overlap: true

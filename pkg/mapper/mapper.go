@@ -189,9 +189,6 @@ func (m *Mapper) mapCustomTileRectangle(layer int, pos model.Position, tile mode
 	}
 	if drawRectangle {
 		rectanglesByLayer[layer] = customTileRectangle
-		if customTileRectangle.Overlap && layer < len(rectanglesByLayer)-1 {
-			rectanglesByLayer[layer+1] = customTileRectangle
-		}
 	}
 	return tile, rectanglesByLayer
 }
