@@ -7,6 +7,14 @@ tilesets:
     tile_width: 32
     tile_height: 32
     first_gid: 1064
+  - source: "tileset/[A]Flower_pipo.tsx"
+    tile_width: 32
+    tile_height: 32
+    first_gid: 4136
+  - source: "tileset/[A]Dirt_pipo.tsx"
+    tile_width: 32
+    tile_height: 32
+    first_gid: 4184
 
 default:
   tile: 2
@@ -15,28 +23,7 @@ default:
     tile: 1378
 
 layers:
-  0:
-    tags:
-      surface:
-        values:
-          sand:
-            tile: 5
-          asphalt:
-            tile: 8
-      landuse:
-        values:
-          forest:
-            tile: 4
-          industrial:
-            tile: 8
-          residential:
-            tile: 8
-          construction:
-            tile: 8
-          cemetery:
-            tile: 291
-          meadow:
-            tile: 1
+  0: # keeping it empty to fill the whole 0 layer with default tile
   1:
     tags:
       waterway:
@@ -53,6 +40,26 @@ layers:
             tile: 6
           mash:
             tile: 60
+      surface:
+        values:
+          sand:
+            tile: 5
+          asphalt:
+            tile: 4486 # 4184+302
+      landuse:
+        values:
+          meadow:
+            tile: 4150 # 4136+14
+          forest:
+            tile: 4
+          industrial:
+            tile: 4486 # 4184+302
+          residential:
+            tile: 4486 # 4184+302
+          construction:
+            tile: 4486 # 4184+302
+          cemetery:
+            tile: 291
 
   2:
     tags:
@@ -61,7 +68,7 @@ layers:
       aeroway:
         tile: 847
       highway:
-        tile: 6
+        tile: 4486 # 4184+302
       natural:
         values:
           wood:
@@ -204,38 +211,38 @@ custom_tiles:
         tile: 1407
       end_way_top:
         tile: 1391
-  6: # highway
+  4486: # highway
     position:
       standalone:
-        tile: 0
+        tile: 4472 # 4184+288
       corner_top_left:
-        tile: 113
+        tile: 4477 # 4184+293
       corner_top_right:
-        tile: 115
+        tile: 4479 # 4184+295
       corner_bottom_left:
-        tile: 129
+        tile: 4493 # 4184+309
       corner_bottom_right:
-        tile: 131
+        tile: 4495 # 4184+311
       border_top:
-        tile: 114
+        tile: 4478 # 4184+294
       border_bottom:
-        tile: 130
+        tile: 4494 # 4184+310
       border_left:
-        tile: 121
+        tile: 4485 # 4184+301
       border_right:
-        tile: 123
+        tile: 4487 # 4184+303
       border_left_and_right:
-        tile: 144
+        tile: 4484 # 4184+300
       border_top_and_bottom:
-        tile: 149
+        tile: 4474 # 4184+290
       end_way_right:
-        tile: 150
+        tile: 4475 # 4184+291
       end_way_left:
-        tile: 148
+        tile: 4473 # 4184+289
       end_way_bottom:
-        tile: 152
+        tile: 4492 # 4184+308
       end_way_top:
-        tile: 135
+        tile: 4476 # 4184+292
   1518: # water
     position:
       standalone:
@@ -268,6 +275,38 @@ custom_tiles:
         tile: 1580 # 1064 + 516
       end_way_top:
         tile: 1452 # 1064 + 388
+  4150: # meadow
+    position:
+      standalone:
+        tile: 4136 # 4136+0
+      corner_top_left:
+        tile: 4141 # 4136+5
+      corner_top_right:
+        tile: 4143 # 4136+7
+      corner_bottom_left:
+        tile: 4157 # 4136+21
+      corner_bottom_right:
+        tile: 4159 # 4136+23
+      border_top:
+        tile: 4142 # 4136+6
+      border_bottom:
+        tile: 4158 # 4136+22
+      border_left:
+        tile: 4149 # 4136+13
+      border_right:
+        tile: 4151 # 4136+15
+      border_left_and_right:
+        tile: 4148 # 4136+12
+      border_top_and_bottom:
+        tile: 4138 # 4136+2
+      end_way_right:
+        tile: 4139 # 4136+3
+      end_way_left:
+        tile: 4137 # 4136+1
+      end_way_bottom:
+        tile: 4156 # 4136+20
+      end_way_top:
+        tile: 4140 # 4136+4
   466:
     rectangle:
       tiles: [
