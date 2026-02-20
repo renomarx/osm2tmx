@@ -26,7 +26,7 @@ func New(m *model.Map, conf Mapping) *Mapper {
 }
 
 func (m *Mapper) GetDefaultTile(pos model.Position) model.Tile {
-	return m.mapTileValue(m.conf.Default, pos)
+	return m.mapTileValue(m.conf.Default, pos, m.randFunc(100))
 }
 
 func (m *Mapper) Layers() int {
@@ -37,13 +37,14 @@ func (m *Mapper) MapTile(tags osm.Tags, pos model.Position) MapTile {
 	byLayer := make(map[int]model.Tile)
 	byLayer[0] = m.GetDefaultTile(pos)
 
+	r := m.randFunc(100)
 	for layer, tagsMapping := range m.conf.Layers {
 		for _, osmTag := range tags {
 			tag, exists := tagsMapping.Tags[osmTag.Key]
 			if !exists {
 				continue
 			}
-			tile := m.mapTileValue(tag.TileValue, pos)
+			tile := m.mapTileValue(tag.TileValue, pos, r)
 			if tile != 0 {
 				byLayer[layer] = tile
 			}
@@ -54,7 +55,7 @@ func (m *Mapper) MapTile(tags osm.Tags, pos model.Position) MapTile {
 			if !exists {
 				continue
 			}
-			tile = m.mapTileValue(tagValue, pos)
+			tile = m.mapTileValue(tagValue, pos, r)
 			if tile != 0 {
 				byLayer[layer] = tile
 			}
@@ -64,14 +65,13 @@ func (m *Mapper) MapTile(tags osm.Tags, pos model.Position) MapTile {
 	return MapTile{ByLayer: byLayer}
 }
 
-func (m *Mapper) mapTileValue(tv TileValue, pos model.Position) model.Tile {
+func (m *Mapper) mapTileValue(tv TileValue, pos model.Position, r int) model.Tile {
 	if tv.Altitude != nil {
 		if pos.Z > tv.Altitude.Min {
 			return tv.Altitude.Tile
 		}
 	}
 	if len(tv.Random) > 0 {
-		r := m.randFunc(100)
 		p := 0
 		for _, rr := range tv.Random {
 			if r >= p && r < p+rr.Probability {
