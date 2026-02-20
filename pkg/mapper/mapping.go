@@ -92,6 +92,7 @@ type RandomCustomTile struct {
 type Rectangle struct {
 	Tiles [][]model.Tile `yaml:"tiles,omitempty"`
 	// InsidePoylgon sepecifications when the rectangle is inside a polygon
+	// Enabling this feature will set to 0 the tiles of the polygon which are outside the rectangles
 	InsidePoylgon *RectangleInsidePolygon `yaml:"inside_polygon,omitempty"`
 }
 
@@ -104,12 +105,23 @@ type RectangleInsidePolygon struct {
 	//	- density == 2 means there can be an overlap of 2 rectangles over the Y axis within a polygon
 	//	- etc...
 	Density uint8 `yaml:"density,omitempty"`
-	// Overflow if true, allows to overflow the boundaries of the polygon
-	// Having Overflow = false (default) will set to 0 the tiles of the polygon which are outside the rectangles,
-	// so it will result in the transformation of the original polygon if it isn't a rectangle itself
-	// and a multiple of Rectangle/density.
-	Overflow bool `yaml:"overflow,omitempty"`
+	// Overflow mode, allows to overflow the boundaries of the polygon
+	// Default to NONE
+	Overflow OverflowMode `yaml:"overflow,omitempty"`
 }
+
+// Overflow mode, allows to overflow the boundaries of a polygon
+type OverflowMode string
+
+const (
+	// OverflowModeAlways always draw the rectangle, independently of the polygon
+	OverflowModeAlways OverflowMode = "ALWAYS"
+	// OverflowModeOrthogonal only draw if the orthogonal projection of the rectangle
+	// is included in the polygon, i.e. the last line and the last column
+	OverflowModeOrthogonal OverflowMode = "ORTHOGONAL"
+	// OverflowModeNone only draw if the full view of the rectangle is included in the polygon
+	OverflowModeNone OverflowMode = ""
+)
 
 func (r Rectangle) Contains(tile model.Tile) bool {
 	for y := range r.Tiles {

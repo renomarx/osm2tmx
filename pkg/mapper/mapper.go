@@ -203,7 +203,10 @@ func (m *Mapper) mapCustomTileRectangle(layer int, pos model.Position, tile mode
 			}
 			drawRectangle = pos.X%moduloX == 0 && pos.Y%moduloY == 0
 		}
-		if !customTileRectangle.InsidePoylgon.Overflow {
+		switch customTileRectangle.InsidePoylgon.Overflow {
+		case OverflowModeOrthogonal:
+			drawRectangle = drawRectangle && m.isOrthogonalProjectionInsidePolygon(layer, pos, customTileRectangle, initialTile)
+		case OverflowModeAlways:
 			drawRectangle = drawRectangle && m.isRectangleInsidePolygon(layer, pos, customTileRectangle, initialTile)
 		}
 	}
@@ -211,6 +214,22 @@ func (m *Mapper) mapCustomTileRectangle(layer int, pos model.Position, tile mode
 		rectanglesByLayer[layer] = customTileRectangle
 	}
 	return tile, rectanglesByLayer
+}
+
+func (m *Mapper) isOrthogonalProjectionInsidePolygon(layer int, pos model.Position, rectangle Rectangle, tile model.Tile) bool {
+	y := len(rectangle.Tiles) - 1
+	for x := 0; x < len(rectangle.Tiles[y]); x++ {
+		if m.m.Layers[layer].GetCell(pos.X-x, pos.Y-y).Tile != tile {
+			return false
+		}
+	}
+	for y := 0; y < len(rectangle.Tiles); y++ {
+		x := len(rectangle.Tiles[y]) - 1
+		if m.m.Layers[layer].GetCell(pos.X-x, pos.Y-y).Tile != tile {
+			return false
+		}
+	}
+	return true
 }
 
 func (m *Mapper) isRectangleInsidePolygon(layer int, pos model.Position, rectangle Rectangle, tile model.Tile) bool {

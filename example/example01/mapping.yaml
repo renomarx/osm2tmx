@@ -383,7 +383,7 @@ custom_tiles:
       ]
       inside_polygon:
         density: 2
-        overflow: true
+        overflow: ORTHOGONAL
   536: # apartments with doors & windows
     rectangle:
       tiles: [
@@ -396,7 +396,7 @@ custom_tiles:
       ]
       inside_polygon:
         density: 2
-        overflow: true
+        overflow: ORTHOGONAL
   482: # religious buildings background
     rectangle:
       tiles: [
@@ -406,7 +406,7 @@ custom_tiles:
         [490]
       ]
       inside_polygon:
-        overflow: true
+        overflow: ORTHOGONAL
   565: # default buidlings background
     rectangle:
       tiles:
@@ -418,7 +418,7 @@ custom_tiles:
         ]
       inside_polygon:
         density: 2
-        overflow: true
+        overflow: ORTHOGONAL
   440: # default buidlings with doors & windows
     rectangle:
       tiles:
@@ -430,7 +430,7 @@ custom_tiles:
         ]
       inside_polygon:
         density: 2
-        overflow: true
+        overflow: ORTHOGONAL
   564: # houses background
     rectangle:
       tiles: [
@@ -443,7 +443,7 @@ custom_tiles:
       ]
       inside_polygon:
         density: 2
-        overflow: true
+        overflow: ORTHOGONAL
   392: # houses with doors & windows
     rectangle:
       tiles: [
@@ -456,7 +456,7 @@ custom_tiles:
       ]
       inside_polygon:
         density: 2
-        overflow: true
+        overflow: ORTHOGONAL
   41:
     rectangle:
       tiles: [

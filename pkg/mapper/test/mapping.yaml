@@ -194,7 +194,7 @@ custom_tiles:
         [489]
       ]
       inside_polygon:
-        overflow: true
+        overflow: ALWAYS
   565:
     rectangle:
       tiles: [
@@ -216,7 +216,7 @@ custom_tiles:
           ]
           inside_polygon:
             density: 2
-            overflow: true
+            overflow: ORTHOGONAL
   41:
     rectangle:
       tiles: [

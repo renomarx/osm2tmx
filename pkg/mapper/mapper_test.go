@@ -298,7 +298,7 @@ func TestMapper(t *testing.T) {
 						{489},
 					},
 					InsidePoylgon: &RectangleInsidePolygon{
-						Overflow: true,
+						Overflow: OverflowModeAlways,
 					},
 				}, rect)
 			}
@@ -337,7 +337,7 @@ func TestMapper(t *testing.T) {
 				}
 			}
 		})
-		t.Run("random rectangle with density 2 and overflow inside polygon", func(t *testing.T) {
+		t.Run("random rectangle with density 2 and overflow orthogonal inside polygon", func(t *testing.T) {
 			m := model.Map{}
 			m.Init(1, 16, 16, func(x, y int) model.Tile { return 2 })
 			for y := 3; y < 12; y++ {
@@ -363,7 +363,7 @@ func TestMapper(t *testing.T) {
 							},
 							InsidePoylgon: &RectangleInsidePolygon{
 								Density:  2,
-								Overflow: true,
+								Overflow: OverflowModeOrthogonal,
 							},
 						}, rect)
 					} else {

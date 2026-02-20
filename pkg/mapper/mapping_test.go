@@ -314,7 +314,7 @@ var mappingTest = Mapping{
 					{489},
 				},
 				InsidePoylgon: &RectangleInsidePolygon{
-					Overflow: true,
+					Overflow: OverflowModeAlways,
 				},
 			},
 		},
@@ -342,7 +342,7 @@ var mappingTest = Mapping{
 						},
 						InsidePoylgon: &RectangleInsidePolygon{
 							Density:  2,
-							Overflow: true,
+							Overflow: OverflowModeOrthogonal,
 						},
 					},
 				},
