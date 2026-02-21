@@ -18,13 +18,13 @@ func TestMapper(t *testing.T) {
 
 	mapping := Mapping{}
 	err = yaml.Unmarshal(yamlFile, &mapping)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	expectedMapping := mappingTest
-	assert.Equal(t, expectedMapping, mapping)
+	require.Equal(t, expectedMapping, mapping)
 
 	err = mapping.Validate()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	t.Run("correctly map single tag", func(t *testing.T) {
 		mapper := New(&model.Map{}, mapping)

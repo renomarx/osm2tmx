@@ -9,17 +9,45 @@ default:
     min: 1400
     tile: 1378
 
+objects:
+  water:
+    tile: 318
+  asphalt:
+    tile: 8
+  forest:
+    random:
+      - probability: 5
+        tile: 41
+        altitude:
+          min: 1400
+          tile: 1351
+      - probability: 5
+        tile: 42
+        altitude:
+          min: 1400
+          tile: 1351
+      - probability: 5
+        tile: 43
+        altitude:
+          min: 1400
+          tile: 1351
+      - probability: 5
+        tile: 44
+        altitude:
+          min: 1400
+          tile: 1351
+
 layers:
   0:
     tags:
       waterway:
-          tile: 318
+        object: water
       water:
-          tile: 318
+        object: water
       natural:
         values:
           water:
-            tile: 318
+            object: water
           wood:
             tile: 4
           heath:
@@ -31,17 +59,17 @@ layers:
             sand:
               tile: 5
             asphalt:
-              tile: 8
+              object: asphalt
       landuse:
         values:
           forest:
             tile: 4
           industrial:
-            tile: 8
+            object: asphalt
           residential:
-            tile: 8
+            object: asphalt
           construction:
-            tile: 8
+            object: asphalt
           cemetery:
             tile: 251
           meadow:
@@ -58,53 +86,13 @@ layers:
       natural:
         values:
           wood:
-            random:
-              - probability: 5
-                tile: 41
-                altitude:
-                  min: 1400
-                  tile: 1351
-              - probability: 5
-                tile: 42
-                altitude:
-                  min: 1400
-                  tile: 1351
-              - probability: 5
-                tile: 43
-                altitude:
-                  min: 1400
-                  tile: 1351
-              - probability: 5
-                tile: 44
-                altitude:
-                  min: 1400
-                  tile: 1351
+            object: forest
           tree:
             tile: 41
       landuse:
         values:
           forest:
-            random:
-              - probability: 5
-                tile: 41
-                altitude:
-                  min: 1400
-                  tile: 1351
-              - probability: 5
-                tile: 42
-                altitude:
-                  min: 1400
-                  tile: 1351
-              - probability: 5
-                tile: 43
-                altitude:
-                  min: 1400
-                  tile: 1351
-              - probability: 5
-                tile: 44
-                altitude:
-                  min: 1400
-                  tile: 1351
+            object: forest
 
   2:
     tags:
