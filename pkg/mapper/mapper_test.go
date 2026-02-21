@@ -341,19 +341,20 @@ func TestMapper(t *testing.T) {
 			m := model.Map{}
 			m.Init(1, 16, 16, func(x, y int) model.Tile { return 2 })
 			for y := 3; y < 12; y++ {
-				for x := 3; x < 12; x++ {
+				for x := 12 - y - 1; x < 12-3; x++ {
 					m.Layers[0].SetTile(x, y, 565)
 				}
 			}
+			m.Print()
 			mapper := New(&m, mapping)
 			mapper.randFunc = func(i int) int { return 42 } // < 50
 
 			for y := 3; y < 12; y++ {
-				for x := 3; x < 12; x++ {
+				for x := 12 - y - 1; x < 12-3; x++ {
 					mapTile := mapper.GetCustomTile(model.Position{X: x, Y: y})
 					assert.Equal(t, model.Tile(0), mapTile.ByLayer[0])
 					rect := mapTile.RectanglesByLayer[0]
-					if x%4 == 0 && y%2 == 0 {
+					if (x == 8 && y == 6) || (x == 8 && y == 8) || (x == 4 && y == 10) || (x == 8 && y == 10) {
 						assert.Equal(t, Rectangle{
 							Tiles: [][]model.Tile{
 								{385, 386, 386, 387},
