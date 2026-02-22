@@ -46,7 +46,7 @@ type topography struct {
 
 func New(downscale int, bounds Bounds, mapping mapper.Mapping) *Raster {
 	m := model.Map{}
-	mapper := mapper.New(&m, mapping)
+	mapper := mapper.New(&m, mapping, downscale)
 	return &Raster{
 		m:                   &m,
 		pointsByNodeID:      make(map[int64]model.Point),

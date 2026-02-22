@@ -27,7 +27,7 @@ func TestMapper(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("correctly map single tag", func(t *testing.T) {
-		mapper := New(&model.Map{}, mapping)
+		mapper := New(&model.Map{}, mapping, 1)
 
 		tags := osm.Tags{
 			osm.Tag{
@@ -45,7 +45,7 @@ func TestMapper(t *testing.T) {
 	})
 
 	t.Run("correctly default to default tile", func(t *testing.T) {
-		mapper := New(&model.Map{}, mapping)
+		mapper := New(&model.Map{}, mapping, 1)
 
 		tags := osm.Tags{
 			osm.Tag{
@@ -59,7 +59,7 @@ func TestMapper(t *testing.T) {
 	})
 
 	t.Run("correctly default to default tile with altitude", func(t *testing.T) {
-		mapper := New(&model.Map{}, mapping)
+		mapper := New(&model.Map{}, mapping, 1)
 
 		tags := osm.Tags{
 			osm.Tag{
@@ -73,7 +73,7 @@ func TestMapper(t *testing.T) {
 	})
 
 	t.Run("correctly map all tiles for multiple tags", func(t *testing.T) {
-		mapper := New(&model.Map{}, mapping)
+		mapper := New(&model.Map{}, mapping, 1)
 
 		tags := osm.Tags{
 			osm.Tag{
@@ -96,7 +96,7 @@ func TestMapper(t *testing.T) {
 	})
 
 	t.Run("correctly map random & altitude", func(t *testing.T) {
-		mapper := New(&model.Map{}, mapping)
+		mapper := New(&model.Map{}, mapping, 1)
 		mapper.randFunc = func(i int) int { return 11 }
 
 		tags := osm.Tags{
@@ -119,7 +119,7 @@ func TestMapper(t *testing.T) {
 			m := model.Map{}
 			m.Init(1, 6, 6, func(x, y int) model.Tile { return 2 })
 			m.Layers[0].SetTile(2, 2, 120)
-			mapper := New(&m, mapping)
+			mapper := New(&m, mapping, 1)
 
 			assert.Equal(t, model.Tile(0), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
 		})
@@ -129,7 +129,7 @@ func TestMapper(t *testing.T) {
 			m.Layers[0].SetTile(2, 2, 120)
 			m.Layers[0].SetTile(2, 3, 120)
 			m.Layers[0].SetTile(3, 2, 120)
-			mapper := New(&m, mapping)
+			mapper := New(&m, mapping, 1)
 
 			assert.Equal(t, model.Tile(113), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
 		})
@@ -139,7 +139,7 @@ func TestMapper(t *testing.T) {
 			m.Layers[0].SetTile(2, 2, 120)
 			m.Layers[0].SetTile(2, 3, 120)
 			m.Layers[0].SetTile(1, 2, 120)
-			mapper := New(&m, mapping)
+			mapper := New(&m, mapping, 1)
 
 			assert.Equal(t, model.Tile(115), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
 		})
@@ -149,7 +149,7 @@ func TestMapper(t *testing.T) {
 			m.Layers[0].SetTile(2, 2, 120)
 			m.Layers[0].SetTile(2, 1, 120)
 			m.Layers[0].SetTile(3, 2, 120)
-			mapper := New(&m, mapping)
+			mapper := New(&m, mapping, 1)
 
 			assert.Equal(t, model.Tile(129), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
 		})
@@ -159,7 +159,7 @@ func TestMapper(t *testing.T) {
 			m.Layers[0].SetTile(2, 2, 120)
 			m.Layers[0].SetTile(2, 1, 120)
 			m.Layers[0].SetTile(1, 2, 120)
-			mapper := New(&m, mapping)
+			mapper := New(&m, mapping, 1)
 
 			assert.Equal(t, model.Tile(131), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
 		})
@@ -170,7 +170,7 @@ func TestMapper(t *testing.T) {
 			m.Layers[0].SetTile(2, 3, 120)
 			m.Layers[0].SetTile(1, 2, 120)
 			m.Layers[0].SetTile(3, 2, 120)
-			mapper := New(&m, mapping)
+			mapper := New(&m, mapping, 1)
 
 			assert.Equal(t, model.Tile(114), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
 		})
@@ -181,7 +181,7 @@ func TestMapper(t *testing.T) {
 			m.Layers[0].SetTile(2, 1, 120)
 			m.Layers[0].SetTile(1, 2, 120)
 			m.Layers[0].SetTile(3, 2, 120)
-			mapper := New(&m, mapping)
+			mapper := New(&m, mapping, 1)
 
 			assert.Equal(t, model.Tile(130), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
 		})
@@ -192,7 +192,7 @@ func TestMapper(t *testing.T) {
 			m.Layers[0].SetTile(3, 2, 120)
 			m.Layers[0].SetTile(2, 1, 120)
 			m.Layers[0].SetTile(2, 3, 120)
-			mapper := New(&m, mapping)
+			mapper := New(&m, mapping, 1)
 
 			assert.Equal(t, model.Tile(121), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
 		})
@@ -203,7 +203,7 @@ func TestMapper(t *testing.T) {
 			m.Layers[0].SetTile(1, 2, 120)
 			m.Layers[0].SetTile(2, 1, 120)
 			m.Layers[0].SetTile(2, 3, 120)
-			mapper := New(&m, mapping)
+			mapper := New(&m, mapping, 1)
 
 			assert.Equal(t, model.Tile(123), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
 		})
@@ -213,7 +213,7 @@ func TestMapper(t *testing.T) {
 			m.Layers[0].SetTile(2, 2, 120)
 			m.Layers[0].SetTile(2, 1, 120)
 			m.Layers[0].SetTile(2, 3, 120)
-			mapper := New(&m, mapping)
+			mapper := New(&m, mapping, 1)
 
 			assert.Equal(t, model.Tile(144), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
 		})
@@ -223,7 +223,7 @@ func TestMapper(t *testing.T) {
 			m.Layers[0].SetTile(2, 2, 120)
 			m.Layers[0].SetTile(1, 2, 120)
 			m.Layers[0].SetTile(3, 2, 120)
-			mapper := New(&m, mapping)
+			mapper := New(&m, mapping, 1)
 
 			assert.Equal(t, model.Tile(149), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
 		})
@@ -232,7 +232,7 @@ func TestMapper(t *testing.T) {
 			m.Init(1, 6, 6, func(x, y int) model.Tile { return 2 })
 			m.Layers[0].SetTile(2, 2, 120)
 			m.Layers[0].SetTile(1, 2, 120)
-			mapper := New(&m, mapping)
+			mapper := New(&m, mapping, 1)
 
 			assert.Equal(t, model.Tile(150), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
 		})
@@ -241,7 +241,7 @@ func TestMapper(t *testing.T) {
 			m.Init(1, 6, 6, func(x, y int) model.Tile { return 2 })
 			m.Layers[0].SetTile(2, 2, 120)
 			m.Layers[0].SetTile(3, 2, 120)
-			mapper := New(&m, mapping)
+			mapper := New(&m, mapping, 1)
 
 			assert.Equal(t, model.Tile(148), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
 		})
@@ -250,7 +250,7 @@ func TestMapper(t *testing.T) {
 			m.Init(1, 6, 6, func(x, y int) model.Tile { return 2 })
 			m.Layers[0].SetTile(2, 2, 120)
 			m.Layers[0].SetTile(2, 1, 120)
-			mapper := New(&m, mapping)
+			mapper := New(&m, mapping, 1)
 
 			assert.Equal(t, model.Tile(152), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
 		})
@@ -259,7 +259,7 @@ func TestMapper(t *testing.T) {
 			m.Init(1, 6, 6, func(x, y int) model.Tile { return 2 })
 			m.Layers[0].SetTile(2, 2, 120)
 			m.Layers[0].SetTile(2, 3, 120)
-			mapper := New(&m, mapping)
+			mapper := New(&m, mapping, 1)
 
 			assert.Equal(t, model.Tile(135), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
 		})
@@ -267,7 +267,7 @@ func TestMapper(t *testing.T) {
 			m := model.Map{}
 			m.Init(1, 6, 6, func(x, y int) model.Tile { return 2 })
 			m.Layers[0].SetTile(2, 2, 41)
-			mapper := New(&m, mapping)
+			mapper := New(&m, mapping, 1)
 
 			mapTile := mapper.GetCustomTile(model.Position{X: 2, Y: 2})
 			rect := mapTile.RectanglesByLayer[0]
@@ -285,7 +285,7 @@ func TestMapper(t *testing.T) {
 			m.Layers[0].SetTile(2, 2, 466)
 			m.Layers[0].SetTile(2, 3, 466)
 			m.Layers[0].SetTile(2, 4, 466)
-			mapper := New(&m, mapping)
+			mapper := New(&m, mapping, 1)
 
 			for y := 1; y <= 4; y++ {
 				mapTile := mapper.GetCustomTile(model.Position{X: 2, Y: y})
@@ -311,7 +311,7 @@ func TestMapper(t *testing.T) {
 					m.Layers[0].SetTile(x, y, 565)
 				}
 			}
-			mapper := New(&m, mapping)
+			mapper := New(&m, mapping, 1)
 			mapper.randFunc = func(i int) int { return 88 } // > 50
 
 			for y := 3; y < 12; y++ {
@@ -345,7 +345,7 @@ func TestMapper(t *testing.T) {
 					m.Layers[0].SetTile(x, y, 565)
 				}
 			}
-			mapper := New(&m, mapping)
+			mapper := New(&m, mapping, 1)
 			mapper.randFunc = func(i int) int { return 21 } // < 25
 
 			for y := 3; y < 12; y++ {
@@ -372,6 +372,41 @@ func TestMapper(t *testing.T) {
 				}
 			}
 		})
+		t.Run("random rectangle with density 2 and overflow orthogonal inside polygon, and downscale 4", func(t *testing.T) {
+			m := model.Map{}
+			m.Init(1, 16, 16, func(x, y int) model.Tile { return 2 })
+			for y := 3; y < 12; y++ {
+				for x := 12 - y - 1; x < 12-3; x++ {
+					m.Layers[0].SetTile(x, y, 565)
+				}
+			}
+			mapper := New(&m, mapping, 4)
+			mapper.randFunc = func(i int) int { return 21 } // < 25
+
+			for y := 3; y < 12; y++ {
+				for x := 12 - y - 1; x < 12-3; x++ {
+					mapTile := mapper.GetCustomTile(model.Position{X: x, Y: y})
+					assert.Equal(t, model.Tile(0), mapTile.ByLayer[0])
+					rect := mapTile.RectanglesByLayer[0]
+					if x%4 == 0 && y%2 == 0 {
+						assert.Equal(t, Rectangle{
+							Tiles: [][]model.Tile{
+								{385, 386, 386, 387},
+								{393, 394, 394, 395},
+								{401, 408, 402, 403},
+								{409, 416, 410, 411},
+							},
+							InsidePoylgon: &RectangleInsidePolygon{
+								Density:  2,
+								Overflow: OverflowModeOrthogonal,
+							},
+						}, rect)
+					} else {
+						assert.Empty(t, rect)
+					}
+				}
+			}
+		})
 		t.Run("random rectangle with density 2 and overflow quarter inside polygon", func(t *testing.T) {
 			m := model.Map{}
 			m.Init(1, 16, 16, func(x, y int) model.Tile { return 2 })
@@ -380,7 +415,7 @@ func TestMapper(t *testing.T) {
 					m.Layers[0].SetTile(x, y, 565)
 				}
 			}
-			mapper := New(&m, mapping)
+			mapper := New(&m, mapping, 1)
 			mapper.randFunc = func(i int) int { return 42 } // < 50
 
 			for y := 2; y < 6; y++ {

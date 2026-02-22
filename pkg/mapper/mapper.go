@@ -8,20 +8,22 @@ import (
 )
 
 type Mapper struct {
-	m        *model.Map
-	conf     Mapping
-	randFunc func(int) int
+	m         *model.Map
+	conf      Mapping
+	downscale int
+	randFunc  func(int) int
 }
 
 type MapTile struct {
 	ByLayer map[int]model.Tile
 }
 
-func New(m *model.Map, conf Mapping) *Mapper {
+func New(m *model.Map, conf Mapping, downscale int) *Mapper {
 	return &Mapper{
-		m:        m,
-		conf:     conf,
-		randFunc: rand.Intn,
+		m:         m,
+		conf:      conf,
+		downscale: downscale,
+		randFunc:  rand.Intn,
 	}
 }
 
@@ -228,7 +230,7 @@ func (m *Mapper) mapCustomTileRectangle(layer int, pos model.Position, tile mode
 
 func (m *Mapper) isPartInsidePolygon(layer int, pos model.Position, rectangle Rectangle, tile model.Tile, divider int) bool {
 	pointsInsidePolygon := 0
-	quarter := len(rectangle.Tiles) * len(rectangle.Tiles[0]) / divider
+	quarter := len(rectangle.Tiles) * len(rectangle.Tiles[0]) / divider / m.downscale
 	for y := 0; y < len(rectangle.Tiles); y++ {
 		for x := 0; x < len(rectangle.Tiles[y]); x++ {
 			if m.m.Layers[layer].GetCell(pos.X-x, pos.Y-y).Tile == tile {
@@ -243,13 +245,13 @@ func (m *Mapper) isPartInsidePolygon(layer int, pos model.Position, rectangle Re
 }
 
 func (m *Mapper) isOrthogonalProjectionInsidePolygon(layer int, pos model.Position, rectangle Rectangle, tile model.Tile) bool {
-	y := len(rectangle.Tiles) - 1
-	for x := 0; x < len(rectangle.Tiles[y]); x++ {
+	y := (len(rectangle.Tiles) - 1) / m.downscale
+	for x := 0; x < len(rectangle.Tiles[y])/m.downscale; x++ {
 		if m.m.Layers[layer].GetCell(pos.X-x, pos.Y).Tile != tile {
 			return false
 		}
 	}
-	for y := 0; y < len(rectangle.Tiles); y++ {
+	for y := 0; y < len(rectangle.Tiles)/m.downscale; y++ {
 		if m.m.Layers[layer].GetCell(pos.X, pos.Y-y).Tile != tile {
 			return false
 		}
@@ -258,8 +260,8 @@ func (m *Mapper) isOrthogonalProjectionInsidePolygon(layer int, pos model.Positi
 }
 
 func (m *Mapper) isRectangleInsidePolygon(layer int, pos model.Position, rectangle Rectangle, tile model.Tile) bool {
-	for y := 0; y < len(rectangle.Tiles); y++ {
-		for x := 0; x < len(rectangle.Tiles[y]); x++ {
+	for y := 0; y < len(rectangle.Tiles)/m.downscale; y++ {
+		for x := 0; x < len(rectangle.Tiles[y])/m.downscale; x++ {
 			if m.m.Layers[layer].GetCell(pos.X-x, pos.Y-y).Tile != tile {
 				return false
 			}
