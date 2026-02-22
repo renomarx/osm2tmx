@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/chai2010/tiff"
 	"github.com/renomarx/osm2tmx/pkg/model"
@@ -23,6 +24,7 @@ var (
 )
 
 type TifParser struct {
+	sync.RWMutex
 	tifs       map[tifID]string
 	loaded     map[tifID]bool
 	Topography *model.Topography
@@ -108,6 +110,8 @@ func (tp *TifParser) Preload(minlat, maxlat, minlon, maxlon float64, precision i
 }
 
 func (tp *TifParser) GetAltitude(lat, lon float64, precision int) (model.Altitude, error) {
+	tp.Lock()
+	defer tp.Unlock()
 	// Get altitude from topography if already loaded
 	mult := math.Pow(10, float64(precision))
 	roundedLat := math.Round(lat*mult) / mult
