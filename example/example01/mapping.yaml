@@ -127,10 +127,18 @@ layers:
       building:
         tile: 565
         values:
+          religious:
+            tile: 482
+          cathedral:
+            tile: 482
+          chapel:
+            tile: 482
+          church:
+            tile: 482
           apartments:
             tile: 582
           detached:
-            tile: 386
+            tile: 564
           house:
             tile: 564
           # the following values are only here for example,
@@ -331,7 +339,7 @@ custom_tiles:
       ]
       inside_polygon:
         density: 2
-        overflow: ORTHOGONAL
+        overflow: HALF
   536: # apartments with doors & windows
     rectangle:
       tiles: [
@@ -344,7 +352,7 @@ custom_tiles:
       ]
       inside_polygon:
         density: 2
-        overflow: ORTHOGONAL
+        overflow: HALF
   482: # religious buildings background
     rectangle:
       tiles: [
@@ -354,7 +362,7 @@ custom_tiles:
         [490]
       ]
       inside_polygon:
-        overflow: ORTHOGONAL
+        overflow: ALWAYS
   565: # default buidlings background
     rectangle:
       tiles:
@@ -391,7 +399,7 @@ custom_tiles:
       ]
       inside_polygon:
         density: 2
-        overflow: ORTHOGONAL
+        overflow: QUARTER
   392: # houses with doors & windows
     rectangle:
       tiles: [
@@ -404,7 +412,7 @@ custom_tiles:
       ]
       inside_polygon:
         density: 2
-        overflow: ORTHOGONAL
+        overflow: QUARTER
   41:
     rectangle:
       tiles: [

@@ -316,7 +316,7 @@ var mappingTest = Mapping{
 			},
 			Random: []RandomCustomTile{
 				{
-					Probability: 50,
+					Probability: 25,
 					Rectangle: &Rectangle{
 						Tiles: [][]model.Tile{
 							{385, 386, 386, 387},
@@ -327,6 +327,21 @@ var mappingTest = Mapping{
 						InsidePoylgon: &RectangleInsidePolygon{
 							Density:  2,
 							Overflow: OverflowModeOrthogonal,
+						},
+					},
+				},
+				{
+					Probability: 25,
+					Rectangle: &Rectangle{
+						Tiles: [][]model.Tile{
+							{385, 386, 386, 387},
+							{393, 394, 394, 395},
+							{401, 408, 402, 403},
+							{409, 416, 410, 411},
+						},
+						InsidePoylgon: &RectangleInsidePolygon{
+							Density:  2,
+							Overflow: OverflowModeQuarter,
 						},
 					},
 				},

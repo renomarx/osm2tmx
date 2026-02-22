@@ -212,6 +212,10 @@ func (m *Mapper) mapCustomTileRectangle(layer int, pos model.Position, tile mode
 		switch customTileRectangle.InsidePoylgon.Overflow {
 		case OverflowModeOrthogonal:
 			drawRectangle = drawRectangle && m.isOrthogonalProjectionInsidePolygon(layer, pos, customTileRectangle, initialTile)
+		case OverflowModeHalf:
+			drawRectangle = drawRectangle && m.isPartInsidePolygon(layer, pos, customTileRectangle, initialTile, 2)
+		case OverflowModeQuarter:
+			drawRectangle = drawRectangle && m.isPartInsidePolygon(layer, pos, customTileRectangle, initialTile, 4)
 		case OverflowModeNone:
 			drawRectangle = drawRectangle && m.isRectangleInsidePolygon(layer, pos, customTileRectangle, initialTile)
 		}
@@ -220,6 +224,22 @@ func (m *Mapper) mapCustomTileRectangle(layer int, pos model.Position, tile mode
 		rectanglesByLayer[layer] = customTileRectangle
 	}
 	return tile, rectanglesByLayer
+}
+
+func (m *Mapper) isPartInsidePolygon(layer int, pos model.Position, rectangle Rectangle, tile model.Tile, divider int) bool {
+	pointsInsidePolygon := 0
+	quarter := len(rectangle.Tiles) * len(rectangle.Tiles[0]) / divider
+	for y := 0; y < len(rectangle.Tiles); y++ {
+		for x := 0; x < len(rectangle.Tiles[y]); x++ {
+			if m.m.Layers[layer].GetCell(pos.X-x, pos.Y-y).Tile == tile {
+				pointsInsidePolygon++
+			}
+			if pointsInsidePolygon >= quarter {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func (m *Mapper) isOrthogonalProjectionInsidePolygon(layer int, pos model.Position, rectangle Rectangle, tile model.Tile) bool {

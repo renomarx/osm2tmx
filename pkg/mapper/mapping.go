@@ -126,6 +126,10 @@ const (
 	// OverflowModeOrthogonal only draw if the orthogonal projection of the rectangle
 	// is included in the polygon, i.e. the last line and the last column
 	OverflowModeOrthogonal OverflowMode = "ORTHOGONAL"
+	// OverflowModeQuarter only draw if the polygon contains at least 1/4 of the rectangle
+	OverflowModeQuarter OverflowMode = "QUARTER"
+	// OverflowModeHalf only draw if the polygon contains at least 1/2 of the rectangle
+	OverflowModeHalf OverflowMode = "HALF"
 	// OverflowModeNone only draw if the full view of the rectangle is included in the polygon
 	OverflowModeNone OverflowMode = ""
 )

@@ -345,9 +345,8 @@ func TestMapper(t *testing.T) {
 					m.Layers[0].SetTile(x, y, 565)
 				}
 			}
-			m.Print()
 			mapper := New(&m, mapping)
-			mapper.randFunc = func(i int) int { return 42 } // < 50
+			mapper.randFunc = func(i int) int { return 21 } // < 25
 
 			for y := 3; y < 12; y++ {
 				for x := 12 - y - 1; x < 12-3; x++ {
@@ -373,5 +372,41 @@ func TestMapper(t *testing.T) {
 				}
 			}
 		})
+		t.Run("random rectangle with density 2 and overflow quarter inside polygon", func(t *testing.T) {
+			m := model.Map{}
+			m.Init(1, 16, 16, func(x, y int) model.Tile { return 2 })
+			for y := 2; y < 6; y++ {
+				for x := 2; x < 6; x++ {
+					m.Layers[0].SetTile(x, y, 565)
+				}
+			}
+			mapper := New(&m, mapping)
+			mapper.randFunc = func(i int) int { return 42 } // < 50
+
+			for y := 2; y < 6; y++ {
+				for x := 2; x < 6; x++ {
+					mapTile := mapper.GetCustomTile(model.Position{X: x, Y: y})
+					assert.Equal(t, model.Tile(0), mapTile.ByLayer[0])
+					rect := mapTile.RectanglesByLayer[0]
+					if x == 4 && y == 4 {
+						assert.Equal(t, Rectangle{
+							Tiles: [][]model.Tile{
+								{385, 386, 386, 387},
+								{393, 394, 394, 395},
+								{401, 408, 402, 403},
+								{409, 416, 410, 411},
+							},
+							InsidePoylgon: &RectangleInsidePolygon{
+								Density:  2,
+								Overflow: OverflowModeQuarter,
+							},
+						}, rect)
+					} else {
+						assert.Empty(t, rect)
+					}
+				}
+			}
+		})
+
 	})
 }
