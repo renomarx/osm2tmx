@@ -144,8 +144,10 @@ func main() {
 	if err := writer.Write(rstMap, tmxFilename); err != nil {
 		log.Fatal(err)
 	}
+	log.Printf("! TMX written to %s", tmxFilename)
 
 	if drawFlag != nil && *drawFlag {
+		log.Printf("Drawing... (can take time if the image is big)")
 		if err := draw.Draw(tmxFilename); err != nil {
 			log.Fatal(err)
 		}

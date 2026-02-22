@@ -2,6 +2,7 @@ package draw
 
 import (
 	"fmt"
+	"image"
 	"log"
 	"math"
 	"path"
@@ -13,12 +14,16 @@ import (
 	"github.com/lafriks/go-tiled/render"
 )
 
+const MaxImageSizeX = 16000
+const MaxImageSizeY = 16000
+
 type UI struct {
 	background  *ebiten.Image
 	pressedKeys []ebiten.Key
 	tx, ty      float64
 	zoom        float64
 	speed       float64
+	resized     bool
 }
 
 func (ui *UI) loadTmx(tmxFile string) error {
@@ -45,6 +50,16 @@ func (ui *UI) loadTmx(tmxFile string) error {
 
 	// Get a reference to the Renderer's output, an image.NRGBA struct.
 	img := renderer.Result
+
+	// Cutting the image if too large fro drawing
+	if img.Rect.Dx() > MaxImageSizeX || img.Rect.Dy() > MaxImageSizeY {
+		centerX := img.Rect.Dx() / 2
+		centerY := img.Rect.Dy() / 2
+		newImg := img.SubImage(image.Rectangle{Min: image.Pt(centerX-MaxImageSizeX/2, centerY-MaxImageSizeY/2), Max: image.Pt(centerX+MaxImageSizeX/2, centerY+MaxImageSizeY/2)})
+		img = newImg.(*image.NRGBA)
+		ui.resized = true
+	}
+
 	ui.background = ebiten.NewImageFromImage(img)
 
 	return nil
@@ -127,6 +142,9 @@ func (ui *UI) Draw(screen *ebiten.Image) {
 	op.GeoM.Scale(ui.zoom, ui.zoom)
 	screen.DrawImage(ui.background, op)
 	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Zoom: %d%%", int(math.Round(ui.zoom*100))), 16, 16)
+	if ui.resized {
+		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Image cropped: %dx%d", MaxImageSizeX, MaxImageSizeY), 16, 32)
+	}
 }
 
 func (ui *UI) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
