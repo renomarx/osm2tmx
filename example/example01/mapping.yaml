@@ -11,44 +11,39 @@ tilesets:
     tile_width: 32
     tile_height: 32
     first_gid: 4136
-  - source: "tileset/[A]Dirt_pipo.tsx"
+  - source: "tileset/[A]Dirt_pipo_with_snow.tsx"
     tile_width: 32
     tile_height: 32
     first_gid: 4184
 
 default:
-  tile: 2
-  altitude:
-    min: 1400
-    tile: 1378
+  object: grass_or_snow
 
 objects:
   water:
     tile: 1518 # 1064+454
   asphalt:
     tile: 4486 # 4184+302
+  grass_or_snow:
+    tile: 2
+    altitude:
+      min: 1400
+      tile: 4534 # 4184+350
+  mud_or_snow:
+    tile: 4
+    altitude:
+      min: 1400
+      tile: 4534 # 4184+350
   forest:
     random:
       - probability: 5
         tile: 41
-        altitude:
-          min: 1400
-          tile: 1351
       - probability: 5
         tile: 42
-        altitude:
-          min: 1400
-          tile: 1351
       - probability: 5
         tile: 43
-        altitude:
-          min: 1400
-          tile: 1351
       - probability: 5
         tile: 44
-        altitude:
-          min: 1400
-          tile: 1351
 
 layers:
   0: # keeping it empty to fill the whole layer 0 with default tile
@@ -63,7 +58,7 @@ layers:
           water:
             object: water
           wood:
-            tile: 4
+            object: mud_or_snow
           heath:
             tile: 6
           mash:
@@ -79,7 +74,7 @@ layers:
           meadow:
             tile: 4150 # 4136+14
           forest:
-            tile: 4
+            object: mud_or_snow
           industrial:
             object: asphalt
           residential:
@@ -91,8 +86,6 @@ layers:
 
   2: # highways, forests...
     tags:
-      aerialway:
-        tile: 647
       aeroway:
         tile: 847
       highway:
@@ -198,39 +191,44 @@ layers:
           house:
             tile: 392
 
+  5: #aerial objects
+    tags:
+      aerialway:
+        tile: 647
+
 custom_tiles:
-  1378: # snow
+  4534: # snow
     position:
       standalone:
-        tile: 1376
+        tile: 4520 # 4184+336=4520
       corner_top_left:
-        tile: 1369
+        tile: 4525 # 4184+341=4525
       corner_top_right:
-        tile: 1371
+        tile: 4527 # 4184+343=4527
       corner_bottom_left:
-        tile: 1385
+        tile: 4541 # 4184+357=4541
       corner_bottom_right:
-        tile: 1387
+        tile: 4543 # 4184+359=4543
       border_top:
-        tile: 1370
+        tile: 4526 # 4184+342=4526
       border_bottom:
-        tile: 1386
+        tile: 4542 # 4184+358=4542
       border_left:
-        tile: 1377
+        tile: 4533 # 4184+349=4533
       border_right:
-        tile: 1379
+        tile: 4535 # 4184+351=4535
       border_left_and_right:
-        tile: 1399
+        tile: 4532 # 4184+348=4532
       border_top_and_bottom:
-        tile: 1405
+        tile: 4522 # 4184+338=4522
       end_way_right:
-        tile: 1406
+        tile: 4523 # 4184+339=4523
       end_way_left:
-        tile: 1404
+        tile: 4521 # 4184+337=4521
       end_way_bottom:
-        tile: 1407
+        tile: 4540 # 4184+356=4540
       end_way_top:
-        tile: 1391
+        tile: 4524 # 4184+340=4524
   4486: # highway
     position:
       standalone:
