@@ -401,7 +401,7 @@ custom_tiles:
       ]
       inside_polygon:
         density: 2
-        overflow: HALF
+        overflow: ORTHOGONAL
   536: # apartments with doors & windows
     rectangle:
       tiles: [
@@ -414,7 +414,7 @@ custom_tiles:
       ]
       inside_polygon:
         density: 2
-        overflow: HALF
+        overflow: ORTHOGONAL
   482: # religious buildings background
     rectangle:
       tiles: [
@@ -461,7 +461,7 @@ custom_tiles:
       ]
       inside_polygon:
         density: 2
-        overflow: QUARTER
+        overflow: HALF
   392: # houses with doors & windows
     rectangle:
       tiles: [
@@ -474,7 +474,7 @@ custom_tiles:
       ]
       inside_polygon:
         density: 2
-        overflow: QUARTER
+        overflow: HALF
   41:
     rectangle:
       tiles: [
