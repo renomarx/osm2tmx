@@ -23,14 +23,14 @@ objects:
   water:
     tile: 1518 # 1064+454
   asphalt:
-    tile: 4486 # 4184+302
+    tile: 4486 # 4184+302=4486
   grass_or_snow:
     tile: 2
     altitude:
       min: 1400
       tile: 4534 # 4184+350
   mud_or_snow:
-    tile: 4
+    tile: 4342
     altitude:
       min: 1400
       tile: 4534 # 4184+350
@@ -89,7 +89,7 @@ layers:
       aeroway:
         tile: 847
       highway:
-        tile: 4486 # 4184+302
+        tile: 4438 # 4184+254=4438
       natural:
         values:
           wood:
@@ -229,7 +229,7 @@ custom_tiles:
         tile: 4540 # 4184+356=4540
       end_way_top:
         tile: 4524 # 4184+340=4524
-  4486: # highway
+  4486: # asphalt
     position:
       standalone:
         tile: 4472 # 4184+288
@@ -325,6 +325,70 @@ custom_tiles:
         tile: 4156 # 4136+20
       end_way_top:
         tile: 4140 # 4136+4
+  4342: # mud
+    position:
+      standalone:
+        tile: 4328
+      corner_top_left:
+        tile: 4333
+      corner_top_right:
+        tile: 4335
+      corner_bottom_left:
+        tile: 4349
+      corner_bottom_right:
+        tile: 4351
+      border_top:
+        tile: 4334
+      border_bottom:
+        tile: 4350
+      border_left:
+        tile: 4341
+      border_right:
+        tile: 4343
+      border_left_and_right:
+        tile: 4340
+      border_top_and_bottom:
+        tile: 4330
+      end_way_right:
+        tile: 4331
+      end_way_left:
+        tile: 4329
+      end_way_bottom:
+        tile: 4348
+      end_way_top:
+        tile: 4332
+  4438: # highway
+    position:
+      standalone:
+        tile: 4424 # 4184+288
+      corner_top_left:
+        tile: 4429 # 4184+293
+      corner_top_right:
+        tile: 4431 # 4184+295
+      corner_bottom_left:
+        tile: 4445 # 4184+309
+      corner_bottom_right:
+        tile: 4447 # 4184+311
+      border_top:
+        tile: 4430 # 4184+294
+      border_bottom:
+        tile: 4446 # 4184+310
+      border_left:
+        tile: 4437 # 4184+301
+      border_right:
+        tile: 4439 # 4184+303
+      border_left_and_right:
+        tile: 4436 # 4184+300
+      border_top_and_bottom:
+        tile: 4426 # 4184+290
+      end_way_right:
+        tile: 4427 # 4184+291
+      end_way_left:
+        tile: 4425 # 4184+289
+      end_way_bottom:
+        tile: 4444 # 4184+308
+      end_way_top:
+        tile: 4428 # 4184+292
   582: # apartments background
     rectangle:
       tiles: [
