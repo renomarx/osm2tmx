@@ -221,8 +221,12 @@ func (r *Raster) drawCustomTiles() {
 						if rect.InsidePoylgon == nil && z < mapTile.RectanglesMaxLayer() && newLayerTile != 0 {
 							continue
 						}
+						newRectTile := rect.Tiles[len(rect.Tiles)-1-j][len(rect.Tiles[j])-1-i]
+						if newRectTile == 0 {
+							continue
+						}
 						// Rectangle is drawed from bottom-right corner
-						newMap.Layers[z].SetTile(x-i, y-j, rect.Tiles[len(rect.Tiles)-1-j][len(rect.Tiles[j])-1-i])
+						newMap.Layers[z].SetTile(x-i, y-j, newRectTile)
 					}
 				}
 			}

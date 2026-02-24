@@ -179,13 +179,13 @@ layers:
         tile: 440
         values:
           religious:
-            tile: 482
+            tile: 488
           cathedral:
-            tile: 482
+            tile: 488
           chapel:
-            tile: 482
+            tile: 488
           church:
-            tile: 482
+            tile: 488
           apartments:
             tile: 536
           detached:
@@ -424,13 +424,33 @@ custom_tiles:
   482: # religious buildings background
     rectangle:
       tiles: [
-        [466],
-        [474],
-        [482],
-        [490]
+        [0, 566, 566, 566, 0],
+        [566, 574, 574, 574, 566],
+        [574, 582, 582, 582, 574],
+        [582, 590, 590, 590, 582],
+        [590, 481, 482, 483, 590],
+        [484, 489, 490, 491, 484],
+        [492, 481, 482, 483, 492],
+        [0, 489, 490, 491, 0]
       ]
       inside_polygon:
-        overflow: ALWAYS
+        density: 2
+        overflow: ORTHOGONAL
+  488: # religious buildings with doors & windows
+    rectangle:
+      tiles: [
+        [0, 566, 566, 566, 0],
+        [566, 574, 616, 574, 566],
+        [574, 582, 582, 582, 574],
+        [925, 590, 590, 590, 925],
+        [933, 481, 482, 483, 933],
+        [484, 489, 490, 491, 484],
+        [492, 481, 488, 483, 492],
+        [0, 489, 496, 491, 0]
+      ]
+      inside_polygon:
+        density: 2
+        overflow: ORTHOGONAL
   565: # default buidlings background
     rectangle:
       tiles:

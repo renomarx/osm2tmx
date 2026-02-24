@@ -27,10 +27,10 @@ In addition, you can add SRTM files to the program, to be able to handle differe
 ./osm2tmx -downscale 4 -draw -mapping example/example01/mapping.yaml -out example/example01/centre_les_gets.osm.tmx example/centre_les_gets.osm.pbf
 ```
 
-- With downscale 10, srtm file and drawing
+- With downscale 4, srtm file and drawing
 
 ```bash
-./osm2tmx -downscale 10 -srtm-tif example/N46E006.tif -draw -mapping example/example01/mapping.yaml -out example/example01/les_gets.osm.tmx example/les_gets.osm.pbf
+./osm2tmx -downscale 4 -srtm-tif example/N46E006.tif -draw -mapping example/example01/mapping.yaml -out example/example01/les_gets.osm.tmx example/les_gets.osm.pbf
 ```
 
 ### Get OSM files
@@ -75,12 +75,8 @@ To get your SRTM files, we can go for instance visit: https://portal.opentopogra
 Examples:
 
 - [example01](example/example01/mapping.yaml)
-
-## TODO
-
-- More examples with other tilesets
-
-- Explore a direct integration in 2d video games, without tilesets, using directional svg ?
+- [example02](example/example02/mapping.yaml)
+- [example03](example/example03/mapping.yaml)
 
 ## Resources
 
