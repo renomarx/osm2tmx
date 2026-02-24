@@ -2,7 +2,6 @@ package mapper
 
 import (
 	"fmt"
-	"slices"
 
 	"github.com/renomarx/osm2tmx/pkg/model"
 )
@@ -133,15 +132,6 @@ const (
 	// OverflowModeNone only draw if the full view of the rectangle is included in the polygon
 	OverflowModeNone OverflowMode = ""
 )
-
-func (r Rectangle) Contains(tile model.Tile) bool {
-	for y := range r.Tiles {
-		if slices.Contains(r.Tiles[y], tile) {
-			return true
-		}
-	}
-	return false
-}
 
 // Position represents a tile mapping depending on the position of a point within a line or a polygon
 type Position struct {

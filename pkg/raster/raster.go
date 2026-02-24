@@ -218,7 +218,7 @@ func (r *Raster) drawCustomTiles() {
 						newLayerTile := newMap.Layers[z].GetCell(x-i, y-j).Tile
 						// For rectangles on multiple layers (for example trees in a forest)
 						// we do not want to overload the tiles of the lower layers
-						if rect.InsidePoylgon == nil && z < mapTile.RectanglesMaxLayer() && rect.Contains(newLayerTile) {
+						if rect.InsidePoylgon == nil && z < mapTile.RectanglesMaxLayer() && newLayerTile != 0 {
 							continue
 						}
 						// Rectangle is drawed from bottom-right corner

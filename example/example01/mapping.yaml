@@ -84,28 +84,20 @@ layers:
           cemetery:
             tile: 291
 
-  2: # highways, forests...
+  2: # highways...
     tags:
       aeroway:
         tile: 847
       highway:
         tile: 4438 # 4184+254=4438
-      natural:
-        values:
-          wood:
-            object: forest
-          tree:
-            tile: 41
       landuse:
         values:
-          forest:
-            object: forest
           cemetery:
             random:
               - probability: 10
                 tile: 616
 
-  3: # buildings, trees & forests (overlapping)...
+  3: # buildings, trees & forests...
     tags:
       natural:
         values:
@@ -171,8 +163,18 @@ layers:
           public:
             tile: 565
 
-  4: # building doors and windows, custom objects...
+  4: # building doors and windows, trees & forests (overlapping)...
     tags:
+      natural:
+        values:
+          wood:
+            object: forest
+          tree:
+            tile: 41
+      landuse:
+        values:
+          forest:
+            object: forest
       building:
         tile: 440
         values:
@@ -429,10 +431,10 @@ custom_tiles:
     rectangle:
       tiles:
         [
-          [433, 434, 434, 435],
-          [441, 442, 442, 443],
-          [449, 450, 450, 451],
-          [457, 458, 458, 459],
+          [579, 579, 579, 579],
+          [587, 587, 587, 587],
+          [417, 418, 418, 419],
+          [425, 426, 426, 427],
         ]
       inside_polygon:
         density: 2
@@ -441,10 +443,10 @@ custom_tiles:
     rectangle:
       tiles:
         [
-          [433, 434, 434, 435],
-          [441, 442, 442, 443],
-          [449, 440, 450, 451],
-          [457, 448, 458, 459],
+          [579, 579, 579, 579],
+          [587, 587, 587, 587],
+          [417, 440, 418, 419],
+          [425, 448, 426, 427],
         ]
       inside_polygon:
         density: 2

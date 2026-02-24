@@ -197,9 +197,9 @@ func (m *Mapper) mapCustomTilePosition(layer int, pos model.Position, tile model
 
 func (m *Mapper) mapCustomTileRectangle(layer int, pos model.Position, tile model.Tile, rectanglesByLayer map[int]Rectangle, customTileRectangle Rectangle, initialTile model.Tile) (model.Tile, map[int]Rectangle) {
 	drawRectangle := true
+	tile = 0
 	if customTileRectangle.InsidePoylgon != nil {
 		if customTileRectangle.InsidePoylgon.Density > 0 {
-			tile = 0
 			rect := customTileRectangle.Tiles
 			moduloX := len(rect[0])
 			if moduloX == 0 {
