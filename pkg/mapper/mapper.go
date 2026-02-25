@@ -125,6 +125,7 @@ func (cmt CustomMapTile) RectanglesMaxLayer() int {
 func (m *Mapper) GetCustomTile(pos model.Position) CustomMapTile {
 	byLayer := make(map[int]model.Tile)
 	rectanglesByLayer := make(map[int]Rectangle)
+	r := m.randFunc(100)
 	for layer := range m.m.Layers {
 		tile := m.m.Layers[layer].GetCell(pos.X, pos.Y).Tile
 		initialTile := tile
@@ -139,7 +140,6 @@ func (m *Mapper) GetCustomTile(pos model.Position) CustomMapTile {
 			}
 		}
 		if len(customTile.Random) > 0 {
-			r := m.randFunc(100)
 			p := 0
 			for _, rr := range customTile.Random {
 				if r >= p && r < p+rr.Probability {
