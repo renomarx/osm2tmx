@@ -87,6 +87,8 @@ layers:
         values:
           forest:
             tile: 590
+          meadow:
+            tile: 566
 
   1:
     tags:
@@ -107,6 +109,21 @@ layers:
             object: forest
       building:
         tile: 3004
+        values:
+          religious:
+            tile: 4789
+          cathedral:
+            tile: 4789
+          chapel:
+            tile: 4789
+          church:
+            tile: 4789
+          apartments:
+            tile: 4653
+          detached:
+            tile: 3065
+          house:
+            tile: 3065
 
   3: # trees & forests (overlapping)
     tags:
@@ -122,8 +139,24 @@ layers:
             object: forest
       building:
         tile: 3004
+        values:
+          religious:
+            tile: 4789
+          cathedral:
+            tile: 4789
+          chapel:
+            tile: 4789
+          church:
+            tile: 4789
+          apartments:
+            tile: 4653
+          detached:
+            tile: 3065
+          house:
+            tile: 3065
 
 custom_tiles:
+  506:
   1:
     rectangle:
       tiles: [
@@ -318,3 +351,45 @@ custom_tiles:
             density: 1
             overflow: ORTHOGONAL
         probability: 20
+  4789: # church
+    rectangle:
+      tiles: [
+        [4789, 4790, 4791, 4792],
+        [4797, 4798, 4799, 4800],
+        [4805, 4806, 4807, 4808],
+        [4813, 4814, 4815, 4816],
+        [4821, 4822, 4823, 4824],
+        [4829, 4830, 4831, 4832],
+        [4837, 4838, 4839, 4840],
+        [4845, 4846, 4847, 4848],
+        [4853, 4854, 4855, 4856],
+        [4861, 4862, 4863, 4864],
+      ]
+      inside_polygon:
+        density: 1
+        overflow: ORTHOGONAL
+  4653: # apartments
+    rectangle:
+      tiles: [
+        [4653, 4654, 4655],
+        [4661, 4662, 4663],
+        [4669, 4670, 4671],
+        [4677, 4678, 4679],
+        [4685, 4686, 4687],
+        [4693, 4694, 4695],
+        [4701, 4702, 4703],
+      ]
+      inside_polygon:
+        density: 1
+        overflow: ORTHOGONAL
+  3065: # house
+    rectangle:
+      tiles: [
+        [3065, 3066, 3067],
+        [3073, 3074, 3075],
+        [3081, 3082, 3083],
+        [3089, 3090, 3091],
+      ]
+      inside_polygon:
+        density: 1
+        overflow: ORTHOGONAL
