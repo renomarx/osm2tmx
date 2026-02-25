@@ -10,6 +10,55 @@ default:
 objects:
   water:
     tile: 1034
+  forest:
+    random:
+      - probability: 1
+        tile: 1
+      - probability: 1
+        tile: 3
+      - probability: 1
+        tile: 5
+      - probability: 1
+        tile: 7
+      - probability: 1
+        tile: 17
+      - probability: 1
+        tile: 19
+      - probability: 1
+        tile: 21
+      - probability: 1
+        tile: 23
+      - probability: 1
+        tile: 33
+      - probability: 1
+        tile: 35
+      - probability: 1
+        tile: 37
+      - probability: 1
+        tile: 39
+      - probability: 1
+        tile: 49
+      - probability: 1
+        tile: 51
+      - probability: 1
+        tile: 53
+      - probability: 1
+        tile: 55
+      - probability: 1
+        tile: 65
+      - probability: 1
+        tile: 67
+      - probability: 1
+        tile: 69
+      - probability: 1
+        tile: 71
+      - probability: 1
+        tile: 81
+      - probability: 1
+        tile: 83
+      - probability: 1
+        tile: 85
+        
 
 layers:
   0:
@@ -46,18 +95,226 @@ layers:
 
   2:
     tags:
+      natural:
+        values:
+          wood:
+            object: forest
+          tree:
+            tile: 1
+      landuse:
+        values:
+          forest:
+            object: forest
+      building:
+        tile: 3004
+
+  3: # trees & forests (overlapping)
+    tags:
+      natural:
+        values:
+          wood:
+            object: forest
+          tree:
+            object: forest
+      landuse:
+        values:
+          forest:
+            object: forest
       building:
         tile: 3004
 
 custom_tiles:
+  1:
+    rectangle:
+      tiles: [
+        [1, 2],
+        [9, 10]
+      ]
+  3:
+    rectangle:
+      tiles: [
+        [3, 4],
+        [11, 12]
+      ]
+  5:
+    rectangle:
+      tiles: [
+        [5, 6],
+        [13, 14]
+      ]
+  7:
+    rectangle:
+      tiles: [
+        [7, 8],
+        [15, 16]
+      ]
+  17:
+    rectangle:
+      tiles: [
+        [17, 18],
+        [25, 26]
+      ]
+  19:
+    rectangle:
+      tiles: [
+        [19, 20],
+        [27, 28]
+      ]
+  21:
+    rectangle:
+      tiles: [
+        [21, 22],
+        [29, 30]
+      ]
+  23:
+    rectangle:
+      tiles: [
+        [23, 24],
+        [31, 32]
+      ]
+  33:
+    rectangle:
+      tiles: [
+        [33, 34],
+        [41, 42]
+      ]
+  35:
+    rectangle:
+      tiles: [
+        [35, 36],
+        [43, 44]
+      ]
+  37:
+    rectangle:
+      tiles: [
+        [37, 38],
+        [45, 46]
+      ]
+  39:
+    rectangle:
+      tiles: [
+        [39, 40],
+        [47, 48]
+      ]
+  49:
+    rectangle:
+      tiles: [
+        [49, 50],
+        [57, 58]
+      ]
+  51:
+    rectangle:
+      tiles: [
+        [51, 52],
+        [59, 60]
+      ]
+  53:
+    rectangle:
+      tiles: [
+        [53, 54],
+        [61, 62]
+      ]
+  55:
+    rectangle:
+      tiles: [
+        [55, 56],
+        [63, 64]
+      ]
+  65:
+    rectangle:
+      tiles: [
+        [65, 66],
+        [73, 74]
+      ]
+  67:
+    rectangle:
+      tiles: [
+        [67, 68],
+        [75, 76]
+      ]
+  69:
+    rectangle:
+      tiles: [
+        [69, 70],
+        [77, 78]
+      ]
+  71:
+    rectangle:
+      tiles: [
+        [71, 72],
+        [79, 80]
+      ]
+  81:
+    rectangle:
+      tiles: [
+        [81, 82],
+        [89, 90]
+      ]
+  83:
+    rectangle:
+      tiles: [
+        [83, 84],
+        [91, 92]
+      ]
+  85:
+    rectangle:
+      tiles: [
+        [85, 86],
+        [93, 94]
+      ]
   3004:
     rectangle:
       tiles: [
-        [3004, 3005, 3006],
-        [3012, 3013, 3014],
-        [3020, 3021, 3022],
-        [3028, 3029, 3030],
+        [3004, 3005, 3006, 0], # adding trailing 0 to have the same width as other rectangles
+        [3012, 3013, 3014, 0],
+        [3020, 3021, 3022, 0],
+        [3028, 3029, 3030, 0],
       ]
       inside_polygon:
         density: 1
         overflow: ORTHOGONAL
+    random:
+      - rectangle:
+          tiles: [
+            [3180, 3181, 3182, 3183],
+            [3188, 3189, 3190, 3191],
+            [3196, 3197, 3198, 3199],
+            [3204, 3205, 3206, 3207],
+          ]
+          inside_polygon:
+            density: 1
+            overflow: ORTHOGONAL
+        probability: 20
+      - rectangle:
+          tiles: [
+            [3212, 3213, 3214, 3215],
+            [3220, 3221, 3222, 3223],
+            [3228, 3229, 3230, 3231],
+            [3236, 3237, 3238, 3239],
+          ]
+          inside_polygon:
+            density: 1
+            overflow: ORTHOGONAL
+        probability: 20
+      - rectangle:
+          tiles: [
+            [3292, 3293, 3294, 3295],
+            [3300, 3301, 3302, 3303],
+            [3308, 3309, 3310, 3311],
+            [0, 0, 0, 0], # adding trailing 0 to have the same height as other rectangles
+          ]
+          inside_polygon:
+            density: 1
+            overflow: ORTHOGONAL
+        probability: 20
+      - rectangle:
+          tiles: [
+            [3316, 3317, 3318, 3319],
+            [3324, 3325, 3326, 3327],
+            [3332, 3333, 3334, 3335],
+            [0, 0, 0, 0], # adding trailing 0 to have the same height as other rectangles
+          ]
+          inside_polygon:
+            density: 1
+            overflow: ORTHOGONAL
+        probability: 20
