@@ -2,57 +2,62 @@ tilesets:
   - source: "tiles.tsx"
     tile_width: 32
     tile_height: 32
+    first_gid: 1
 
 default:
-  tile: 182
+  tile: 564
+
+objects:
+  water:
+    tile: 1034
 
 layers:
   0:
     tags:
       waterway:
-          tile: 988
+        object: water
       water:
-          tile: 988
+        object: water
       natural:
         values:
           water:
-            tile: 988
+            object: water
           wood:
-            tile: 119
+            tile: 590
           heath:
-            tile: 61
+            tile: 591
           mash:
-            tile: 61
+            tile: 579
       surface:
           values:
             sand:
-              tile: 61
+              tile: 579
             asphalt:
-              tile: 182
+              tile: 581
       landuse:
         values:
           forest:
-            tile: 119
+            tile: 590
 
   1:
     tags:
       highway:
-        tile: 61
+        tile: 506
 
   2:
     tags:
       building:
-        tile: 174
+        tile: 3004
 
 custom_tiles:
-  174:
+  3004:
     rectangle:
       tiles: [
-        [141, 142, 143, 144, 145, 146, 147],
-        [173, 174, 175, 176, 177, 178, 179],
-        [205, 206, 207, 208, 209, 210, 211],
-        [237, 238, 239, 240, 241, 242, 243],
-        [269, 270, 271, 272, 273, 274, 275]
+        [3004, 3005, 3006],
+        [3012, 3013, 3014],
+        [3020, 3021, 3022],
+        [3028, 3029, 3030],
       ]
       inside_polygon:
         density: 1
+        overflow: ORTHOGONAL
