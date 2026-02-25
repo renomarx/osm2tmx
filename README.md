@@ -75,8 +75,6 @@ To get your SRTM files, we can go for instance visit: https://portal.opentopogra
 Examples:
 
 - [example01](example/example01/mapping.yaml)
-- [example02](example/example02/mapping.yaml)
-- [example03](example/example03/mapping.yaml)
 
 ## Resources
 
