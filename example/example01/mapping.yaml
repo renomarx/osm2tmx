@@ -200,197 +200,89 @@ layers:
 
 custom_tiles:
   4534: # snow
-    position:
-      standalone:
-        tile: 4520 # 4184+336=4520
-      corner_top_left:
-        tile: 4525 # 4184+341=4525
-      corner_top_right:
-        tile: 4527 # 4184+343=4527
-      corner_bottom_left:
-        tile: 4541 # 4184+357=4541
-      corner_bottom_right:
-        tile: 4543 # 4184+359=4543
-      border_top:
-        tile: 4526 # 4184+342=4526
-      border_bottom:
-        tile: 4542 # 4184+358=4542
-      border_left:
-        tile: 4533 # 4184+349=4533
-      border_right:
-        tile: 4535 # 4184+351=4535
-      border_left_and_right:
-        tile: 4532 # 4184+348=4532
-      border_top_and_bottom:
-        tile: 4522 # 4184+338=4522
-      end_way_right:
-        tile: 4523 # 4184+339=4523
-      end_way_left:
-        tile: 4521 # 4184+337=4521
-      end_way_bottom:
-        tile: 4540 # 4184+356=4540
-      end_way_top:
-        tile: 4524 # 4184+340=4524
+    shapes:
+      standalone: 4520 # 4184+336=4520
+      square9: [
+        [4525, 4526, 4527],
+        [4533, 4534, 4535],
+        [4541, 4542, 4543],
+      ]
+      line: [4521, 4522, 4523]
+      column: [
+        4524,
+        4532,
+        4540
+      ]
   4486: # asphalt
-    position:
-      standalone:
-        tile: 4472 # 4184+288
-      corner_top_left:
-        tile: 4477 # 4184+293
-      corner_top_right:
-        tile: 4479 # 4184+295
-      corner_bottom_left:
-        tile: 4493 # 4184+309
-      corner_bottom_right:
-        tile: 4495 # 4184+311
-      border_top:
-        tile: 4478 # 4184+294
-      border_bottom:
-        tile: 4494 # 4184+310
-      border_left:
-        tile: 4485 # 4184+301
-      border_right:
-        tile: 4487 # 4184+303
-      border_left_and_right:
-        tile: 4484 # 4184+300
-      border_top_and_bottom:
-        tile: 4474 # 4184+290
-      end_way_right:
-        tile: 4475 # 4184+291
-      end_way_left:
-        tile: 4473 # 4184+289
-      end_way_bottom:
-        tile: 4492 # 4184+308
-      end_way_top:
-        tile: 4476 # 4184+292
+    shapes:
+      standalone: 4472 # 4184+288=4472
+      square9: [
+        [4477, 4478, 4479],
+        [4485, 4486, 4487],
+        [4493, 4494, 4495],
+      ]
+      line: [4473, 4474, 4475]
+      column: [
+        4476,
+        4484,
+        4492
+      ]
   1518: # water
-    position:
-      standalone:
-        tile: 1448 # 1064 + 384
-      corner_top_left:
-        tile: 1453 # 1064 + 389
-      corner_top_right:
-        tile: 1455 # 1064 + 391
-      corner_bottom_left:
-        tile: 1581 # 1064 + 517
-      corner_bottom_right:
-        tile: 1583 # 1064 + 519
-      border_top:
-        tile: 1454 # 1064 + 390
-      border_bottom:
-        tile: 1582 # 1064 + 518
-      border_left:
-        tile: 1517 # 1064 + 453
-      border_right:
-        tile: 1519 # 1064 + 455
-      border_left_and_right:
-        tile: 1516 # 1064 + 452
-      border_top_and_bottom:
-        tile: 1450 # 1064 + 386
-      end_way_right:
-        tile: 1451 # 1064 + 387
-      end_way_left:
-        tile: 1449 # 1064 + 385
-      end_way_bottom:
-        tile: 1580 # 1064 + 516
-      end_way_top:
-        tile: 1452 # 1064 + 388
+    shapes:
+      standalone: 1448 # 1064 + 384
+      square9: [
+        [1453, 1454, 1455],
+        [1517, 1518, 1519],
+        [1581, 1582, 1583],
+      ]
+      line: [1449, 1450, 1451]
+      column: [
+        1452,
+        1516,
+        1580
+      ]
   4150: # meadow
-    position:
-      standalone:
-        tile: 4136 # 4136+0
-      corner_top_left:
-        tile: 4141 # 4136+5
-      corner_top_right:
-        tile: 4143 # 4136+7
-      corner_bottom_left:
-        tile: 4157 # 4136+21
-      corner_bottom_right:
-        tile: 4159 # 4136+23
-      border_top:
-        tile: 4142 # 4136+6
-      border_bottom:
-        tile: 4158 # 4136+22
-      border_left:
-        tile: 4149 # 4136+13
-      border_right:
-        tile: 4151 # 4136+15
-      border_left_and_right:
-        tile: 4148 # 4136+12
-      border_top_and_bottom:
-        tile: 4138 # 4136+2
-      end_way_right:
-        tile: 4139 # 4136+3
-      end_way_left:
-        tile: 4137 # 4136+1
-      end_way_bottom:
-        tile: 4156 # 4136+20
-      end_way_top:
-        tile: 4140 # 4136+4
+    shapes:
+      standalone: 4136 # 4136+0
+      square9: [
+        [4141, 4142, 4143],
+        [4149, 4150, 4151],
+        [4157, 4158, 4159],
+      ]
+      line: [4137, 4138, 4139]
+      column: [
+        4140,
+        4148,
+        4156
+      ]
   4342: # mud
-    position:
-      standalone:
-        tile: 4328
-      corner_top_left:
-        tile: 4333
-      corner_top_right:
-        tile: 4335
-      corner_bottom_left:
-        tile: 4349
-      corner_bottom_right:
-        tile: 4351
-      border_top:
-        tile: 4334
-      border_bottom:
-        tile: 4350
-      border_left:
-        tile: 4341
-      border_right:
-        tile: 4343
-      border_left_and_right:
-        tile: 4340
-      border_top_and_bottom:
-        tile: 4330
-      end_way_right:
-        tile: 4331
-      end_way_left:
-        tile: 4329
-      end_way_bottom:
-        tile: 4348
-      end_way_top:
-        tile: 4332
+    shapes:
+      standalone: 4328
+      square9: [
+        [4333, 4334, 4335],
+        [4341, 4342, 4343],
+        [4349, 4350, 4351],
+      ]
+      line: [4329, 4330, 4331]
+      column: [
+        4332,
+        4340,
+        4348
+      ]
   4438: # highway
-    position:
-      standalone:
-        tile: 4424 # 4184+288
-      corner_top_left:
-        tile: 4429 # 4184+293
-      corner_top_right:
-        tile: 4431 # 4184+295
-      corner_bottom_left:
-        tile: 4445 # 4184+309
-      corner_bottom_right:
-        tile: 4447 # 4184+311
-      border_top:
-        tile: 4430 # 4184+294
-      border_bottom:
-        tile: 4446 # 4184+310
-      border_left:
-        tile: 4437 # 4184+301
-      border_right:
-        tile: 4439 # 4184+303
-      border_left_and_right:
-        tile: 4436 # 4184+300
-      border_top_and_bottom:
-        tile: 4426 # 4184+290
-      end_way_right:
-        tile: 4427 # 4184+291
-      end_way_left:
-        tile: 4425 # 4184+289
-      end_way_bottom:
-        tile: 4444 # 4184+308
-      end_way_top:
-        tile: 4428 # 4184+292
+    shapes:
+      standalone: 4424
+      square9: [
+        [4429, 4430, 4431],
+        [4437, 4438, 4439],
+        [4445, 4446, 4447],
+      ]
+      line: [4425, 4426, 4427]
+      column: [
+        4428,
+        4436,
+        4444
+      ]
   582: # apartments background
     rectangle:
       tiles: [
