@@ -166,69 +166,33 @@ layers:
 
 custom_tiles:
   8534: # highway
-    position:
-      standalone:
-        tile: 8568 # 8280+288=8568
-      corner_top_left:
-        tile: 8573 # 8280+293=8573
-      corner_top_right:
-        tile: 8575 # 8280+295=8575
-      corner_bottom_left:
-        tile: 8589 # 8280+309=8589
-      corner_bottom_right:
-        tile: 8591 # 8280+311=8591
-      border_top:
-        tile: 8574 # 8280+294=8574
-      border_bottom:
-        tile: 8590 # 8280+310=8590
-      border_left:
-        tile: 8581 # 8280+301=8581
-      border_right:
-        tile: 8583 # 8280+303=8583
-      border_left_and_right:
-        tile: 8580 # 8280+300=8580
-      border_top_and_bottom:
-        tile: 8570 # 8280+290=8570
-      end_way_right:
-        tile: 8571 # 8280+291=8571
-      end_way_left:
-        tile: 8569 # 8280+289=8569
-      end_way_bottom:
-        tile: 8588 # 8280+308=8588
-      end_way_top:
-        tile: 8572 # 8280+292=8572
+    shapes:
+      standalone: 8568 # 8280+288=8568
+      square9: [
+        [8573, 8574, 8575],
+        [8533, 8534, 8535],
+        [8589, 8590, 8591],
+      ]
+      line: [8569, 8570, 8571]
+      column: [
+        8572,
+        8580,
+        8588
+      ]
   5662: # water
-    position:
-      standalone:
-        tile: 5592 # 5208 + 384=5592
-      corner_top_left:
-        tile: 5597 # 5208 + 389=5597
-      corner_top_right:
-        tile: 5599 # 5208 + 391=5599
-      corner_bottom_left:
-        tile: 5725 # 5208 + 517=5725
-      corner_bottom_right:
-        tile: 5727 # 5208 + 519=5727
-      border_top:
-        tile: 5598 # 5208 + 390=5598
-      border_bottom:
-        tile: 5726 # 5208 + 518=5726
-      border_left:
-        tile: 5661 # 5208 + 453=5661
-      border_right:
-        tile: 5663 # 5208 + 455=5663
-      border_left_and_right:
-        tile: 5660 # 5208 + 452=5660
-      border_top_and_bottom:
-        tile: 5594 # 5208 + 386=5594
-      end_way_right:
-        tile: 5595 # 5208 + 387=5595
-      end_way_left:
-        tile: 5593 # 5208 + 385=5593
-      end_way_bottom:
-        tile: 5724 # 5208 + 516=5724
-      end_way_top:
-        tile: 5596 # 5208 + 388=5596
+    shapes:
+      standalone: 5592 # 5208 + 384=5592
+      square9: [
+        [5597, 5598, 5599],
+        [5661, 5662, 5663],
+        [5725, 5726, 5727],
+      ]
+      line: [5593, 5594, 5595]
+      column: [
+        5596,
+        5660,
+        5724
+      ]
   1:
     rectangle:
       tiles: [
