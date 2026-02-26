@@ -110,69 +110,33 @@ layers:
 
 custom_tiles:
   1378:
-    position:
-      standalone:
-        tile: 1376
-      corner_top_left:
-        tile: 1369
-      corner_top_right:
-        tile: 1371
-      corner_bottom_left:
-        tile: 1385
-      corner_bottom_right:
-        tile: 1387
-      border_top:
-        tile: 1370
-      border_bottom:
-        tile: 1386
-      border_left:
-        tile: 1377
-      border_right:
-        tile: 1379
-      border_left_and_right:
-        tile: 1399
-      border_top_and_bottom:
-        tile: 1405
-      end_way_right:
-        tile: 1406
-      end_way_left:
-        tile: 1404
-      end_way_bottom:
-        tile: 1407
-      end_way_top:
-        tile: 1391
+    shapes:
+      square9: [
+        [1369, 1370, 1371],
+        [1377, 1378, 1379],
+        [1385, 1386, 1387],
+      ]
+      line: [1404, 1405, 1406]
+      column: [
+        1391,
+        1399,
+        1407
+      ]
+      standalone: 1376
   120:
-    position:
-      standalone:
-        tile: 0
-      corner_top_left:
-        tile: 113
-      corner_top_right:
-        tile: 115
-      corner_bottom_left:
-        tile: 129
-      corner_bottom_right:
-        tile: 131
-      border_top:
-        tile: 114
-      border_bottom:
-        tile: 130
-      border_left:
-        tile: 121
-      border_right:
-        tile: 123
-      border_left_and_right:
-        tile: 144
-      border_top_and_bottom:
-        tile: 149
-      end_way_right:
-        tile: 150
-      end_way_left:
-        tile: 148
-      end_way_bottom:
-        tile: 152
-      end_way_top:
-        tile: 135
+    shapes:
+      square9: [
+        [113, 114, 115],
+        [121, 120, 123],
+        [129, 130, 131],
+      ]
+      line: [148, 149, 150]
+      column: [
+        135,
+        144,
+        152
+      ]
+      standalone: 0
   466:
     rectangle:
       tiles: [

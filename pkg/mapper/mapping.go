@@ -79,7 +79,7 @@ type Altitude struct {
 
 // CustomTile represents a custom mapping for a tile
 type CustomTile struct {
-	Position  *Position  `yaml:"position,omitempty"`
+	Shapes    *Shapes    `yaml:"shapes,omitempty"`
 	Rectangle *Rectangle `yaml:"rectangle,omitempty"`
 	// If filled, the mapper will choose a random custom tile depending on its probability
 	Random []RandomCustomTile `yaml:"random,omitempty"`
@@ -89,7 +89,7 @@ type CustomTile struct {
 type RandomCustomTile struct {
 	// Probability is a percentage (1-100)
 	Probability int        `yaml:"probability"`
-	Position    *Position  `yaml:"position,omitempty"`
+	Shapes      *Shapes    `yaml:"shapes,omitempty"`
 	Rectangle   *Rectangle `yaml:"rectangle,omitempty"`
 }
 
@@ -133,27 +133,13 @@ const (
 	OverflowModeNone OverflowMode = ""
 )
 
-// Position represents a tile mapping depending on the position of a point within a line or a polygon
-type Position struct {
-	Standalone         *PositionTile `yaml:"standalone,omitempty"`
-	CornerTopLeft      *PositionTile `yaml:"corner_top_left,omitempty"`
-	CornerTopRight     *PositionTile `yaml:"corner_top_right,omitempty"`
-	CornerBottomLeft   *PositionTile `yaml:"corner_bottom_left,omitempty"`
-	CornerBottomRight  *PositionTile `yaml:"corner_bottom_right,omitempty"`
-	BorderTop          *PositionTile `yaml:"border_top,omitempty"`
-	BorderBottom       *PositionTile `yaml:"border_bottom,omitempty"`
-	BorderLeft         *PositionTile `yaml:"border_left,omitempty"`
-	BorderRight        *PositionTile `yaml:"border_right,omitempty"`
-	BorderLeftAndRight *PositionTile `yaml:"border_left_and_right,omitempty"`
-	BorderTopAndBottom *PositionTile `yaml:"border_top_and_bottom,omitempty"`
-	EndWayRight        *PositionTile `yaml:"end_way_right,omitempty"`
-	EndWayLeft         *PositionTile `yaml:"end_way_left,omitempty"`
-	EndWayBottom       *PositionTile `yaml:"end_way_bottom,omitempty"`
-	EndWayTop          *PositionTile `yaml:"end_way_top,omitempty"`
-}
-
-type PositionTile struct {
-	Tile model.Tile `yaml:"tile"`
+// Shapes represents a tile mapping depending on the position of a point within a line or a polygon
+type Shapes struct {
+	Square9    *[3][3]model.Tile `yaml:"square9,omitempty"`
+	Line       *[3]model.Tile    `yaml:"line,omitempty"`
+	Column     *[3]model.Tile    `yaml:"column,omitempty"`
+	Square4    *[2][2]model.Tile `yaml:"square4,omitempty"`
+	Standalone *model.Tile       `yaml:"standalone,omitempty"`
 }
 
 func (m Mapping) Validate() error {
@@ -291,14 +277,14 @@ func (rr RandomTile) Validate() error {
 }
 
 func (ct CustomTile) Validate() error {
-	if ct.Position != nil {
-		if err := ct.Position.Validate(); err != nil {
+	if ct.Shapes != nil {
+		if err := ct.Shapes.Validate(); err != nil {
 			return fmt.Errorf("error validation Position: %w", err)
 		}
 	}
 	return nil
 }
 
-func (p Position) Validate() error {
+func (s Shapes) Validate() error {
 	return nil
 }

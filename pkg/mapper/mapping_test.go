@@ -192,101 +192,39 @@ var mappingTest = Mapping{
 	},
 	CustomTiles: map[model.Tile]CustomTile{
 		1378: {
-			Position: &Position{
-				Standalone: &PositionTile{
-					Tile: 1376,
+			Shapes: &Shapes{
+				Square9: &[3][3]model.Tile{
+					{1369, 1370, 1371},
+					{1377, 1378, 1379},
+					{1385, 1386, 1387},
 				},
-				CornerTopLeft: &PositionTile{
-					Tile: 1369,
+				Line: &[3]model.Tile{
+					1404, 1405, 1406,
 				},
-				CornerTopRight: &PositionTile{
-					Tile: 1371,
+				Column: &[3]model.Tile{
+					1391,
+					1399,
+					1407,
 				},
-				CornerBottomLeft: &PositionTile{
-					Tile: 1385,
-				},
-				CornerBottomRight: &PositionTile{
-					Tile: 1387,
-				},
-				BorderTop: &PositionTile{
-					Tile: 1370,
-				},
-				BorderBottom: &PositionTile{
-					Tile: 1386,
-				},
-				BorderLeft: &PositionTile{
-					Tile: 1377,
-				},
-				BorderRight: &PositionTile{
-					Tile: 1379,
-				},
-				BorderLeftAndRight: &PositionTile{
-					Tile: 1399,
-				},
-				BorderTopAndBottom: &PositionTile{
-					Tile: 1405,
-				},
-				EndWayRight: &PositionTile{
-					Tile: 1406,
-				},
-				EndWayLeft: &PositionTile{
-					Tile: 1404,
-				},
-				EndWayBottom: &PositionTile{
-					Tile: 1407,
-				},
-				EndWayTop: &PositionTile{
-					Tile: 1391,
-				},
+				Standalone: tilePointer(1376),
 			},
 		},
 		120: {
-			Position: &Position{
-				Standalone: &PositionTile{
-					Tile: 0,
+			Shapes: &Shapes{
+				Square9: &[3][3]model.Tile{
+					{113, 114, 115},
+					{121, 120, 123},
+					{129, 130, 131},
 				},
-				CornerTopLeft: &PositionTile{
-					Tile: 113,
+				Line: &[3]model.Tile{
+					148, 149, 150,
 				},
-				CornerTopRight: &PositionTile{
-					Tile: 115,
+				Column: &[3]model.Tile{
+					135,
+					144,
+					152,
 				},
-				CornerBottomLeft: &PositionTile{
-					Tile: 129,
-				},
-				CornerBottomRight: &PositionTile{
-					Tile: 131,
-				},
-				BorderTop: &PositionTile{
-					Tile: 114,
-				},
-				BorderBottom: &PositionTile{
-					Tile: 130,
-				},
-				BorderLeft: &PositionTile{
-					Tile: 121,
-				},
-				BorderRight: &PositionTile{
-					Tile: 123,
-				},
-				BorderLeftAndRight: &PositionTile{
-					Tile: 144,
-				},
-				BorderTopAndBottom: &PositionTile{
-					Tile: 149,
-				},
-				EndWayRight: &PositionTile{
-					Tile: 150,
-				},
-				EndWayLeft: &PositionTile{
-					Tile: 148,
-				},
-				EndWayBottom: &PositionTile{
-					Tile: 152,
-				},
-				EndWayTop: &PositionTile{
-					Tile: 135,
-				},
+				Standalone: tilePointer(0),
 			},
 		},
 		466: {
@@ -356,4 +294,8 @@ var mappingTest = Mapping{
 			},
 		},
 	},
+}
+
+func tilePointer(v model.Tile) *model.Tile {
+	return &v
 }
