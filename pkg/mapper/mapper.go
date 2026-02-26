@@ -230,13 +230,13 @@ func (m *Mapper) mapCustomTileRectangle(layer int, pos model.Position, tile mode
 
 func (m *Mapper) isPartInsidePolygon(layer int, pos model.Position, rectangle Rectangle, tile model.Tile, divider int) bool {
 	pointsInsidePolygon := 0
-	quarter := len(rectangle.Tiles) * len(rectangle.Tiles[0]) / divider / m.downscale
+	minPoints := len(rectangle.Tiles) * len(rectangle.Tiles[0]) / divider / m.downscale
 	for y := 0; y < len(rectangle.Tiles); y++ {
 		for x := 0; x < len(rectangle.Tiles[y]); x++ {
 			if m.m.Layers[layer].GetCell(pos.X-x, pos.Y-y).Tile == tile {
 				pointsInsidePolygon++
 			}
-			if pointsInsidePolygon >= quarter {
+			if pointsInsidePolygon >= minPoints {
 				return true
 			}
 		}
