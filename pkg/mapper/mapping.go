@@ -12,8 +12,6 @@ type Mapping struct {
 	Tilesets []Tileset `yaml:"tilesets"`
 	// Default informations about the default tile to use
 	Default TileValue `yaml:"default"`
-	// Objects definitions, to be used in Layers part, referenced by their name
-	Objects map[string]Object `yaml:"objects"`
 	// Mapping, by layer, of tags & tags values => tiles || objects
 	Layers TagsByLayer `yaml:"layers"`
 	// CustomTiles maps a tile to a custom other tile, generally depending on
@@ -47,13 +45,8 @@ type Tag struct {
 	Values map[string]TileValue `yaml:"values,omitempty"`
 }
 
-type Object struct {
-	TileValue `yaml:",inline"`
-}
-
 // TileValue mapping to a tile
 type TileValue struct {
-	Object string `yaml:"object"`
 	// Default tile if nothing else filled
 	Tile model.Tile `yaml:"tile,omitempty"`
 	// If not nil, the mapper will try to map the tile depending on the altitude of the point
@@ -151,10 +144,10 @@ func (m Mapping) Validate() error {
 			return fmt.Errorf("error validating Tileset: %w", err)
 		}
 	}
-	if err := m.Default.Validate(m.Objects); err != nil {
+	if err := m.Default.Validate(); err != nil {
 		return fmt.Errorf("error validating Default: %w", err)
 	}
-	if err := m.Layers.Validate(m.Objects); err != nil {
+	if err := m.Layers.Validate(); err != nil {
 		return fmt.Errorf("error validating TagsByLayer: %w", err)
 	}
 	for tile, ct := range m.CustomTiles {
@@ -181,13 +174,7 @@ func (t *Tileset) Validate() error {
 	return nil
 }
 
-func (t TileValue) Validate(objects map[string]Object) error {
-	if t.Object != "" {
-		_, exists := objects[t.Object]
-		if !exists {
-			return fmt.Errorf("object %s does not exist", t.Object)
-		}
-	}
+func (t TileValue) Validate() error {
 	if t.Altitude != nil {
 		if err := t.Altitude.Validate(); err != nil {
 			return fmt.Errorf("error validating Altitude: %w", err)
@@ -206,49 +193,43 @@ func (t TileValue) Validate(objects map[string]Object) error {
 	return nil
 }
 
-func (t TagsByLayer) Validate(objects map[string]Object) error {
+func (t TagsByLayer) Validate() error {
 	for layer, tags := range t {
-		if err := tags.Validate(objects); err != nil {
+		if err := tags.Validate(); err != nil {
 			return fmt.Errorf("error validating Tags of layer #%d: %w", layer, err)
 		}
 	}
 	return nil
 }
 
-func (lt LayerTags) Validate(objects map[string]Object) error {
+func (lt LayerTags) Validate() error {
 	for key, tag := range lt.Tags {
-		if err := tag.Validate(objects); err != nil {
+		if err := tag.Validate(); err != nil {
 			return fmt.Errorf("error validating Tag %s: %w", key, err)
 		}
 	}
 	return nil
 }
 
-func (t Tag) Validate(objects map[string]Object) error {
-	if err := t.TileValue.Validate(objects); err != nil {
+func (t Tag) Validate() error {
+	if err := t.TileValue.Validate(); err != nil {
 		return fmt.Errorf("error validating tag TileValue: %w", err)
 	}
-	if len(t.Values) == 0 && !t.TileValue.HasTile(objects) {
+	if len(t.Values) == 0 && !t.TileValue.HasTile() {
 		return fmt.Errorf("tag must have either at least one value, or a defined tile")
 	}
 	for value, tv := range t.Values {
-		if err := tv.Validate(objects); err != nil {
+		if err := tv.Validate(); err != nil {
 			return fmt.Errorf("error validating tag value %s: %w", value, err)
 		}
-		if !tv.HasTile(objects) {
+		if !tv.HasTile() {
 			return fmt.Errorf("tag value %s must have a defined tile", value)
 		}
 	}
 	return nil
 }
 
-func (t TileValue) HasTile(objects map[string]Object) bool {
-	if t.Object != "" {
-		obj, exists := objects[t.Object]
-		if exists {
-			return obj.HasTile(objects)
-		}
-	}
+func (t TileValue) HasTile() bool {
 	if t.Altitude != nil && t.Altitude.Tile != 0 {
 		return true
 	}

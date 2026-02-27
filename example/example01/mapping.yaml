@@ -16,49 +16,45 @@ tilesets:
     tile_height: 32
     first_gid: 4184
 
-default:
-  object: grass_or_snow
 
-objects:
-  water:
-    tile: 1518 # 1064+454
-  asphalt:
-    tile: 4486 # 4184+302=4486
-  grass_or_snow:
-    tile: 2
-    altitude:
-      min: 1400
-      tile: 4534 # 4184+350
-  mud_or_snow:
-    tile: 4342
-    altitude:
-      min: 1400
-      tile: 4534 # 4184+350
-  forest:
-    random:
-      - probability: 5
-        tile: 41
-      - probability: 5
-        tile: 42
-      - probability: 5
-        tile: 43
-      - probability: 5
-        tile: 44
+# references:
+water: &water
+  tile: 1518 # 1064+454
+asphalt: &asphalt
+  tile: 4486 # 4184+302=4486
+grass_or_snow: &grass_or_snow
+  tile: 2
+  altitude:
+    min: 1400
+    tile: 4534 # 4184+350
+mud_or_snow: &mud_or_snow
+  tile: 4342
+  altitude:
+    min: 1400
+    tile: 4534 # 4184+350
+forest: &forest
+  random:
+    - probability: 5
+      tile: 41
+    - probability: 5
+      tile: 42
+    - probability: 5
+      tile: 43
+    - probability: 5
+      tile: 44
+
+default: *grass_or_snow
 
 layers:
   0: # keeping it empty to fill the whole layer 0 with default tile
   1: # water, different surfaces...
     tags:
-      waterway:
-        object: water
-      water:
-        object: water
+      waterway: *water
+      water: *water
       natural:
         values:
-          water:
-            object: water
-          wood:
-            object: mud_or_snow
+          water: *water
+          wood: *mud_or_snow
           heath:
             tile: 6
           mash:
@@ -67,20 +63,15 @@ layers:
         values:
           sand:
             tile: 5
-          asphalt:
-            object: asphalt
+          asphalt: *asphalt
       landuse:
         values:
           meadow:
             tile: 4150 # 4136+14
-          forest:
-            object: mud_or_snow
-          industrial:
-            object: asphalt
-          residential:
-            object: asphalt
-          construction:
-            object: asphalt
+          forest: *mud_or_snow
+          industrial: *asphalt
+          residential: *asphalt
+          construction: *asphalt
           cemetery:
             tile: 291
 
@@ -101,14 +92,12 @@ layers:
     tags:
       natural:
         values:
-          wood:
-            object: forest
+          wood: *forest
           tree:
             tile: 41
       landuse:
         values:
-          forest:
-            object: forest
+          forest: *forest
       building:
         tile: 565
         values:
@@ -167,14 +156,12 @@ layers:
     tags:
       natural:
         values:
-          wood:
-            object: forest
+          wood: *forest
           tree:
             tile: 41
       landuse:
         values:
-          forest:
-            object: forest
+          forest: *forest
       building:
         tile: 440
         values:
@@ -193,7 +180,7 @@ layers:
           house:
             tile: 392
 
-  5: #aerial objects
+  5: # aerial
     tags:
       aerialway:
         tile: 647

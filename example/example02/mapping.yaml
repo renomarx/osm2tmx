@@ -12,74 +12,70 @@ tilesets:
     tile_height: 32
     first_gid: 8280
 
+# references :
+water: &water
+  tile: 5662 # 5208+454=5662
+forest: &forest
+  random:
+    - probability: 1
+      tile: 1
+    - probability: 1
+      tile: 3
+    - probability: 1
+      tile: 5
+    - probability: 1
+      tile: 7
+    - probability: 1
+      tile: 17
+    - probability: 1
+      tile: 19
+    - probability: 1
+      tile: 21
+    - probability: 1
+      tile: 23
+    - probability: 1
+      tile: 33
+    - probability: 1
+      tile: 35
+    - probability: 1
+      tile: 37
+    - probability: 1
+      tile: 39
+    - probability: 1
+      tile: 49
+    - probability: 1
+      tile: 51
+    - probability: 1
+      tile: 53
+    - probability: 1
+      tile: 55
+    - probability: 1
+      tile: 65
+    - probability: 1
+      tile: 67
+    - probability: 1
+      tile: 69
+    - probability: 1
+      tile: 71
+    - probability: 1
+      tile: 81
+    - probability: 1
+      tile: 83
+    - probability: 1
+      tile: 85
+
 default:
   tile: 564
-
-objects:
-  water:
-    tile: 5662 # 5208+454=5662
-  forest:
-    random:
-      - probability: 1
-        tile: 1
-      - probability: 1
-        tile: 3
-      - probability: 1
-        tile: 5
-      - probability: 1
-        tile: 7
-      - probability: 1
-        tile: 17
-      - probability: 1
-        tile: 19
-      - probability: 1
-        tile: 21
-      - probability: 1
-        tile: 23
-      - probability: 1
-        tile: 33
-      - probability: 1
-        tile: 35
-      - probability: 1
-        tile: 37
-      - probability: 1
-        tile: 39
-      - probability: 1
-        tile: 49
-      - probability: 1
-        tile: 51
-      - probability: 1
-        tile: 53
-      - probability: 1
-        tile: 55
-      - probability: 1
-        tile: 65
-      - probability: 1
-        tile: 67
-      - probability: 1
-        tile: 69
-      - probability: 1
-        tile: 71
-      - probability: 1
-        tile: 81
-      - probability: 1
-        tile: 83
-      - probability: 1
-        tile: 85
-        
 
 layers:
   0:
   1:
     tags:
-      waterway:
-        object: water
-      water:
-        object: water
+      waterway: *water
+      water: *water
       natural:
         values:
-          water:
-            object: water
+          water: *water
           wood:
             tile: 590
           heath:
@@ -108,14 +104,12 @@ layers:
     tags:
       natural:
         values:
-          wood:
-            object: forest
+          wood: *forest
           tree:
             tile: 1
       landuse:
         values:
-          forest:
-            object: forest
+          forest: *forest
       building:
         tile: 3004
         values:
@@ -138,14 +132,11 @@ layers:
     tags:
       natural:
         values:
-          wood:
-            object: forest
-          tree:
-            object: forest
+          wood: *forest
+          tree: *forest
       landuse:
         values:
-          forest:
-            object: forest
+          forest: *forest
       building:
         tile: 3004
         values:

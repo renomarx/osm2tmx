@@ -9,45 +9,42 @@ default:
     min: 1400
     tile: 1378
 
-objects:
-  water:
-    tile: 318
-  asphalt:
-    tile: 8
-  forest:
-    random:
-      - probability: 5
-        tile: 41
-        altitude:
-          min: 1400
-          tile: 1351
-      - probability: 5
-        tile: 42
-        altitude:
-          min: 1400
-          tile: 1351
-      - probability: 5
-        tile: 43
-        altitude:
-          min: 1400
-          tile: 1351
-      - probability: 5
-        tile: 44
-        altitude:
-          min: 1400
-          tile: 1351
+# references:
+water: &water
+  tile: 318
+asphalt: &asphalt
+  tile: 8
+forest: &forest
+  random:
+    - probability: 5
+      tile: 41
+      altitude:
+        min: 1400
+        tile: 1351
+    - probability: 5
+      tile: 42
+      altitude:
+        min: 1400
+        tile: 1351
+    - probability: 5
+      tile: 43
+      altitude:
+        min: 1400
+        tile: 1351
+    - probability: 5
+      tile: 44
+      altitude:
+        min: 1400
+        tile: 1351
 
 layers:
   0:
     tags:
-      waterway:
-        object: water
-      water:
-        object: water
+      waterway: *water
+      water: *water
       natural:
         values:
-          water:
-            object: water
+          water: *water
           wood:
             tile: 4
           heath:
@@ -58,18 +55,14 @@ layers:
           values:
             sand:
               tile: 5
-            asphalt:
-              object: asphalt
+            asphalt: *asphalt
       landuse:
         values:
           forest:
             tile: 4
-          industrial:
-            object: asphalt
-          residential:
-            object: asphalt
-          construction:
-            object: asphalt
+          industrial: *asphalt
+          residential: *asphalt
+          construction: *asphalt
           cemetery:
             tile: 251
           meadow:
@@ -85,14 +78,12 @@ layers:
         tile: 120
       natural:
         values:
-          wood:
-            object: forest
+          wood: *forest
           tree:
             tile: 41
       landuse:
         values:
-          forest:
-            object: forest
+          forest: *forest
 
   2:
     tags:

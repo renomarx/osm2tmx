@@ -68,12 +68,6 @@ func (m *Mapper) MapTile(tags osm.Tags, pos model.Position) MapTile {
 }
 
 func (m *Mapper) mapTileValue(tv TileValue, pos model.Position, r int) model.Tile {
-	if tv.Object != "" {
-		obj, exists := m.conf.Objects[tv.Object]
-		if exists {
-			return m.mapTileValue(obj.TileValue, pos, r)
-		}
-	}
 	if tv.Altitude != nil {
 		if pos.Z > tv.Altitude.Min {
 			return tv.Altitude.Tile

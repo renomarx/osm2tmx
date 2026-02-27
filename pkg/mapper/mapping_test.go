@@ -17,73 +17,23 @@ var mappingTest = Mapping{
 			Tile: 1378,
 		},
 	},
-	Objects: map[string]Object{
-		"water": {
-			TileValue: TileValue{
-				Tile: 318,
-			},
-		},
-		"asphalt": {
-			TileValue: TileValue{
-				Tile: 8,
-			},
-		},
-		"forest": {
-			TileValue: TileValue{
-				Random: []RandomTile{
-					{
-						Probability: 5,
-						Tile:        41,
-						Altitude: &Altitude{
-							Min:  1400,
-							Tile: 1351,
-						},
-					},
-					{
-						Probability: 5,
-						Tile:        42,
-						Altitude: &Altitude{
-							Min:  1400,
-							Tile: 1351,
-						},
-					},
-					{
-						Probability: 5,
-						Tile:        43,
-						Altitude: &Altitude{
-							Min:  1400,
-							Tile: 1351,
-						},
-					},
-					{
-						Probability: 5,
-						Tile:        44,
-						Altitude: &Altitude{
-							Min:  1400,
-							Tile: 1351,
-						},
-					},
-				},
-			},
-		},
-	},
 	Layers: TagsByLayer{
 		0: LayerTags{
 			Tags: map[string]Tag{
 				"waterway": {
 					TileValue: TileValue{
-						Object: "water",
+						Tile: 318,
 					},
 				},
 				"water": {
 					TileValue: TileValue{
-						Object: "water",
+						Tile: 318,
 					},
 				},
 				"natural": {
 					Values: map[string]TileValue{
 						"water": {
-							Object: "water",
+							Tile: 318,
 						},
 						"wood": {
 							Tile: 4,
@@ -102,7 +52,7 @@ var mappingTest = Mapping{
 							Tile: 5,
 						},
 						"asphalt": {
-							Object: "asphalt",
+							Tile: 8,
 						},
 					},
 				},
@@ -112,13 +62,13 @@ var mappingTest = Mapping{
 							Tile: 4,
 						},
 						"industrial": {
-							Object: "asphalt",
+							Tile: 8,
 						},
 						"residential": {
-							Object: "asphalt",
+							Tile: 8,
 						},
 						"construction": {
-							Object: "asphalt",
+							Tile: 8,
 						},
 						"cemetery": {
 							Tile: 251,
@@ -150,7 +100,40 @@ var mappingTest = Mapping{
 				"natural": {
 					Values: map[string]TileValue{
 						"wood": {
-							Object: "forest",
+							Random: []RandomTile{
+								{
+									Probability: 5,
+									Tile:        41,
+									Altitude: &Altitude{
+										Min:  1400,
+										Tile: 1351,
+									},
+								},
+								{
+									Probability: 5,
+									Tile:        42,
+									Altitude: &Altitude{
+										Min:  1400,
+										Tile: 1351,
+									},
+								},
+								{
+									Probability: 5,
+									Tile:        43,
+									Altitude: &Altitude{
+										Min:  1400,
+										Tile: 1351,
+									},
+								},
+								{
+									Probability: 5,
+									Tile:        44,
+									Altitude: &Altitude{
+										Min:  1400,
+										Tile: 1351,
+									},
+								},
+							},
 						},
 						"tree": {
 							Tile: 41,
@@ -160,7 +143,40 @@ var mappingTest = Mapping{
 				"landuse": {
 					Values: map[string]TileValue{
 						"forest": {
-							Object: "forest",
+							Random: []RandomTile{
+								{
+									Probability: 5,
+									Tile:        41,
+									Altitude: &Altitude{
+										Min:  1400,
+										Tile: 1351,
+									},
+								},
+								{
+									Probability: 5,
+									Tile:        42,
+									Altitude: &Altitude{
+										Min:  1400,
+										Tile: 1351,
+									},
+								},
+								{
+									Probability: 5,
+									Tile:        43,
+									Altitude: &Altitude{
+										Min:  1400,
+										Tile: 1351,
+									},
+								},
+								{
+									Probability: 5,
+									Tile:        44,
+									Altitude: &Altitude{
+										Min:  1400,
+										Tile: 1351,
+									},
+								},
+							},
 						},
 					},
 				},
