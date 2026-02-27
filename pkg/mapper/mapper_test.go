@@ -129,9 +129,20 @@ func TestMapper(t *testing.T) {
 			m.Layers[0].SetTile(2, 2, 120)
 			m.Layers[0].SetTile(2, 3, 120)
 			m.Layers[0].SetTile(3, 2, 120)
+			m.Layers[0].SetTile(3, 3, 120)
 			mapper := New(&m, mapping, 1)
 
 			assert.Equal(t, model.Tile(113), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
+		})
+		t.Run("position corner_top_left alone", func(t *testing.T) {
+			m := model.Map{}
+			m.Init(1, 6, 6, func(x, y int) model.Tile { return 2 })
+			m.Layers[0].SetTile(2, 2, 120)
+			m.Layers[0].SetTile(2, 3, 120)
+			m.Layers[0].SetTile(3, 2, 120)
+			mapper := New(&m, mapping, 1)
+
+			assert.Equal(t, model.Tile(116), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
 		})
 		t.Run("position corner_top_right", func(t *testing.T) {
 			m := model.Map{}
@@ -139,9 +150,20 @@ func TestMapper(t *testing.T) {
 			m.Layers[0].SetTile(2, 2, 120)
 			m.Layers[0].SetTile(2, 3, 120)
 			m.Layers[0].SetTile(1, 2, 120)
+			m.Layers[0].SetTile(1, 3, 120)
 			mapper := New(&m, mapping, 1)
 
 			assert.Equal(t, model.Tile(115), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
+		})
+		t.Run("position corner_top_right alone", func(t *testing.T) {
+			m := model.Map{}
+			m.Init(1, 6, 6, func(x, y int) model.Tile { return 2 })
+			m.Layers[0].SetTile(2, 2, 120)
+			m.Layers[0].SetTile(2, 3, 120)
+			m.Layers[0].SetTile(1, 2, 120)
+			mapper := New(&m, mapping, 1)
+
+			assert.Equal(t, model.Tile(117), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
 		})
 		t.Run("position corner_bottom_left", func(t *testing.T) {
 			m := model.Map{}
@@ -149,9 +171,20 @@ func TestMapper(t *testing.T) {
 			m.Layers[0].SetTile(2, 2, 120)
 			m.Layers[0].SetTile(2, 1, 120)
 			m.Layers[0].SetTile(3, 2, 120)
+			m.Layers[0].SetTile(3, 1, 120)
 			mapper := New(&m, mapping, 1)
 
 			assert.Equal(t, model.Tile(129), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
+		})
+		t.Run("position corner_bottom_left alone", func(t *testing.T) {
+			m := model.Map{}
+			m.Init(1, 6, 6, func(x, y int) model.Tile { return 2 })
+			m.Layers[0].SetTile(2, 2, 120)
+			m.Layers[0].SetTile(2, 1, 120)
+			m.Layers[0].SetTile(3, 2, 120)
+			mapper := New(&m, mapping, 1)
+
+			assert.Equal(t, model.Tile(124), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
 		})
 		t.Run("position corner_bottom_right", func(t *testing.T) {
 			m := model.Map{}
@@ -159,9 +192,20 @@ func TestMapper(t *testing.T) {
 			m.Layers[0].SetTile(2, 2, 120)
 			m.Layers[0].SetTile(2, 1, 120)
 			m.Layers[0].SetTile(1, 2, 120)
+			m.Layers[0].SetTile(1, 1, 120)
 			mapper := New(&m, mapping, 1)
 
 			assert.Equal(t, model.Tile(131), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
+		})
+		t.Run("position corner_bottom_right alone", func(t *testing.T) {
+			m := model.Map{}
+			m.Init(1, 6, 6, func(x, y int) model.Tile { return 2 })
+			m.Layers[0].SetTile(2, 2, 120)
+			m.Layers[0].SetTile(2, 1, 120)
+			m.Layers[0].SetTile(1, 2, 120)
+			mapper := New(&m, mapping, 1)
+
+			assert.Equal(t, model.Tile(125), mapper.GetCustomTile(model.Position{X: 2, Y: 2}).ByLayer[0])
 		})
 		t.Run("position border_top", func(t *testing.T) {
 			m := model.Map{}

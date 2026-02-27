@@ -227,6 +227,10 @@ var mappingTest = Mapping{
 		},
 		120: {
 			Shapes: &Shapes{
+				Square4: &[2][2]model.Tile{
+					{116, 117},
+					{124, 125},
+				},
 				Square9: &[3][3]model.Tile{
 					{113, 114, 115},
 					{121, 120, 123},

@@ -116,6 +116,10 @@ custom_tiles:
       standalone: 1376
   120:
     shapes:
+      square4: [
+        [116, 117],
+        [124, 125],
+      ]
       square9: [
         [113, 114, 115],
         [121, 120, 123],

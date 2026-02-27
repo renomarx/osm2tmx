@@ -82,8 +82,6 @@ Examples:
 - Fix overlapping (trees x 3, buildings in example02...)
   - Calculate the good tile to draw directly in mapper.go (in raster, only draw the rect tile if != 0)
   - Automatically calculate the number of layers necessary to draw overlapping objects ?
-- Re-design positions to include "corners-borders"
-  - Maybe use shapes instead of positions ? 6x6, 1x3, 3x1, 4x4, 1 ?
 
 ## Resources
 

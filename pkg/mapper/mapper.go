@@ -157,6 +157,18 @@ func (m *Mapper) mapCustomTilePosition(layer int, pos model.Position, tile model
 	if shapes.Standalone != nil && m.isStandalone(layer, pos, tile) {
 		return *shapes.Standalone
 	}
+	if shapes.Square4 != nil {
+		switch {
+		case m.isCornerTopLeftAlone(layer, pos, tile):
+			return shapes.Square4[0][0]
+		case m.isCornerTopRightAlone(layer, pos, tile):
+			return shapes.Square4[0][1]
+		case m.isCornerBottomLeftAlone(layer, pos, tile):
+			return shapes.Square4[1][0]
+		case m.isCornerBottomRightAlone(layer, pos, tile):
+			return shapes.Square4[1][1]
+		}
+	}
 	if shapes.Square9 != nil {
 		switch {
 		case m.isCornerTopLeft(layer, pos, tile):
@@ -290,11 +302,21 @@ func (m *Mapper) isCornerTopLeft(layer int, pos model.Position, tile model.Tile)
 		m.m.Layers[layer].GetCell(pos.X, pos.Y+1).Tile == tile
 }
 
+func (m *Mapper) isCornerTopLeftAlone(layer int, pos model.Position, tile model.Tile) bool {
+	return m.isCornerTopLeft(layer, pos, tile) &&
+		m.m.Layers[layer].GetCell(pos.X+1, pos.Y+1).Tile != tile
+}
+
 func (m *Mapper) isCornerTopRight(layer int, pos model.Position, tile model.Tile) bool {
 	return m.m.Layers[layer].GetCell(pos.X-1, pos.Y).Tile == tile &&
 		m.m.Layers[layer].GetCell(pos.X+1, pos.Y).Tile != tile &&
 		m.m.Layers[layer].GetCell(pos.X, pos.Y-1).Tile != tile &&
 		m.m.Layers[layer].GetCell(pos.X, pos.Y+1).Tile == tile
+}
+
+func (m *Mapper) isCornerTopRightAlone(layer int, pos model.Position, tile model.Tile) bool {
+	return m.isCornerTopRight(layer, pos, tile) &&
+		m.m.Layers[layer].GetCell(pos.X-1, pos.Y+1).Tile != tile
 }
 
 func (m *Mapper) isCornerBottomLeft(layer int, pos model.Position, tile model.Tile) bool {
@@ -304,11 +326,21 @@ func (m *Mapper) isCornerBottomLeft(layer int, pos model.Position, tile model.Ti
 		m.m.Layers[layer].GetCell(pos.X, pos.Y+1).Tile != tile
 }
 
+func (m *Mapper) isCornerBottomLeftAlone(layer int, pos model.Position, tile model.Tile) bool {
+	return m.isCornerBottomLeft(layer, pos, tile) &&
+		m.m.Layers[layer].GetCell(pos.X+1, pos.Y-1).Tile != tile
+}
+
 func (m *Mapper) isCornerBottomRight(layer int, pos model.Position, tile model.Tile) bool {
 	return m.m.Layers[layer].GetCell(pos.X-1, pos.Y).Tile == tile &&
 		m.m.Layers[layer].GetCell(pos.X+1, pos.Y).Tile != tile &&
 		m.m.Layers[layer].GetCell(pos.X, pos.Y-1).Tile == tile &&
 		m.m.Layers[layer].GetCell(pos.X, pos.Y+1).Tile != tile
+}
+
+func (m *Mapper) isCornerBottomRightAlone(layer int, pos model.Position, tile model.Tile) bool {
+	return m.isCornerBottomRight(layer, pos, tile) &&
+		m.m.Layers[layer].GetCell(pos.X-1, pos.Y-1).Tile != tile
 }
 
 func (m *Mapper) isBorderTop(layer int, pos model.Position, tile model.Tile) bool {
