@@ -26,7 +26,9 @@ type Tileset struct {
 	Source     string `yaml:"source"`
 	TileWidth  int    `yaml:"tile_width"`
 	TileHeight int    `yaml:"tile_height"`
-	FirstGID   int    `yaml:"first_gid"`
+	// FirstGID is the first id of the first tile of the tileset
+	// it means that all the tiles of the tileset will be represented in the file by their number + tileset.FirstGID
+	FirstGID int `yaml:"first_gid"`
 }
 
 // TagsByLayer Tags mapped by layer number
