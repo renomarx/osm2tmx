@@ -303,7 +303,7 @@ custom_tiles:
         - [0, 84, 85, 86, 0]
         - [0, 87, 88, 89, 0]
       inside_polygon:
-        density: 2  # Overlap factor (0=max density, higher=more spacing)
+        density: 2  # Overlap factor (0=max density, 1=no overlapping, 2=2 overlapped , higher=less spacing)
         overflow: "ORTHOGONAL"  # ALWAYS, ORTHOGONAL, QUARTER, HALF, or ""
 ```
 
@@ -332,8 +332,8 @@ custom_tiles:
 
 ### Example Configurations
 
-- [example01](example/example01/mapping.yaml) - Basic mapping example
-- [example02](example/example02/mapping.yaml) - Advanced features
+- [example01](example/example01/mapping.yaml)
+- [example02](example/example02/mapping.yaml)
 
 ## Project Architecture
 
