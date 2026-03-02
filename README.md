@@ -80,7 +80,6 @@ Examples:
 ## TODO
 
 - Fix overlapping (trees x 3, buildings in example02...)
-  - Calculate the good tile to draw directly in mapper.go (in raster, only draw the rect tile if != 0)
   - Automatically calculate the number of layers necessary to draw overlapping objects ?
 
 ## Resources
