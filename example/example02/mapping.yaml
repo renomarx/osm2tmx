@@ -76,7 +76,7 @@ layers:
       natural:
         values:
           water: *water
-          wood:
+          wood: &mud
             tile: 590
           heath:
             tile: 591
@@ -90,8 +90,7 @@ layers:
               tile: 581
       landuse:
         values:
-          forest:
-            tile: 590
+          forest: *mud
           meadow:
             tile: 566
 
@@ -113,47 +112,16 @@ layers:
       building:
         tile: 3004
         values:
-          religious:
+          religious: &religious
             tile: 4789
-          cathedral:
-            tile: 4789
-          chapel:
-            tile: 4789
-          church:
-            tile: 4789
+          cathedral: *religious
+          chapel: *religious
+          church: *religious
           apartments:
             tile: 4653
-          detached:
+          detached: &house
             tile: 3065
-          house:
-            tile: 3065
-
-  4: # trees & forests (overlapping)
-    tags:
-      natural:
-        values:
-          wood: *forest
-          tree: *forest
-      landuse:
-        values:
-          forest: *forest
-      building:
-        tile: 3004
-        values:
-          religious:
-            tile: 4789
-          cathedral:
-            tile: 4789
-          chapel:
-            tile: 4789
-          church:
-            tile: 4789
-          apartments:
-            tile: 4653
-          detached:
-            tile: 3065
-          house:
-            tile: 3065
+          house: *house
 
 custom_tiles:
   8534: # highway

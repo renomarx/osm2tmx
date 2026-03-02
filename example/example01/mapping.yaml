@@ -88,7 +88,7 @@ layers:
               - probability: 10
                 tile: 616
 
-  3: # buildings, trees & forests...
+  3: # buildings backgrounds, trees & forests...
     tags:
       natural:
         values:
@@ -101,84 +101,52 @@ layers:
       building:
         tile: 565
         values:
-          religious:
+          religious: &religious
             tile: 482
-          cathedral:
-            tile: 482
-          chapel:
-            tile: 482
-          church:
-            tile: 482
+          cathedral: *religious
+          chapel: *religious
+          church: *religious
           apartments:
             tile: 582
-          detached:
+          detached: &house
             tile: 564
-          house:
-            tile: 564
+          house: *house
           # the following values are only here for example,
-          # because for now they are mapped to the default building tile (565)
-          hotel:
+          # because for now they are mapped to the default building tile
+          hotel: &default_building
             tile: 565
-          residential:
-            tile: 565
-          commercial:
-            tile: 565
-          industrial:
-            tile: 565
-          kiosk:
-            tile: 565
-          office:
-            tile: 565
-          retail:
-            tile: 565
-          supermarket:
-            tile: 565
-          warehouse:
-            tile: 565
-          hospital:
-            tile: 565
-          museum:
-            tile: 565
-          school:
-            tile: 565
-          train_station:
-            tile: 565
-          university:
-            tile: 565
-          fire_station:
-            tile: 565
-          government:
-            tile: 565
-          public:
-            tile: 565
+          residential: *default_building
+          commercial: *default_building
+          industrial: *default_building
+          kiosk: *default_building
+          office: *default_building
+          retail: *default_building
+          supermarket: *default_building
+          warehouse: *default_building
+          hospital: *default_building
+          museum: *default_building
+          school: *default_building
+          train_station: *default_building
+          university: *default_building
+          fire_station: *default_building
+          government: *default_building
+          public: *default_building
 
-  4: # building doors and windows, trees & forests (overlapping)...
+  4: # building with doors and windows...
     tags:
-      natural:
-        values:
-          wood: *forest
-          tree:
-            tile: 41
-      landuse:
-        values:
-          forest: *forest
       building:
         tile: 440
         values:
-          religious:
+          religious: &religious_2
             tile: 488
-          cathedral:
-            tile: 488
-          chapel:
-            tile: 488
-          church:
-            tile: 488
+          cathedral: *religious_2
+          chapel: *religious_2
+          church: *religious_2
           apartments:
             tile: 536
-          detached:
+          detached: &house_2
             tile: 392
-          house:
-            tile: 392
+          house: *house_2
 
   5: # aerial
     tags:
