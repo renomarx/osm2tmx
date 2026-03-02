@@ -68,8 +68,8 @@ default:
   tile: 564
 
 layers:
-  0:
-  1:
+  0: # keeping it empty to fill the whole layer 0 with default tile
+  1: # water, different surfaces...
     tags:
       waterway: *water
       water: *water
@@ -94,12 +94,12 @@ layers:
           meadow:
             tile: 566
 
-  2:
+  2: # highways...
     tags:
       highway:
         tile: 8534 # 8280+254=8534
 
-  3:
+  3: # buildings, trees & forests...
     tags:
       natural:
         values:
@@ -122,6 +122,9 @@ layers:
           detached: &house
             tile: 3065
           house: *house
+
+  4: # keeping empty to allow overlapping
+  5: # keeping empty to allow even more overlapping
 
 custom_tiles:
   8534: # highway

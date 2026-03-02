@@ -204,7 +204,8 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 // Draw custom tiles, depending on position, like corners, borders, walls...
 func (r *Raster) drawCustomTiles() {
 	newMap := model.Map{}
-	newMap.Init(len(r.m.Layers), r.m.SizeX(), r.m.SizeY(), r.getDefaultTile)
+	nbLayers := len(r.m.Layers)
+	newMap.Init(nbLayers, r.m.SizeX(), r.m.SizeY(), r.getDefaultTile)
 	for y := 0; y < r.m.SizeY(); y++ {
 		for x := 0; x < r.m.SizeX(); x++ {
 			height := r.getAltitude(x, y)
@@ -215,18 +216,21 @@ func (r *Raster) drawCustomTiles() {
 			for z, rect := range mapTile.RectanglesByLayer {
 				for j := 0; j < len(rect.Tiles); j++ {
 					for i := 0; i < len(rect.Tiles[j]); i++ {
-						newLayerTile := newMap.Layers[z].GetCell(x-i, y-j).Tile
-						// For rectangles on multiple layers (for example trees in a forest)
-						// we do not want to overload the tiles of the lower layers
-						if z < mapTile.RectanglesMaxLayer() && newLayerTile != 0 {
-							continue
-						}
 						newRectTile := rect.Tiles[len(rect.Tiles)-1-j][len(rect.Tiles[j])-1-i]
 						if newRectTile == 0 {
 							continue
 						}
+						// overlapping: if the cell on this layer is already occupied by some tile,
+						// we draw the rectangle tile on the next level (recursively until finding an empty cell or reaching the max layer)
+						// to allow bottom (Y+) rectangles overlapping top (Y-) rectangles
+						zz := z
+						for ; zz < nbLayers-1; zz++ {
+							if newMap.Layers[zz].GetCell(x-i, y-j).Tile == 0 {
+								break
+							}
+						}
 						// Rectangle is drawed from bottom-right corner
-						newMap.Layers[z].SetTile(x-i, y-j, newRectTile)
+						newMap.Layers[zz].SetTile(x-i, y-j, newRectTile)
 					}
 				}
 			}
