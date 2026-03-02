@@ -204,8 +204,7 @@ func (r *Raster) Parse(osmFilename string) (model.RasterMap, error) {
 // Draw custom tiles, depending on position, like corners, borders, walls...
 func (r *Raster) drawCustomTiles() {
 	newMap := model.Map{}
-	nbLayers := len(r.m.Layers)
-	newMap.Init(nbLayers, r.m.SizeX(), r.m.SizeY(), r.getDefaultTile)
+	newMap.Init(len(r.m.Layers), r.m.SizeX(), r.m.SizeY(), r.getDefaultTile)
 	for y := 0; y < r.m.SizeY(); y++ {
 		for x := 0; x < r.m.SizeX(); x++ {
 			height := r.getAltitude(x, y)
@@ -224,10 +223,14 @@ func (r *Raster) drawCustomTiles() {
 						// we draw the rectangle tile on the next level (recursively until finding an empty cell or reaching the max layer)
 						// to allow bottom (Y+) rectangles overlapping top (Y-) rectangles
 						zz := z
-						for ; zz < nbLayers-1; zz++ {
+						for ; zz < len(newMap.Layers); zz++ {
 							if newMap.Layers[zz].GetCell(x-i, y-j).Tile == 0 {
 								break
 							}
+						}
+						if zz == len(newMap.Layers) {
+							// we didn't find any available layer for our tile, so we create an empty one
+							newMap.AddLayer(func(x, y int) model.Tile { return 0 })
 						}
 						// Rectangle is drawed from bottom-right corner
 						newMap.Layers[zz].SetTile(x-i, y-j, newRectTile)

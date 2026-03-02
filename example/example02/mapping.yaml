@@ -123,9 +123,6 @@ layers:
             tile: 3065
           house: *house
 
-  4: # keeping empty to allow overlapping
-  5: # keeping empty to allow even more overlapping
-
 custom_tiles:
   8534: # highway
     shapes:

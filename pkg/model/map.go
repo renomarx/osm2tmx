@@ -35,6 +35,12 @@ func (m *Map) Init(layers, mapSizeX, mapSizeY int, getTile func(x, y int) Tile) 
 	}
 }
 
+func (m *Map) AddLayer(getTile func(x, y int) Tile) {
+	newLayer := Layer{}
+	newLayer.Init(m.SizeX(), m.SizeY(), getTile)
+	m.Layers = append(m.Layers, newLayer)
+}
+
 func (l *Layer) Init(mapSizeX, mapSizeY int, getTile func(x, y int) Tile) {
 	l.m = make([][]Cell, mapSizeY)
 	for y := range l.m {

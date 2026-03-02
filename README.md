@@ -77,11 +77,6 @@ Examples:
 - [example01](example/example01/mapping.yaml)
 - [example02](example/example02/mapping.yaml)
 
-## TODO
-
-- Fix overlapping (trees x 3, buildings in example02...)
-  - Automatically calculate the number of layers necessary to draw overlapping objects ?
-
 ## Resources
 
 - https://en.wikipedia.org/wiki/Geographic_coordinate_system

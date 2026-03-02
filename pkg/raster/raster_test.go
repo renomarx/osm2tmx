@@ -32,7 +32,7 @@ func TestRaster(t *testing.T) {
 		totalDuration := time.Since(begin)
 		t.Logf("duration: %d ms", totalDuration/time.Millisecond)
 		assert.NoError(t, err)
-		assert.Equal(t, 3, len(result.Map.Layers))
+		assert.Equal(t, 6, len(result.Map.Layers))
 		assert.Equal(t, 352, result.Map.Layers[0].SizeY())
 		assert.Equal(t, 410, result.Map.Layers[0].SizeX())
 		assert.Equal(t, 352, result.Map.Layers[1].SizeY())
@@ -76,7 +76,7 @@ func TestRaster(t *testing.T) {
 
 		result, err := raster.Parse(osmfilename)
 		assert.NoError(t, err)
-		assert.Equal(t, 3, len(result.Map.Layers))
+		assert.Equal(t, 6, len(result.Map.Layers))
 		assert.Equal(t, 88, result.Map.Layers[0].SizeY())
 		assert.Equal(t, 102, result.Map.Layers[0].SizeX())
 		assert.Equal(t, 88, result.Map.Layers[1].SizeY())
@@ -118,7 +118,7 @@ func TestRaster(t *testing.T) {
 
 		result, err := raster.Parse(osmfilename)
 		assert.NoError(t, err)
-		assert.Equal(t, 3, len(result.Map.Layers))
+		assert.Equal(t, 6, len(result.Map.Layers))
 		assert.Equal(t, 95, result.Map.Layers[0].SizeY())
 		assert.Equal(t, 100, result.Map.Layers[0].SizeX())
 		assert.Equal(t, 95, result.Map.Layers[1].SizeY())
