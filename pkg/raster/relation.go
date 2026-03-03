@@ -44,6 +44,12 @@ func (r *Raster) drawRelationArea(relation *osm.Relation) {
 		}
 	}
 
+	// Some times, a relation is not "complete" because some of its points are outside the boundaries of the osm file
+	// In that case, we need to add the first vertex at the end of the polygon, to "close" the polygon
+	if len(polygon.Vertices) > 0 && polygon.Vertices[len(polygon.Vertices)-1] != polygon.Vertices[0] {
+		polygon.Vertices = append(polygon.Vertices, polygon.Vertices[0])
+	}
+
 	// 2. Apply the scanline + even-odd algorithm
 	r.fillPolygon(relation.Tags, polygon)
 }
