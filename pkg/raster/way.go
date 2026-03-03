@@ -23,28 +23,26 @@ func (r *Raster) drawWayLine(way *osm.Way) {
 		if lastPoint != nil {
 			points := bresenham.Bresenham(lastPoint.X, lastPoint.Y, nodePoint.X, nodePoint.Y, true)
 			for _, point := range points {
-				line.AddPoint(point)
+				r.addWayLinePoint(way, line, point)
 				for i := 1; i < borderWidth; i++ {
-					line.AddPoint(model.Point{X: point.X, Y: point.Y + i})
-					line.AddPoint(model.Point{X: point.X, Y: point.Y - i})
-					line.AddPoint(model.Point{X: point.X + i, Y: point.Y})
-					line.AddPoint(model.Point{X: point.X - i, Y: point.Y})
+					r.addWayLinePoint(way, line, model.Point{X: point.X, Y: point.Y + i})
+					r.addWayLinePoint(way, line, model.Point{X: point.X, Y: point.Y - i})
+					r.addWayLinePoint(way, line, model.Point{X: point.X + i, Y: point.Y})
+					r.addWayLinePoint(way, line, model.Point{X: point.X - i, Y: point.Y})
 				}
 			}
 		}
 		lastPoint = &nodePoint
 	}
+}
 
-	// range over line to get the relative position of each point of the line,
-	// and select corresponding tile to fill the map
-	for _, point := range line.Points {
-		pos := model.Position{X: point.X, Y: point.Y}
-		height := r.getAltitude(point.X, point.Y)
-		pos.Z = height
-		mapTile := r.mapper.MapTile(way.Tags, pos)
-		for z, tile := range mapTile.ByLayer {
-			r.m.Layers[z].SetTile(point.X, point.Y, tile)
-		}
+func (r *Raster) addWayLinePoint(way *osm.Way, line *model.Line, point model.Point) {
+	line.AddPoint(point)
+	pos := model.Position{X: point.X, Y: point.Y}
+	pos.Z = r.getAltitude(point.X, point.Y)
+	mapTile := r.mapper.MapTile(way.Tags, pos)
+	for z, tile := range mapTile.ByLayer {
+		r.m.Layers[z].SetTile(point.X, point.Y, tile)
 	}
 }
 
