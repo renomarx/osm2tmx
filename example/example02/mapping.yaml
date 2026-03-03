@@ -303,7 +303,7 @@ custom_tiles:
         [3028, 3029, 3030, 0],
       ]
       inside_polygon:
-        density: 1
+        density: 2
         overflow: ORTHOGONAL
     random:
       - rectangle:
@@ -314,7 +314,7 @@ custom_tiles:
             [3204, 3205, 3206, 3207],
           ]
           inside_polygon:
-            density: 1
+            density: 2
             overflow: ORTHOGONAL
         probability: 20
       - rectangle:
@@ -325,7 +325,7 @@ custom_tiles:
             [3236, 3237, 3238, 3239],
           ]
           inside_polygon:
-            density: 1
+            density: 2
             overflow: ORTHOGONAL
         probability: 20
       - rectangle:
@@ -336,7 +336,7 @@ custom_tiles:
             [0, 0, 0, 0], # adding trailing 0 to have the same height as other rectangles
           ]
           inside_polygon:
-            density: 1
+            density: 2
             overflow: ORTHOGONAL
         probability: 20
       - rectangle:
@@ -347,26 +347,26 @@ custom_tiles:
             [0, 0, 0, 0], # adding trailing 0 to have the same height as other rectangles
           ]
           inside_polygon:
-            density: 1
+            density: 2
             overflow: ORTHOGONAL
         probability: 20
   4789: # church
     rectangle:
       tiles: [
-        [4789, 4790, 4791, 4792],
-        [4797, 4798, 4799, 4800],
-        [4805, 4806, 4807, 4808],
-        [4813, 4814, 4815, 4816],
-        [4821, 4822, 4823, 4824],
-        [4829, 4830, 4831, 4832],
-        [4837, 4838, 4839, 4840],
-        [4845, 4846, 4847, 4848],
-        [4853, 4854, 4855, 4856],
-        [4861, 4862, 4863, 4864],
+        [0, 0, 0, 0, 0, 0],
+        [0, 4789, 4790, 4791, 4792, 0],
+        [0, 4797, 4798, 4799, 4800, 0],
+        [0, 4805, 4806, 4807, 4808, 0],
+        [0, 4813, 4814, 4815, 4816, 0],
+        [0, 4821, 4822, 4823, 4824, 0],
+        [0, 4829, 4830, 4831, 4832, 0],
+        [0, 4837, 4838, 4839, 4840, 0],
+        [0, 4845, 4846, 4847, 4848, 0],
+        [0, 4853, 4854, 4855, 4856, 0],
+        [0, 4861, 4862, 4863, 4864, 0],
       ]
       inside_polygon:
         density: 1
-        overflow: ORTHOGONAL
   4653: # apartments
     rectangle:
       tiles: [
@@ -379,7 +379,7 @@ custom_tiles:
         [4701, 4702, 4703],
       ]
       inside_polygon:
-        density: 1
+        density: 2
         overflow: ORTHOGONAL
   3065: # house
     rectangle:
