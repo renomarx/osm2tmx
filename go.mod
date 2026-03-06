@@ -13,6 +13,8 @@ require (
 	github.com/hajimehoshi/ebiten/v2 v2.9.7
 	github.com/lafriks/go-tiled v0.14.0
 	github.com/stretchr/testify v1.10.0
+	go.yaml.in/yaml/v4 v4.0.0-rc.4
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -32,5 +34,4 @@ require (
 	golang.org/x/sync v0.17.0 // indirect
 	golang.org/x/sys v0.36.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200902074654-038fdea0a05b // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

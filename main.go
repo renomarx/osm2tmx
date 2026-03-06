@@ -13,7 +13,7 @@ import (
 	"github.com/renomarx/osm2tmx/pkg/raster"
 	"github.com/renomarx/osm2tmx/pkg/tmx"
 	"github.com/renomarx/osm2tmx/pkg/topography/srtm"
-	"github.com/stretchr/testify/assert/yaml"
+	"go.yaml.in/yaml/v4"
 )
 
 func printUsageAndExit() {
